@@ -3,6 +3,10 @@ defmodule Stat.StatCdaService do
   alias Hitb.Repo
   alias Hitb.Stat.StatCda
   alias Hitb.Edit.Cda
+  alias Hitb.Library.RuleCdaIcd9
+  alias Hitb.Library.RuleCdaIcd10
+  alias Hitb.Library.RulePharmacy
+  alias Hitb.Library.RuleSymptom
 
   def get_stat_cda(item) do
     #查询条件整理
@@ -52,6 +56,28 @@ defmodule Stat.StatCdaService do
       end
     end)
     :ok
+  end
+
+  def get_rule() do
+    icd9 = Repo.all(RuleCdaIcd9)
+      |>Enum.reduce(%{}, fn x, acc ->
+          Map.put(acc, x.code, Map.drop(x, [:__meta__, :__struct__, :id]))
+        end)
+    icd10 = Repo.all(RuleCdaIcd10)
+      |>Enum.reduce(%{}, fn x, acc ->
+          Map.put(acc, x.code, Map.drop(x, [:__meta__, :__struct__, :id]))
+        end)
+    #用药
+    pharmacy = Repo.all(RulePharmacy)
+      |>Enum.reduce(%{}, fn x, acc ->
+          Map.put(acc, x.code, Map.drop(x, [:__meta__, :__struct__, :id]))
+        end)
+    #主诉
+    symptom = Repo.all(RuleSymptom)
+      |>Enum.reduce(%{}, fn x, acc ->
+          Map.put(acc, x.code, Map.drop(x, [:__meta__, :__struct__, :id]))
+        end)
+    %{icd9: icd9, icd10: icd10, pharmacy: pharmacy, symptom: symptom}
   end
 
   #初始化计算

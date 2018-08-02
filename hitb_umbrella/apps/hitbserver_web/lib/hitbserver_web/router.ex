@@ -224,7 +224,8 @@ defmodule HitbserverWeb.Router do
     # 自定义查询
     get "/custom", ClientController, :custom
     get "/custom_select", ClientController, :custom_select
-
+    #stat_cda规则
+    get "/get_rule", StatCdaController, :get_rule
   end
 
 end

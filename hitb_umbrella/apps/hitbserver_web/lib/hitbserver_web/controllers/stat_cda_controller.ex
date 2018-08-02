@@ -14,4 +14,9 @@ defmodule HitbserverWeb.StatCdaController do
       end
     json conn, %{cda: result}
   end
+
+  def get_rule(conn, _params) do
+    result = StatCdaService.get_rule()
+    json conn, result
+  end
 end
