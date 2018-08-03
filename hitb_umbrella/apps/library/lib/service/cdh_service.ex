@@ -5,7 +5,7 @@ defmodule Library.CdhService do
   alias Hitb.Library.Cdh, as: HitbCdh
   alias Block.Library.Cdh, as: BlockCdh
   alias Hitb.Page
-  alias Library.RuleService
+  alias Library.Key
 
   def cdh_list() do
     Repo.all(HitbCdh)
@@ -26,16 +26,19 @@ defmodule Library.CdhService do
       end)
   end
 
-  def cdh(page, rows, server_type, sort_type, sort_value) do
-    if sort_value == "" do
-      sort_value = "键"
-    end
+  def cdh(page, rows, server_type, order_type, order) do
+    order =
+      if order == "" do
+        "键"
+      else
+        order
+      end
     rows = if(is_integer(rows))do rows else String.to_integer(rows) end
     skip = Page.skip(page, rows)
     query = if(server_type == "server")do from(w in HitbCdh) else from(w in BlockCdh) end
     count = query |> select([w], count(w.id)) |> Repo.all |> List.first
-    sort_value2 = RuleService.en(sort_value)|>String.to_atom
-    result = order_by(query, [w], asc: field(w, ^sort_value2))
+    order2 = Key.en(order)|>String.to_atom
+    result = order_by(query, [w], asc: field(w, ^order2))
       |> limit([w], ^rows)
       |> offset([w], ^skip)
       |> Repo.all
@@ -46,7 +49,7 @@ defmodule Library.CdhService do
           [[], ["键", "值"]] ++ Enum.map(result, fn x -> [:key, :value]|>Enum.map(fn key -> Map.get(x, key) end) end)
       end
     [page_num, page_list, _count_page] = Page.page_list(page, count, rows)
-    %{library: result, list: %{time: [], org: [], version: []}, count: count, page_list: page_list, page: page_num, sort_type: sort_type, sort_value: sort_value}
+    %{library: result, list: %{time: [], org: [], version: []}, count: count, page_list: page_list, page: page_num, sort_type: order_type, sort_value: order}
   end
 
 end

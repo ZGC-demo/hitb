@@ -22,7 +22,7 @@ defmodule HitbserverWeb.RuleController do
 
   def rule_file(conn, _params) do
     %{"server_type" => server_type} = Map.merge(%{"server_type" => "server"}, conn.params)
-    file = RuleService.rule_file(server_type)
+    file = RuleService.file(server_type)
     json conn, %{data: file}
   end
 
@@ -45,7 +45,7 @@ defmodule HitbserverWeb.RuleController do
         "cdh" ->
           CdhService.cdh(page, rows, server_type, order_type, order)
         _ ->
-          RuleService.rule_client(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order)
+          RuleService.client(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order)
       end
     json conn, result
   end

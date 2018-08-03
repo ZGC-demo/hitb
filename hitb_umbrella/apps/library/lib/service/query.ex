@@ -1,29 +1,22 @@
 defmodule Library.RuleQuery do
   import Ecto.Query
   alias Hitb.Page
-  alias Hitb.Time
   alias Hitb.Library.RuleMdc, as: HitbRuleMdc
-  alias Hitb.Library.LibraryFile, as: HitbLibraryFile
   alias Hitb.Library.RuleAdrg, as: HitbRuleAdrg
   alias Hitb.Library.RuleDrg, as: HitbRuleDrg
   alias Hitb.Library.RuleIcd9, as: HitbRuleIcd9
   alias Hitb.Library.RuleIcd10, as: HitbRuleIcd10
   alias Hitb.Library.LibWt4, as: HitbLibWt4
   alias Hitb.Library.Cdh, as: HitbRuleCdh
-  alias Hitb.Library.RuleSymptom, as: HitbRuleSymptom
-  alias Hitb.Edit.MyMould, as: HitbRuleMyMould
   alias Hitb.Library.ChineseMedicine, as: HitbChineseMedicine
   alias Hitb.Library.ChineseMedicinePatent, as: HitbChineseMedicinePatent
   alias Hitb.Library.WesternMedicine, as: HitbWesternMedicine
-  alias Hitb.Library.LibraryFile, as: HitbLibraryFile
   alias Block.Library.RuleMdc, as: BlockRuleMdc
   alias Block.Library.RuleAdrg, as: BlockRuleAdrg
   alias Block.Library.RuleDrg, as: BlockRuleDrg
   alias Block.Library.RuleIcd9, as: BlockRuleIcd9
   alias Block.Library.RuleIcd10, as: BlockRuleIcd10
   alias Block.Library.LibWt4, as: BlockLibWt4
-  alias Block.Library.ChineseMedicine, as: BlockChineseMedicine
-  alias Block.Library.ChineseMedicinePatent, as: BlockChineseMedicinePatent
   alias Hitb.Repo, as: HitbRepo
   alias Block.Repo, as: BlockRepo
 
@@ -36,7 +29,7 @@ defmodule Library.RuleQuery do
         BlockRepo
       end
     #生成查询语句
-    [query, list] = query(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order, repo)
+    [query, list] = query(type, tab_type, version, year, dissect, server_type, repo)
     count = select(query, [w], count(w.id))
       |>repo.all([timeout: 1500000])
       |>List.first
@@ -54,7 +47,7 @@ defmodule Library.RuleQuery do
     [result, page_list, page_num, count_page, tab_type, type, dissect, list, version, year]
   end
 
-  def query(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order, repo) do
+  def query(type, tab_type, version, year, dissect, server_type, repo) do
     tab = tab(server_type, tab_type)
     query =
       cond do

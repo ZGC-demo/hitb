@@ -11,7 +11,7 @@ defmodule Library.RuleService do
   alias Library.Key
   alias Block.LibraryService
 
-  def json(page, type, tab_type, version, year, dissect, rows, order_type, order) do
+  def json(page, type, tab_type, version, year, dissect, rows, _, _) do
     #取得分析结果
     [result, page_list, page_num, _, tab_type, _type, dissect, list, version, _] = RuleQuery.get_rule(page, type, tab_type, version, year, dissect, rows, "server", "asc", "code", "")
     #去除关键字段
@@ -19,7 +19,7 @@ defmodule Library.RuleService do
     %{result: result, page_list: page_list, page_num: page_num, tab_type: tab_type, type: type, dissect: dissect, list: list, version: version, year: year}
   end
 
-  def rule_file(server_type) do
+  def file(server_type) do
     case server_type do
       "block" -> LibraryService.get_block_file()
       _ ->
@@ -28,7 +28,7 @@ defmodule Library.RuleService do
     end
   end
 
-  def rule_client(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order) do
+  def client(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order) do
     [result, page_list, page_num, count, _, _, _, list, _, _] = RuleQuery.get_rule(page, type, tab_type, version, year, dissect, rows, server_type, order_type, Key.en(order), "")
     result = RuleQuery.del_key(result)
     result =
@@ -67,8 +67,8 @@ defmodule Library.RuleService do
           val2 = Map.get(a2, x)
           cond do
             val1 == nil -> nil
-            val1 == val2 -> [Key.cnkey(x), "一致"]
-            val1 !=val2 -> [Key.cnkey(x), "不一致"]
+            val1 == val2 -> [Key.cn(x), "一致"]
+            val1 !=val2 -> [Key.cn(x), "不一致"]
           end
         end)
         c = Enum.reject(b, fn x -> x == nil end)

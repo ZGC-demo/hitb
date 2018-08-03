@@ -86,8 +86,7 @@ defmodule Server.ShareService do
           Enum.reject(stat, fn x -> "#{x.org}-#{x.time}" not in cont end)
         "library" ->
           file_name2 = String.split(file_name, ".")|>List.first
-          [library, _list, _count, _page_list,_page_num] = RuleService.clinet(1, "year", file_name2, "BJ", "", "", 0, "server", "", "")
-          library
+          RuleService.client(1, "year", file_name2, "BJ", "", "", 0, "server", "asc", "code").library
       end
     data =
       Enum.reduce(data, [[], previous_hash], fn x, acc ->
