@@ -1,4 +1,5 @@
 defmodule Hitb.Library.RulePharmacy do
+  #药品表
   use Ecto.Schema
   import Ecto.Changeset
 

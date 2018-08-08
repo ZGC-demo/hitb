@@ -5,7 +5,12 @@ defmodule Hitb.Library.RuleCdaIcd9 do
   schema "rule_cda_icd9" do
     field :code, :string
     field :name, :string
-    field :symptom, {:array, :string}
+    field :symptom, {:array, :string} #症状
+    field :breathe, {:array, :string} #呼吸区间
+    field :body_heat, {:array, :string} #心跳区间
+    field :sphygums, {:array, :string} #脉搏区间
+    field :blood_pressure, {:array, :string} #血压区间
+    field :examine, {:array, :string} #检查
     timestamps()
   end
 
@@ -15,8 +20,8 @@ defmodule Hitb.Library.RuleCdaIcd9 do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:code, :name, :symptom])
-    |> validate_required([:code])
+    |> cast(params, [:code, :name, :symptom, :symptom, :breathe, :body_heat, :sphygums, :blood_pressure, :examine])
+    |> validate_required([:code, :symptom, :breathe, :body_heat, :sphygums, :blood_pressure, :examine])
   end
 
 end
