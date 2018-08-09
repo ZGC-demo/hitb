@@ -8,7 +8,7 @@ defmodule Hitb.Library.RuleSign do
     field :icd9_a, {:array, :string}
     field :icd10_a, {:array, :string}
     field :pharmacy, {:array, :string}
-    timestamps()
+    # timestamps()
   end
 
   @doc """

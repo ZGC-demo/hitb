@@ -7,7 +7,7 @@ defmodule Hitb.Library.RuleExamine do
     field :examine, :string
     field :icd10_a, {:array, :string}
     field :icd10_b, {:array, :string}
-    timestamps()
+    # timestamps()
   end
 
   @doc """

@@ -7,7 +7,7 @@ defmodule Hitb.Library.RulePharmacy do
     field :pharmacy, :string
     field :icd10_a, {:array, :string}
     field :symptom, {:array, :string}
-    timestamps()
+    # timestamps()
   end
 
   @doc """

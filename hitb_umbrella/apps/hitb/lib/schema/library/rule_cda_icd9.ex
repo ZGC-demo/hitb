@@ -11,7 +11,7 @@ defmodule Hitb.Library.RuleCdaIcd9 do
     field :sphygums, {:array, :string} #脉搏区间
     field :blood_pressure, {:array, :string} #血压区间
     field :examine, {:array, :string} #检查
-    timestamps()
+    # timestamps()
   end
 
   @doc """

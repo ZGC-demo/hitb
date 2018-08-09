@@ -11,6 +11,12 @@ defmodule Library.RuleQuery do
   alias Hitb.Library.ChineseMedicine, as: HitbChineseMedicine
   alias Hitb.Library.ChineseMedicinePatent, as: HitbChineseMedicinePatent
   alias Hitb.Library.WesternMedicine, as: HitbWesternMedicine
+  alias Hitb.Library.RuleCdaIcd10
+  alias Hitb.Library.RuleCdaIcd9
+  alias Hitb.Library.RuleExamine
+  alias Hitb.Library.RulePharmacy
+  alias Hitb.Library.RuleSign
+  alias Hitb.Library.RuleSymptom
   alias Block.Library.RuleMdc, as: BlockRuleMdc
   alias Block.Library.RuleAdrg, as: BlockRuleAdrg
   alias Block.Library.RuleDrg, as: BlockRuleDrg
@@ -41,7 +47,11 @@ defmodule Library.RuleQuery do
         "download" ->
           query
         _ ->
-          my_order(query, order_type, String.to_atom(order))|>limit([w], ^rows)|>offset([w], ^skip)
+          if(tab_type in ["cda_icd10", "cda_icd9", "检查", "药品", "体征", "症状"])do
+            query
+          else
+            my_order(query, order_type, String.to_atom(order))|>limit([w], ^rows)|>offset([w], ^skip)
+          end
       end
       |>repo.all
     [result, page_list, page_num, count_page, tab_type, type, dissect, list, version, year]
@@ -104,7 +114,7 @@ defmodule Library.RuleQuery do
             true ->
               from(p in tab)
           end
-        tab_type in ["模板"] ->
+        tab_type in ["模板", "cda_icd10", "cda_icd9", "检查", "药品", "体征", "症状"] ->
           from(p in tab)
         true->
           cond do
@@ -122,7 +132,7 @@ defmodule Library.RuleQuery do
       cond do
         tab_type in ["mdc", "adrg", "drg", "icd9", "icd10"] ->
           %{time: ["全部"] ++ repo.all(from p in tab, distinct: true, select: p.year), version: ["全部"] ++ repo.all(from p in tab, distinct: true, select: p.version), org: ["全部"] ++ repo.all(from p in tab, distinct: true, select: p.org)}
-        tab_type in ["中药", "中成药", "西药", "模板"] ->
+        tab_type in ["中药", "中成药", "西药", "模板", "cda_icd10", "cda_icd9", "检查", "药品", "体征", "症状"] ->
           %{time: [], org: [], version: []}
         true ->
           %{time: ["全部"] ++ repo.all(from p in tab, distinct: true, select: p.year), org: [], version: []}
@@ -173,6 +183,12 @@ defmodule Library.RuleQuery do
     case server_type do
       "server" ->
         case filename do
+          "cda_icd10" -> RuleCdaIcd10
+          "cda_icd9" -> RuleCdaIcd9
+          "检查" -> RuleExamine
+          "药品" -> RulePharmacy
+          "体征" -> RuleSign
+          "症状" -> RuleSymptom
           "icd9" -> HitbRuleIcd9
           "icd10" -> HitbRuleIcd10
           "mdc" -> HitbRuleMdc

@@ -39,7 +39,7 @@ defmodule HitbserverWeb.Mixfile do
     [
       {:phoenix, "~> 1.3.0"},
       {:phoenix_pubsub, "~> 1.0"},
-      {:pdf_generator, "~> 0.3.6"},
+      # {:pdf_generator, "~> 0.3.6"},
       {:phoenix_html, "~> 2.10"},
       {:httpoison, "~> 1.0"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
