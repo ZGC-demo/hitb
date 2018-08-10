@@ -2,7 +2,6 @@ defmodule HitbserverWeb.RuleController do
   use HitbserverWeb, :controller
   # alias Server.UserService
   alias Library.RuleService
-  alias Library.RuleService
   alias Library.CdhService
   alias Library.RuleCdaStatService
   plug HitbserverWeb.Access
@@ -46,6 +45,7 @@ defmodule HitbserverWeb.RuleController do
           CdhService.cdh(page, rows, server_type, order_type, order)
         _ ->
           RuleService.client(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order)
+          # RuleService.client/
       end
     json conn, result
   end
@@ -83,7 +83,7 @@ defmodule HitbserverWeb.RuleController do
     RuleService.rule_symptom(symptom, icd9_a, icd10_a, pharmacy)
     json conn, %{}
   end
-  
+
   #帮助查询
   def symptom_serach(conn, _params) do
     %{"symptom" => symptom, "section" => section} = Map.merge(%{"symptom" => %{}}, conn.params)
