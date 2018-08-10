@@ -6,7 +6,9 @@ defmodule Hitb.Library.Repo.Migrations.RuleSign do
       add :symptom, :string
       add :icd9_a, {:array, :string}
       add :icd10_a, {:array, :string}
-      add :pharmacy, {:array, :string}
+      add :pharmacys, {:array, :string}
+      add :create_user, :string
+      add :update_user, :string
       timestamps()
     end
     # create unique_index(:stat_cda, [:items])

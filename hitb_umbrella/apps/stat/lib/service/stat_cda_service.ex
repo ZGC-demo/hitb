@@ -23,7 +23,8 @@ defmodule Stat.StatCdaService do
     |>Repo.all
     |>List.flatten
     |>:lists.usort
-    |>Enum.map(fn x -> Repo.get!(Cda, String.to_integer(x)) end)
+    |>Enum.map(fn x -> Repo.get_by(Cda, patient_id: x) end)
+    |>Enum.reject(fn x -> x == nil end)
     |>List.flatten
     |>Enum.map(fn x -> x.content end)
   end

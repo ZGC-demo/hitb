@@ -30,7 +30,7 @@ defmodule Library.RuleService do
 
   def client(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order) do
     [result, page_list, page_num, count, _, _, _, list, _, _] = RuleQuery.get_rule(page, type, tab_type, version, year, dissect, rows, server_type, order_type, Key.en(order), "")
-    result = RuleQuery.del_key(result)
+    result = RuleQuery.del_key(result, tab_type)
     result =
       case length(result) do
         0 -> []
@@ -118,7 +118,7 @@ defmodule Library.RuleService do
   #下载
   def download(filename) do
     [result, _, _, _, _, _, _, _, _, _] = RuleQuery.get_rule(1, "", filename, "", "", "", 0, "server", "", "", "download")
-    result = RuleQuery.del_key(result)
+    result = RuleQuery.del_key(result, filename)
     result =
       case length(result) do
         0 -> []
@@ -138,7 +138,7 @@ defmodule Library.RuleService do
         "server" -> HitbRepo.all(from p in tab, limit: 1)
         "block" -> BlockRepo.all(from p in tab, limit: 1)
       end
-      |>RuleQuery.del_key|>List.first|>Map.keys
+      |>RuleQuery.del_key(filename)|>List.first|>Map.keys
     query = RuleQuery.table(filename, tab)
     query =
       case tab do
@@ -158,7 +158,7 @@ defmodule Library.RuleService do
         "server" -> HitbRepo.all(query)
         "block" -> BlockRepo.all(query)
       end
-    result = RuleQuery.del_key(result)
+    result = RuleQuery.del_key(result, filename)
     result =
       case length(result) do
         0 -> []
@@ -170,12 +170,6 @@ defmodule Library.RuleService do
   end
 
   def rule_symptom(symptom, icd9_a, icd10_a, pharmacy) do
-    IO.inspect [symptom, icd9_a, icd10_a, pharmacy]
-
-
-
-
-
     symptoms = HitbRepo.get_by(HitbRuleSymptom, symptom: symptom)
     if symptoms != nil do
       symptoms

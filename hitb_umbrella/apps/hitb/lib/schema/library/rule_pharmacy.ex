@@ -6,8 +6,10 @@ defmodule Hitb.Library.RulePharmacy do
   schema "rule_pharmacy" do
     field :pharmacy, :string
     field :icd10_a, {:array, :string}
-    field :symptom, {:array, :string}
-    # timestamps()
+    field :symptoms, {:array, :string}
+    field :create_user, :string
+    field :update_user, :string
+    timestamps()
   end
 
   @doc """
@@ -16,8 +18,8 @@ defmodule Hitb.Library.RulePharmacy do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:pharmacy, :icd10_a, :symptom])
-    |> validate_required([:pharmacy, :icd10_a, :symptom])
+    |> cast(params, [:pharmacy, :icd10_a, :symptoms, :create_user, :update_user])
+    |> validate_required([:pharmacy, :icd10_a, :symptoms, :create_user, :update_user])
   end
 
 end

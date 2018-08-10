@@ -47,7 +47,7 @@ defmodule Library.RuleQuery do
         "download" ->
           query
         _ ->
-          if(tab_type in ["cda_icd10", "cda_icd9", "检查", "药品", "体征", "症状"])do
+          if(tab_type in ["模板", "诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"])do
             query
           else
             my_order(query, order_type, String.to_atom(order))|>limit([w], ^rows)|>offset([w], ^skip)
@@ -114,7 +114,7 @@ defmodule Library.RuleQuery do
             true ->
               from(p in tab)
           end
-        tab_type in ["模板", "cda_icd10", "cda_icd9", "检查", "药品", "体征", "症状"] ->
+        tab_type in ["模板", "诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] ->
           from(p in tab)
         true->
           cond do
@@ -132,7 +132,7 @@ defmodule Library.RuleQuery do
       cond do
         tab_type in ["mdc", "adrg", "drg", "icd9", "icd10"] ->
           %{time: ["全部"] ++ repo.all(from p in tab, distinct: true, select: p.year), version: ["全部"] ++ repo.all(from p in tab, distinct: true, select: p.version), org: ["全部"] ++ repo.all(from p in tab, distinct: true, select: p.org)}
-        tab_type in ["中药", "中成药", "西药", "模板", "cda_icd10", "cda_icd9", "检查", "药品", "体征", "症状"] ->
+        tab_type in ["中药", "中成药", "西药", "模板", "模板", "诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] ->
           %{time: [], org: [], version: []}
         true ->
           %{time: ["全部"] ++ repo.all(from p in tab, distinct: true, select: p.year), org: [], version: []}
@@ -183,12 +183,12 @@ defmodule Library.RuleQuery do
     case server_type do
       "server" ->
         case filename do
-          "cda_icd10" -> RuleCdaIcd10
-          "cda_icd9" -> RuleCdaIcd9
-          "检查" -> RuleExamine
-          "药品" -> RulePharmacy
-          "体征" -> RuleSign
-          "症状" -> RuleSymptom
+          "诊断规则" -> RuleCdaIcd10
+          "手术规则" -> RuleCdaIcd9
+          "检查规则" -> RuleExamine
+          "药品规则" -> RulePharmacy
+          "体征规则" -> RuleSign
+          "症状规则" -> RuleSymptom
           "icd9" -> HitbRuleIcd9
           "icd10" -> HitbRuleIcd10
           "mdc" -> HitbRuleMdc
@@ -212,14 +212,25 @@ defmodule Library.RuleQuery do
     end
   end
 
-  def del_key(result) do
+  def del_key(result, tab_type) do
     result
     |>Enum.map(fn x ->
+      if(tab_type in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"])do
+        Map.drop(x, [:__meta__, :__struct__, :inserted_at, :updated_at, :id])
+      else
         Map.drop(x, [:__meta__, :__struct__, :inserted_at, :updated_at, :id, :icdc, :icdc_az, :icdcc, :nocc_1, :nocc_a, :nocc_aa, :org, :plat, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :drgs_1, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc])
+      end
       end)
     |>Enum.map(fn x ->
-        x = if(not is_nil(Map.get(x, :adrg)) and is_list(Map.get(x, :adrg)))do %{x | :adrg => Enum.join(x.adrg,"，")} else x end
-        if(not is_nil(Map.get(x, :codes)))do %{x | :codes => Enum.join(x.codes,"，")}|>Map.delete(:code) else x|>Map.delete(:codes) end
+        #根据key取到value值,判断是否是list,是list补充中文逗号
+        Map.keys(x)
+        |>Enum.reduce(x, fn key, map ->
+            val = Map.get(map, key)
+            case is_list(val) do
+              true -> %{map | key => Enum.join(val, "，")}
+              false -> map
+            end
+          end)
       end)
   end
 

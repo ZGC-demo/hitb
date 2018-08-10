@@ -37,6 +37,21 @@ defmodule Library.Key do
       "zh_name" -> "中文名称"
       "hash" -> "哈希值"
       "previous_hash" -> "上一条哈希值"
+      "pharmacys" -> "药品集"
+      "symptom" -> "症状"
+      "symptoms" -> "症状集"
+      "sign" -> "体征"
+      "breathe" -> "呼吸区间"
+      "body_heat" -> "心跳区间"
+      "sphygums" -> "脉搏区间"
+      "blood_pressure" -> "血压区间"
+      "examines" -> "检查集"
+      "examine" -> "检查"
+      "pharmacy" -> "药品"
+      "icd10_a" -> "诊断集"
+      "icd9_a" -> "手术集"
+      "create_user" -> "创建用户"
+      "update_user" -> "更新用户"
       _ -> to_string(key)
     end
   end
@@ -80,6 +95,21 @@ defmodule Library.Key do
       "上一条哈希值" -> "previous_hash"
       "键" -> "key"
       "值" -> "value"
+      "药品集" => "pharmacys"
+      "症状" => "symptom"
+      "症状集" => "symptoms"
+      "体征" => "sign"
+      "呼吸区间" => "breathe"
+      "心跳区间" => "body_heat"
+      "脉搏区间" => "sphygums"
+      "血压区间" => "blood_pressure"
+      "检查集" => "examines"
+      "检查" => "examine"
+      "药品" => "pharmacy"
+      "诊断集" => "icd10_a"
+      "手术集" => "icd9_a"
+      "创建用户" => "create_user"
+      "更新用户" => "update_user"
       _ ->to_string(key)
     end
   end

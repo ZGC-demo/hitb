@@ -22,8 +22,10 @@ defmodule Library.RuleCdaStatService do
         _ -> %{}
       end
     case result do
-      nil -> %{}
-      _ -> Map.drop(result, [:id, :__meta__, :__struct__])
+      nil -> %{section: section}
+      _ ->
+      result = Map.drop(result, [:id, :__meta__, :__struct__])
+      Map.put(result, :section, section)
     end
   end
 end
