@@ -6,6 +6,8 @@ defmodule Hitb.Library.Repo.Migrations.RuleExamine do
       add :examine, :string
       add :icd10_a, {:array, :string}
       add :icd10_b, {:array, :string}
+      add :create_user, :string
+      add :update_user, :string
       timestamps()
     end
     # create unique_index(:stat_cda, [:items])

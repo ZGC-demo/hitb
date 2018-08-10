@@ -2,7 +2,8 @@ defmodule Hitb.Library.RuleSymptomTest do
   use Hitb.DataCase
 
   alias Hitb.Library.RuleSymptom
-  @valid_attrs %{symptom: "sss", icd9_a: ["sss"], icd10_a: ["sss"], pharmacy: ["sss"]}
+  @valid_attrs %{symptom: "sss", icd9_a: ["sss"], icd10_a: ["sss"], pharmacys: ["sss"], create_user: "sss", update_user: "Sss"}
+
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

@@ -86,7 +86,7 @@ defmodule HitbserverWeb.RuleController do
 
   #帮助查询
   def symptom_serach(conn, _params) do
-    %{"symptom" => symptom, "section" => section} = Map.merge(%{"symptom" => %{}}, conn.params)
+    %{"symptom" => symptom, "section" => section} = Map.merge(%{"symptom" => []}, conn.params)
     symptom = Poison.decode!(symptom)|>hd()
     result = RuleCdaStatService.symptom_serach(symptom, section)
     json conn, %{result: result}

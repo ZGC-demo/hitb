@@ -2,7 +2,7 @@ defmodule Hitb.Library.RulePharmacyTest do
   use Hitb.DataCase
 
   alias Hitb.Library.RulePharmacy
-  @valid_attrs %{pharmacy: "sss", icd10_a: ["sss"], symptom: ["sss"]}
+  @valid_attrs %{pharmacy: "sss", icd10_a: ["sss"], symptoms: ["sss"], create_user: "sss", update_user: "Sss"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

@@ -3,7 +3,7 @@ defmodule Hitb.Library.Repo.Migrations.RuleSign do
 
   def change do
     create table(:rule_sign) do
-      add :symptom, :string
+      add :sign, :string
       add :icd9_a, {:array, :string}
       add :icd10_a, {:array, :string}
       add :pharmacys, {:array, :string}

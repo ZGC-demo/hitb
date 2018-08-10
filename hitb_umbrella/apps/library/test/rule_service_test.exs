@@ -28,6 +28,6 @@ defmodule Library.RuleServiceTest do
   end
 
   test "test symptom_serach" do
-    assert RuleCdaStatService.symptom_serach(%{}) == []
+    assert RuleCdaStatService.symptom_serach("key", "section") == %{section: "section"}
   end
 end

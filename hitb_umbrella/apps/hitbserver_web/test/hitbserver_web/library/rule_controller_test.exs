@@ -33,8 +33,8 @@ defmodule HitbserverWeb.RuleControllerTest do
     assert json_response(conn, 200)["table"] == []
   end
   test "post /symptom_serach", %{conn: conn} do
-    conn = post conn, "/library/symptom_serach", symptom: %{}
-    assert json_response(conn, 200)["result"] == []
+    conn = post conn, "/library/symptom_serach", section: "section", symptom: "[\"key\"]"
+    assert json_response(conn, 200)["result"] == %{"section" => "section"}
   end
 
 

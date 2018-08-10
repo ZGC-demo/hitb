@@ -2,7 +2,7 @@ defmodule Hitb.Library.RuleCdaIcd10Test do
   use Hitb.DataCase
 
   alias Hitb.Library.RuleCdaIcd10
-  @valid_attrs %{code: "sss", name: "sss", symptom: ["sss"]}
+  @valid_attrs %{code: "sss", name: "sss", symptoms: ["sss"], breathe: ["ss"], body_heat: ["sss"], sphygums: ["sss"], blood_pressure: ["sss"], examines: ["sss"], create_user: "sss", update_user: "Sss"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

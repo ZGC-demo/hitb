@@ -19,8 +19,8 @@ defmodule Hitb.Library.RuleSign do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:symptom, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user])
-    |> validate_required([:symptom, :pharmacys, :create_user, :update_user])
+    |> cast(params, [:sign, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user])
+    |> validate_required([:sign, :pharmacys, :create_user, :update_user])
   end
 
 end
