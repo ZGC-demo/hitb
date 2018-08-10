@@ -1,7 +1,7 @@
 defmodule Hitb.Library.RuleSymptom do
   use Ecto.Schema
   import Ecto.Changeset
-
+  #主诉
   schema "rule_symptom" do
     field :symptom, :string
     field :icd9_a, {:array, :string}

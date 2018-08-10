@@ -170,6 +170,12 @@ defmodule Library.RuleService do
   end
 
   def rule_symptom(symptom, icd9_a, icd10_a, pharmacy) do
+    IO.inspect [symptom, icd9_a, icd10_a, pharmacy]
+
+
+
+
+
     symptoms = HitbRepo.get_by(HitbRuleSymptom, symptom: symptom)
     if symptoms != nil do
       symptoms

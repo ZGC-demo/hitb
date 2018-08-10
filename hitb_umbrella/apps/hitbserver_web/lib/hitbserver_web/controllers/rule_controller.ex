@@ -76,14 +76,19 @@ defmodule HitbserverWeb.RuleController do
     result = RuleService.rule_search(filename, value, servertype)
     json conn, result
   end
+  #??????????
   def rule_symptom(conn, _params) do
-    %{"symptom" => symptom, "icd9_a" => icd9_a, "icd10_a" => icd10_a, "pharmacy" => pharmacy } = Map.merge(%{"symptom" => "上腹痛", "icd9_a" => [], "icd10_a" => [], "pharmacy" => ["消化系溃疡"]}, conn.params)
+    %{"symptom" => symptom, "icd9_a" => icd9_a, "icd10_a" => icd10_a, "pharmacy" => pharmacy, "key" => key, "section" => section } = Map.merge(%{"symptom" => "上腹痛", "icd9_a" => [], "icd10_a" => [], "pharmacy" => ["消化系溃疡"]}, conn.params)
+    symptom = Poison.decode!(symptom)
     RuleService.rule_symptom(symptom, icd9_a, icd10_a, pharmacy)
     json conn, %{}
   end
+  
+  #帮助查询
   def symptom_serach(conn, _params) do
-    %{"symptom" => symptom} = Map.merge(%{"symptom" => %{}}, conn.params)
-    result = RuleCdaStatService.symptom_serach(symptom)
+    %{"symptom" => symptom, "section" => section} = Map.merge(%{"symptom" => %{}}, conn.params)
+    symptom = Poison.decode!(symptom)|>hd()
+    result = RuleCdaStatService.symptom_serach(symptom, section)
     json conn, %{result: result}
   end
 

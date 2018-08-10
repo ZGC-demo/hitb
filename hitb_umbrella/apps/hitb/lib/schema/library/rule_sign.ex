@@ -3,8 +3,8 @@ defmodule Hitb.Library.RuleSign do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "rule_symptom" do
-    field :symptom, :string
+  schema "rule_sign" do
+    field :sign, :string
     field :icd9_a, {:array, :string}
     field :icd10_a, {:array, :string}
     field :pharmacy, {:array, :string}
