@@ -192,69 +192,71 @@ defmodule Library.RuleService do
   end
 
   def client_save(filename, server_type, username, data, rows, order_type, order) do
-    [result, _, _, _, _, _, _, _, _, _] = RuleQuery.get_rule(1, "", filename, "", "", "", 30, "server", order_type, Key.en(order), "", username)
-    #去掉文件头
-    data = List.delete_at(data, 0)
-    #取得表头
-    header = data|>List.first|>String.split(",")|>Enum.map(fn x -> Key.en(x)|>String.to_atom end)
-    #去掉表头,并拆分行列
-    data = List.delete_at(data, 0)|>Enum.reject(fn x -> x == "" end)
-    data_key = data
-    #将数组转换为对象
-    data =
-      Enum.map(data, fn x ->
-        x = String.split(x, ",")
-        Enum.reduce(header, %{}, fn k, acc ->
-          index = Enum.find_index(header, fn ks -> ks == k end)
-          value = Enum.at(x, index)
-          Map.put(acc, k, value)
-        end)
-      end)
-    result_key =
-      Enum.map(result, fn x ->
-        Enum.map(header, fn k ->
-          Map.get(x, k)
-        end)
-        |>Enum.join(",")
-      end)
-    #判断
-    cond do
-      filename in ["基本信息", "街道乡镇代码", "民族", "区县编码", "手术血型", "出入院编码", "肿瘤编码", "科别代码", "病理诊断编码", "医保诊断依据"]->
-        []
-      filename in ["中药", "中成药", "西药"] ->
-        []
-      filename in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] ->
-        []
-      true->
-        #判断是否有旧的需要删除(删除数据库中不在传入的数据内,要么是客户端修改的,要么是删除的)
-        Enum.reject(result, fn x -> join(header, x) in data_key end)
-        |>Enum.map(fn x ->
-            HitbRepo.delete!(x)
+    if(length(data) > 0)do
+      [result, _, _, _, _, _, _, _, _, _] = RuleQuery.get_rule(1, "", filename, "", "", "", 30, "server", order_type, Key.en(order), "", username)
+      #去掉文件头
+      data = List.delete_at(data, 0)
+      #取得表头
+      header = data|>List.first|>String.split(",")|>Enum.map(fn x -> Key.en(x)|>String.to_atom end)
+      #去掉表头,并拆分行列
+      data = List.delete_at(data, 0)|>Enum.reject(fn x -> x == "" end)
+      data_key = data
+      #将数组转换为对象
+      data =
+        Enum.map(data, fn x ->
+          x = String.split(x, ",")
+          Enum.reduce(header, %{}, fn k, acc ->
+            index = Enum.find_index(header, fn ks -> ks == k end)
+            value = Enum.at(x, index)
+            Map.put(acc, k, value)
           end)
-        #增加传过来数据库中没有的
-        Enum.reject(data, fn x -> join(header, x) in result_key end)
-        |>Enum.map(fn x ->
-            case filename do
-              # "诊断规则" -> RuleCdaIcd10|>RuleCdaIcd10.changeset
-              # "手术规则" -> RuleCdaIcd9|>RuleCdaIcd9.changeset
-              # "检查规则" -> RuleExamine|>RuleExamine.changeset
-              # "药品规则" -> RulePharmacy|>RulePharmacy.changeset
-              # "体征规则" -> RuleSign|>RuleSign.changeset
-              # "症状规则" -> RuleSymptom|>RuleSymptom.changeset
-              "icd9" -> %HitbRuleIcd9{}|>HitbRuleIcd9.changeset(x)
-              "icd10" -> %HitbRuleIcd10{}|>HitbRuleIcd10.changeset(x)
-              "mdc" -> %HitbRuleMdc{}|>HitbRuleMdc.changeset(x)
-              "adrg" -> %HitbRuleAdrg{}|>HitbRuleAdrg.changeset(x)
-              "drg" -> %HitbRuleDrg{}|>HitbRuleDrg.changeset(x)
-              # "cdh" -> %HitbRuleCdh{}|>HitbRuleCdh.changeset(x)
-              # "中药" -> HitbChineseMedicine|>HitbChineseMedicine.changeset
-              # "中成药" -> HitbChineseMedicinePatent|>HitbChineseMedicinePatent.changeset
-              # "西药" -> HitbWesternMedicine|>HitbWesternMedicine.changeset
-              # _ -> HitbLibWt4|>HitbLibWt4.changeset
-            end
-            |>HitbRepo.insert
-            # Repo.delete!(x)
+        end)
+      result_key =
+        Enum.map(result, fn x ->
+          Enum.map(header, fn k ->
+            Map.get(x, k)
           end)
+          |>Enum.join(",")
+        end)
+      #判断
+      cond do
+        filename in ["基本信息", "街道乡镇代码", "民族", "区县编码", "手术血型", "出入院编码", "肿瘤编码", "科别代码", "病理诊断编码", "医保诊断依据"]->
+          []
+        filename in ["中药", "中成药", "西药"] ->
+          []
+        filename in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] ->
+          []
+        true->
+          #判断是否有旧的需要删除(删除数据库中不在传入的数据内,要么是客户端修改的,要么是删除的)
+          Enum.reject(result, fn x -> join(header, x) in data_key end)
+          |>Enum.map(fn x ->
+              HitbRepo.delete!(x)
+            end)
+          #增加传过来数据库中没有的
+          Enum.reject(data, fn x -> join(header, x) in result_key end)
+          |>Enum.map(fn x ->
+              case filename do
+                # "诊断规则" -> RuleCdaIcd10|>RuleCdaIcd10.changeset
+                # "手术规则" -> RuleCdaIcd9|>RuleCdaIcd9.changeset
+                # "检查规则" -> RuleExamine|>RuleExamine.changeset
+                # "药品规则" -> RulePharmacy|>RulePharmacy.changeset
+                # "体征规则" -> RuleSign|>RuleSign.changeset
+                # "症状规则" -> RuleSymptom|>RuleSymptom.changeset
+                "icd9" -> %HitbRuleIcd9{}|>HitbRuleIcd9.changeset(x)
+                "icd10" -> %HitbRuleIcd10{}|>HitbRuleIcd10.changeset(x)
+                "mdc" -> %HitbRuleMdc{}|>HitbRuleMdc.changeset(x)
+                "adrg" -> %HitbRuleAdrg{}|>HitbRuleAdrg.changeset(x)
+                "drg" -> %HitbRuleDrg{}|>HitbRuleDrg.changeset(x)
+                # "cdh" -> %HitbRuleCdh{}|>HitbRuleCdh.changeset(x)
+                # "中药" -> HitbChineseMedicine|>HitbChineseMedicine.changeset
+                # "中成药" -> HitbChineseMedicinePatent|>HitbChineseMedicinePatent.changeset
+                # "西药" -> HitbWesternMedicine|>HitbWesternMedicine.changeset
+                # _ -> HitbLibWt4|>HitbLibWt4.changeset
+              end
+              |>HitbRepo.insert
+              # Repo.delete!(x)
+          end)
+      end
     end
   end
 

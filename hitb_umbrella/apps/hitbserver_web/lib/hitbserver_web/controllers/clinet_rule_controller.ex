@@ -94,7 +94,7 @@ defmodule HitbserverWeb.RuleController do
 
   #客户端规则保存
   def client_save(conn, _params) do
-    %{"data" => data, "rows" => rows, "server_type" => server_type, "sort_type" => order_type, "sort_value" => order, "tab_type" => tab_type, "username" => username} = Map.merge(%{"data" => "[\"\",\"ADRG编码,编码,名称,版本,年份\",\"AA1111111,AA19,心脏移植,BJ,2017\",\"AA1,AA19,心脏移植,BJ,2014\",\"AA1,AA19,心脏移植,CC,2016\",\"AA1,AA19,心脏移植,BJ,2016\",\"AA1,AA19,心脏移植,GB,2017\",\"AA1,AA19,心脏移植,CC,2015\",\"AA1,AA19,心脏移植,BJ,2015\",\"AA1,AA19,心脏移植,CN,2017\",\"AB1,AB19,肝移植,BJ,2016\",\"AB1,AB19,肝移植,GB,2017\",\"AB1,AB19,肝移植,CC,2015\",\"AB1,AB19,肝移植,BJ,2015\",\"AB1,AB19,肝移植,BJ,2014\",\"AB1,AB19,肝移植,BJ,2017\",\"AB1,AB19,肝移植,CC,2016\",\"AB1,AB19,肝移植,CN,2017\",\"AC1,AC19,胰/肾同时移植,GB,2017\",\"AC1,AC19,胰/肾同时移植,BJ,2016\",\"AC1,AC19,胰/肾同时移植,BJ,2015\",\"AC1,AC19,胰/肾同时移植,CC,2016\",\"AC1,AC19,胰/肾同时移植,CC,2015\",\"AC1,AC19,胰/肾同时移植,BJ,2017\",\"AC1,AC19,胰/肾同时移植,BJ,2014\",\"AC1,AC19,胰/肾同时移植,CN,2017\",\"AD1,AD19,胰腺移植,CC,2015\",\"AD1,AD19,胰腺移植,CN,2017\",\"AD1,AD19,胰腺移植,GB,2017\",\"AD1,AD19,胰腺移植,BJ,2014\",\"AD1,AD19,胰腺移植,BJ,2017\",\"AD1,AD19,胰腺移植,BJ,2016\"]", "rows" => 30, "server_type" => "server", "sort_type" => "asc", "sort_value" => "编码", "tab_type" => "drg", "username" => ""}, conn.params)
+    %{"data" => data, "rows" => rows, "server_type" => server_type, "sort_type" => order_type, "sort_value" => order, "tab_type" => tab_type, "username" => username} = Map.merge(%{"data" => "[]", "rows" => 30, "server_type" => "server", "sort_type" => "asc", "sort_value" => "编码", "tab_type" => "drg", "username" => ""}, conn.params)
     order =
       cond do
         tab_type == "西药" and order == "编码" -> "英文名称"
