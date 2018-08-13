@@ -26,7 +26,7 @@ defmodule HitbserverWeb.RuleController do
   end
 
   def rule_client(conn, _params) do
-    %{"page" => page, "type" => type, "tab_type" => tab_type, "version" => version, "year" => year, "dissect" => dissect, "rows" => rows, "server_type" => server_type, "sort_type" => order_type, "sort_value" => order} = Map.merge(%{"page" => "1", "type" => "year", "tab_type" => "mdc", "version" => "BJ", "year" => "", "dissect" => "", "rows" => 15, "server_type" => "server", "sort_type" => "asc", "sort_value" => "编码"}, conn.params)
+    %{"page" => page, "type" => type, "tab_type" => tab_type, "version" => version, "year" => year, "dissect" => dissect, "rows" => rows, "server_type" => server_type, "sort_type" => order_type, "sort_value" => order, "username" => username} = Map.merge(%{"page" => "1", "type" => "year", "tab_type" => "mdc", "version" => "BJ", "year" => "", "dissect" => "", "rows" => 15, "server_type" => "server", "sort_type" => "asc", "sort_value" => "编码", "username" => ""}, conn.params)
     rows =
       case is_integer(rows) do
         true -> rows
@@ -44,7 +44,7 @@ defmodule HitbserverWeb.RuleController do
         "cdh" ->
           CdhService.cdh(page, rows, server_type, order_type, order)
         _ ->
-          RuleService.client(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order)
+          RuleService.client(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order, username)
           # RuleService.client/
       end
     json conn, result
@@ -92,4 +92,17 @@ defmodule HitbserverWeb.RuleController do
     json conn, %{result: result}
   end
 
+  #客户端规则保存
+  def client_save(conn, _params) do
+    %{"data" => data, "rows" => rows, "server_type" => server_type, "sort_type" => order_type, "sort_value" => order, "tab_type" => tab_type, "username" => username} = Map.merge(%{"data" => "[\"\",\"ADRG编码,编码,名称,版本,年份\",\"AA1111111,AA19,心脏移植,BJ,2017\",\"AA1,AA19,心脏移植,BJ,2014\",\"AA1,AA19,心脏移植,CC,2016\",\"AA1,AA19,心脏移植,BJ,2016\",\"AA1,AA19,心脏移植,GB,2017\",\"AA1,AA19,心脏移植,CC,2015\",\"AA1,AA19,心脏移植,BJ,2015\",\"AA1,AA19,心脏移植,CN,2017\",\"AB1,AB19,肝移植,BJ,2016\",\"AB1,AB19,肝移植,GB,2017\",\"AB1,AB19,肝移植,CC,2015\",\"AB1,AB19,肝移植,BJ,2015\",\"AB1,AB19,肝移植,BJ,2014\",\"AB1,AB19,肝移植,BJ,2017\",\"AB1,AB19,肝移植,CC,2016\",\"AB1,AB19,肝移植,CN,2017\",\"AC1,AC19,胰/肾同时移植,GB,2017\",\"AC1,AC19,胰/肾同时移植,BJ,2016\",\"AC1,AC19,胰/肾同时移植,BJ,2015\",\"AC1,AC19,胰/肾同时移植,CC,2016\",\"AC1,AC19,胰/肾同时移植,CC,2015\",\"AC1,AC19,胰/肾同时移植,BJ,2017\",\"AC1,AC19,胰/肾同时移植,BJ,2014\",\"AC1,AC19,胰/肾同时移植,CN,2017\",\"AD1,AD19,胰腺移植,CC,2015\",\"AD1,AD19,胰腺移植,CN,2017\",\"AD1,AD19,胰腺移植,GB,2017\",\"AD1,AD19,胰腺移植,BJ,2014\",\"AD1,AD19,胰腺移植,BJ,2017\",\"AD1,AD19,胰腺移植,BJ,2016\"]", "rows" => 30, "server_type" => "server", "sort_type" => "asc", "sort_value" => "编码", "tab_type" => "drg", "username" => ""}, conn.params)
+    order =
+      cond do
+        tab_type == "西药" and order == "编码" -> "英文名称"
+        tab_type == "cdh" and order == "编码" -> "键"
+        true -> order
+      end
+    data = Poison.decode!(data)
+    RuleService.client_save(tab_type, server_type, username, data, rows, order_type, order)
+    json conn, %{result: true}
+  end
 end

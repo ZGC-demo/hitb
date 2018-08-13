@@ -27,7 +27,7 @@ defmodule Library.RuleQuery do
   alias Block.Repo, as: BlockRepo
 
   #get_rule(页面,类型,表类型,版本,年份,部位,每页记录数量,服务类型(server祸区块链),排序方式,排序字段,查询类型(查询,下载))
-  def get_rule(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order, query_type) do
+  def get_rule(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order, query_type, username) do
     repo =
       if(server_type == "server")do
         HitbRepo
@@ -35,7 +35,7 @@ defmodule Library.RuleQuery do
         BlockRepo
       end
     #生成查询语句
-    [query, list] = query(type, tab_type, version, year, dissect, server_type, repo)
+    [query, list] = query(type, tab_type, version, year, dissect, server_type, repo, username)
     count = select(query, [w], count(w.id))
       |>repo.all([timeout: 1500000])
       |>List.first
@@ -57,7 +57,7 @@ defmodule Library.RuleQuery do
     [result, page_list, page_num, count_page, tab_type, type, dissect, list, version, year]
   end
 
-  def query(type, tab_type, version, year, dissect, server_type, repo) do
+  def query(type, tab_type, version, year, dissect, server_type, repo, username) do
     tab = tab(server_type, tab_type)
     query =
       cond do
@@ -115,7 +115,8 @@ defmodule Library.RuleQuery do
               from(p in tab)
           end
         tab_type in ["模板", "诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] ->
-          from(p in tab)
+          from(w in tab)
+          |>where([w], w.create_user == ^username)
         true->
           cond do
             year != "" and version != "" and dissect == "" -> from(w in tab)|>where([w], w.year == ^year and w.version == ^version)
@@ -241,7 +242,7 @@ defmodule Library.RuleQuery do
       "desc" ->
         order_by(query, [w], desc: field(w, ^order))
       _->
-        order_by(query, [w], asc: field(w, ^order))
+        query
     end
   end
 

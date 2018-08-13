@@ -12,8 +12,6 @@ defmodule HitbserverWeb.PageServerController do
     login = UserService.is_login(user)
     if(login)do
       render conn, "org_set.html", user: user
-      # , page: page, type: type, tab_type: tab_type, version: version, year: year,
-      # dissect: dissect
     else
       redirect conn, to: "/hospitals/login"
     end
@@ -25,8 +23,6 @@ defmodule HitbserverWeb.PageServerController do
     if(login)do
       %{"page" => page} = Map.merge(%{"page" => "1"}, conn.params)
       render conn, "department.html", user: user, page: page
-      # , page: page, type: type, tab_type: tab_type, version: version, year: year,
-      # dissect: dissect
     else
       redirect conn, to: "/hospitals/login"
     end
@@ -58,16 +54,7 @@ defmodule HitbserverWeb.PageServerController do
     user = get_session(conn, :user)
     login = UserService.is_login(user)
     if(login)do
-      # SchemaHospitals.butying_insert("用户管理", user.username)
       %{"page" => page} = Map.merge(%{"page" => "1"}, conn.params)
-      # skip = Myfn.skip(page, 10)
-      # user_list = from(w in User)
-      #   |> limit([w], 10)
-      #   |> offset([w], ^skip)
-      #   |> order_by([w], [asc: w.id])
-      #   |> Repo.all
-      # count = hd(Repo.all(from p in User, select: count(p.id)))
-      # {page_num, page_list} = Myfn.page(page, skip, count, 10)
       render conn, "user_html.html", user: user, page_num: page
     else
       redirect conn, to: "/hospitals/login"

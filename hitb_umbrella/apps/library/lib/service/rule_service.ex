@@ -10,10 +10,16 @@ defmodule Library.RuleService do
   alias Hitb.Library.LibraryFile, as: HitbLibraryFile
   alias Library.Key
   alias Block.LibraryService
+  alias Hitb.Library.RuleMdc, as: HitbRuleMdc
+  alias Hitb.Library.RuleAdrg, as: HitbRuleAdrg
+  alias Hitb.Library.RuleDrg, as: HitbRuleDrg
+  alias Hitb.Library.RuleIcd9, as: HitbRuleIcd9
+  alias Hitb.Library.RuleIcd10, as: HitbRuleIcd10
+  alias Hitb.Library.LibWt4, as: HitbLibWt4
 
   def json(page, type, tab_type, version, year, dissect, rows, _, _) do
     #取得分析结果
-    [result, page_list, page_num, _, tab_type, _type, dissect, list, version, _] = RuleQuery.get_rule(page, type, tab_type, version, year, dissect, rows, "server", "asc", "code", "")
+    [result, page_list, page_num, _, tab_type, _type, dissect, list, version, _] = RuleQuery.get_rule(page, type, tab_type, version, year, dissect, rows, "server", "asc", "code", "", "")
     #去除关键字段
     result = Enum.map(result, fn x -> Map.drop(x, [:__meta__, :__struct__]) end)
     %{result: result, page_list: page_list, page_num: page_num, tab_type: tab_type, type: type, dissect: dissect, list: list, version: version, year: year}
@@ -28,8 +34,8 @@ defmodule Library.RuleService do
     end
   end
 
-  def client(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order) do
-    [result, page_list, page_num, count, _, _, _, list, _, _] = RuleQuery.get_rule(page, type, tab_type, version, year, dissect, rows, server_type, order_type, Key.en(order), "")
+  def client(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order, username) do
+    [result, page_list, page_num, count, _, _, _, list, _, _] = RuleQuery.get_rule(page, type, tab_type, version, year, dissect, rows, server_type, order_type, Key.en(order), "", username)
     result = RuleQuery.del_key(result, tab_type)
     result =
       case length(result) do
@@ -117,7 +123,7 @@ defmodule Library.RuleService do
 
   #下载
   def download(filename) do
-    [result, _, _, _, _, _, _, _, _, _] = RuleQuery.get_rule(1, "", filename, "", "", "", 0, "server", "", "", "download")
+    [result, _, _, _, _, _, _, _, _, _] = RuleQuery.get_rule(1, "", filename, "", "", "", 0, "server", "", "", "download", "")
     result = RuleQuery.del_key(result, filename)
     result =
       case length(result) do
@@ -184,5 +190,77 @@ defmodule Library.RuleService do
       %{success: true, info: "保存成功"}
     end
   end
+
+  def client_save(filename, server_type, username, data, rows, order_type, order) do
+    [result, _, _, _, _, _, _, _, _, _] = RuleQuery.get_rule(1, "", filename, "", "", "", 30, "server", order_type, Key.en(order), "", username)
+    #去掉文件头
+    data = List.delete_at(data, 0)
+    #取得表头
+    header = data|>List.first|>String.split(",")|>Enum.map(fn x -> Key.en(x)|>String.to_atom end)
+    #去掉表头,并拆分行列
+    data = List.delete_at(data, 0)|>Enum.reject(fn x -> x == "" end)
+    data_key = data
+    #将数组转换为对象
+    data =
+      Enum.map(data, fn x ->
+        x = String.split(x, ",")
+        Enum.reduce(header, %{}, fn k, acc ->
+          index = Enum.find_index(header, fn ks -> ks == k end)
+          value = Enum.at(x, index)
+          Map.put(acc, k, value)
+        end)
+      end)
+    result_key =
+      Enum.map(result, fn x ->
+        Enum.map(header, fn k ->
+          Map.get(x, k)
+        end)
+        |>Enum.join(",")
+      end)
+    #判断
+    cond do
+      filename in ["基本信息", "街道乡镇代码", "民族", "区县编码", "手术血型", "出入院编码", "肿瘤编码", "科别代码", "病理诊断编码", "医保诊断依据"]->
+        []
+      filename in ["中药", "中成药", "西药"] ->
+        []
+      filename in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] ->
+        []
+      true->
+        #判断是否有旧的需要删除(删除数据库中不在传入的数据内,要么是客户端修改的,要么是删除的)
+        Enum.reject(result, fn x -> join(header, x) in data_key end)
+        |>Enum.map(fn x ->
+            HitbRepo.delete!(x)
+          end)
+        #增加传过来数据库中没有的
+        Enum.reject(data, fn x -> join(header, x) in result_key end)
+        |>Enum.map(fn x ->
+            case filename do
+              # "诊断规则" -> RuleCdaIcd10|>RuleCdaIcd10.changeset
+              # "手术规则" -> RuleCdaIcd9|>RuleCdaIcd9.changeset
+              # "检查规则" -> RuleExamine|>RuleExamine.changeset
+              # "药品规则" -> RulePharmacy|>RulePharmacy.changeset
+              # "体征规则" -> RuleSign|>RuleSign.changeset
+              # "症状规则" -> RuleSymptom|>RuleSymptom.changeset
+              "icd9" -> %HitbRuleIcd9{}|>HitbRuleIcd9.changeset(x)
+              "icd10" -> %HitbRuleIcd10{}|>HitbRuleIcd10.changeset(x)
+              "mdc" -> %HitbRuleMdc{}|>HitbRuleMdc.changeset(x)
+              "adrg" -> %HitbRuleAdrg{}|>HitbRuleAdrg.changeset(x)
+              "drg" -> %HitbRuleDrg{}|>HitbRuleDrg.changeset(x)
+              # "cdh" -> %HitbRuleCdh{}|>HitbRuleCdh.changeset(x)
+              # "中药" -> HitbChineseMedicine|>HitbChineseMedicine.changeset
+              # "中成药" -> HitbChineseMedicinePatent|>HitbChineseMedicinePatent.changeset
+              # "西药" -> HitbWesternMedicine|>HitbWesternMedicine.changeset
+              # _ -> HitbLibWt4|>HitbLibWt4.changeset
+            end
+            |>HitbRepo.insert
+            # Repo.delete!(x)
+          end)
+    end
+  end
+
+  defp join(header, data) do
+    Enum.map(header, fn k -> Map.get(data, k) end)|>Enum.join(",")
+  end
+
 
 end
