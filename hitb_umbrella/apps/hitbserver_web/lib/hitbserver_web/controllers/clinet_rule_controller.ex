@@ -26,7 +26,7 @@ defmodule HitbserverWeb.RuleController do
   end
 
   def rule_client(conn, _params) do
-    %{"page" => page, "type" => type, "tab_type" => tab_type, "version" => version, "year" => year, "dissect" => dissect, "rows" => rows, "server_type" => server_type, "sort_type" => order_type, "sort_value" => order, "username" => username} = Map.merge(%{"page" => "1", "type" => "year", "tab_type" => "mdc", "version" => "BJ", "year" => "", "dissect" => "", "rows" => 15, "server_type" => "server", "sort_type" => "asc", "sort_value" => "编码", "username" => ""}, conn.params)
+    %{"page" => page, "type" => type, "tab_type" => tab_type, "version" => version, "year" => year, "dissect" => dissect, "rows" => rows, "server_type" => server_type, "order_type" => order_type, "order" => order, "username" => username} = Map.merge(%{"page" => "1", "type" => "year", "tab_type" => "mdc", "version" => "BJ", "year" => "", "dissect" => "", "rows" => 15, "server_type" => "server", "order_type" => "asc", "order" => "编码", "username" => ""}, conn.params)
     rows =
       case is_integer(rows) do
         true -> rows
@@ -94,7 +94,7 @@ defmodule HitbserverWeb.RuleController do
 
   #客户端规则保存
   def client_save(conn, _params) do
-    %{"data" => data, "rows" => rows, "server_type" => server_type, "sort_type" => order_type, "sort_value" => order, "tab_type" => tab_type, "username" => username} = Map.merge(%{"data" => "[]", "rows" => 30, "server_type" => "server", "sort_type" => "asc", "sort_value" => "编码", "tab_type" => "drg", "username" => ""}, conn.params)
+    %{"data" => data, "rows" => rows, "server_type" => server_type, "order_type" => order_type, "order" => order, "tab_type" => tab_type, "username" => username} = Map.merge(%{"data" => "[]", "rows" => 30, "server_type" => "server", "order_type" => "asc", "order" => "编码", "tab_type" => "drg", "username" => ""}, conn.params)
     order =
       cond do
         tab_type == "西药" and order == "编码" -> "英文名称"
