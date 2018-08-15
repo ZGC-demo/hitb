@@ -78,7 +78,7 @@ defmodule HitbserverWeb.RuleController do
   end
   #??????????
   def rule_symptom(conn, _params) do
-    %{"symptom" => symptom, "icd9_a" => icd9_a, "icd10_a" => icd10_a, "pharmacy" => pharmacy, "key" => key, "section" => section } = Map.merge(%{"symptom" => "上腹痛", "icd9_a" => [], "icd10_a" => [], "pharmacy" => ["消化系溃疡"]}, conn.params)
+    %{"symptom" => symptom, "icd9_a" => icd9_a, "icd10_a" => icd10_a, "pharmacy" => pharmacy } = Map.merge(%{"symptom" => "上腹痛", "icd9_a" => [], "icd10_a" => [], "pharmacy" => ["消化系溃疡"]}, conn.params)
     symptom = Poison.decode!(symptom)
     RuleService.rule_symptom(symptom, icd9_a, icd10_a, pharmacy)
     json conn, %{}

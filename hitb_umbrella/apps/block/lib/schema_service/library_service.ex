@@ -1,5 +1,5 @@
 defmodule Block.LibraryService do
-  import Ecto.Query, warn: false
+  import Ecto.Query
   alias Block.Repo
   alias Block.Library.Cdh
   alias Block.Library.LibWt4
@@ -18,245 +18,95 @@ defmodule Block.LibraryService do
   alias Block.Library.RuleSymptom
 
 
-  def get_cdh() do
-    Repo.all(from p in Cdh, order_by: [desc: p.inserted_at], limit: 1)
+  def get_last(table, file_name)do
+    case table do
+      "cdh" -> from(p in Cdh)
+      "rule_mdc" -> from(p in RuleMdc)
+      "rule_adrg" -> from(p in RuleAdrg)
+      "rule_drg" -> from(p in RuleDrg)
+      "rule_icd9" -> from(p in RuleIcd9)
+      "rule_icd10" -> from(p in RuleIcd10)
+      "chinese_medicine" -> from(p in ChineseMedicine)
+      "chinese_medicine_patent" -> from(p in ChineseMedicinePatent)
+      "lib_wt4" ->
+        case file_name do
+          "" -> from(p in LibWt4)
+          _ -> from(p in LibWt4)|>where([p], p.type == ^file_name)
+        end
+      "rule_cda_icd10" -> from(p in RuleCdaIcd10)
+      "rule_cda_icd9" -> from(p in RuleCdaIcd9)
+      "rule_examine" -> from(p in RuleExamine)
+      "rule_pharmacy" -> from(p in RulePharmacy)
+      "rule_sign" -> from(p in RuleSign)
+      "rule_symptom" -> from(p in RuleSymptom)
+    end
+    |>order_by([p], [desc: p.inserted_at])
+    |>limit([p], 1)
+    |>Repo.all
   end
 
-  def get_rulemdc() do
-    Repo.all(from p in RuleMdc, order_by: [desc: p.inserted_at], limit: 1)
+  def get_all(table) do
+    case table do
+      "cdh" -> from(p in Cdh)
+      "rule_mdc" -> from(p in RuleMdc)
+      "rule_adrg" -> from(p in RuleAdrg)
+      "rule_drg" -> from(p in RuleDrg)
+      "rule_icd9" -> from(p in RuleIcd9)
+      "rule_icd10" -> from(p in RuleIcd10)
+      "chinese_medicine" -> from(p in ChineseMedicine)
+      "chinese_medicine_patent" -> from(p in ChineseMedicinePatent)
+      "lib_wt4" -> from(p in LibWt4)
+      "rule_cda_icd10" -> from(p in RuleCdaIcd10)
+      "rule_cda_icd9" -> from(p in RuleCdaIcd9)
+      "rule_examine" -> from(p in RuleExamine)
+      "rule_pharmacy" -> from(p in RulePharmacy)
+      "rule_sign" -> from(p in RuleSign)
+      "rule_symptom" -> from(p in RuleSymptom)
+    end
+    |>Repo.all
   end
 
-  def get_ruleadrg() do
-    Repo.all(from p in RuleAdrg, order_by: [desc: p.inserted_at], limit: 1)
+  def get_num(table)do
+    case table do
+      "cdh" -> from(p in Cdh)
+      "rule_mdc" -> from(p in RuleMdc)
+      "rule_adrg" -> from(p in RuleAdrg)
+      "rule_drg" -> from(p in RuleDrg)
+      "rule_icd9" -> from(p in RuleIcd9)
+      "rule_icd10" -> from(p in RuleIcd10)
+      "chinese_medicine" -> from(p in ChineseMedicine)
+      "chinese_medicine_patent" -> from(p in ChineseMedicinePatent)
+      "lib_wt4" -> from(p in LibWt4)
+      "rule_cda_icd10" -> from(p in RuleCdaIcd10)
+      "rule_cda_icd9" -> from(p in RuleCdaIcd9)
+      "rule_examine" -> from(p in RuleExamine)
+      "rule_pharmacy" -> from(p in RulePharmacy)
+      "rule_sign" -> from(p in RuleSign)
+      "rule_symptom" -> from(p in RuleSymptom)
+    end
+    |>select([p], count(p.id))
+    |>Repo.all
+    |>List.first
   end
 
-  def get_ruledrg() do
-    Repo.all(from p in RuleDrg, order_by: [desc: p.inserted_at], limit: 1)
-  end
-
-  def get_ruleicd9() do
-    Repo.all(from p in RuleIcd9, order_by: [desc: p.inserted_at], limit: 1)
-  end
-
-  def get_ruleicd10() do
-    Repo.all(from p in RuleIcd10, order_by: [desc: p.inserted_at], limit: 1)
-  end
-
-  def get_chinese_medicine() do
-    Repo.all(from p in ChineseMedicine, order_by: [desc: p.inserted_at], limit: 1)
-  end
-
-  def get_chinese_medicine_patent() do
-     Repo.all(from p in ChineseMedicinePatent, order_by: [desc: p.inserted_at], limit: 1)
-  end
-
-  def get_lib_wt4(file_name2) do
-    Repo.all(from p in LibWt4, where: p.type == ^file_name2, order_by: [desc: p.inserted_at], limit: 1)
-  end
-
-  def get_rule_cda_icd10() do
-    Repo.all(from p in RuleCdaIcd10, order_by: [desc: p.inserted_at], limit: 1)
-  end
-
-  def get_rule_cda_icd9() do
-    Repo.all(from p in RuleCdaIcd9, order_by: [desc: p.inserted_at], limit: 1)
-  end
-
-  def get_rule_examine() do
-    Repo.all(from p in RuleExamine, order_by: [desc: p.inserted_at], limit: 1)
-  end
-
-  def get_rule_pharmacy() do
-    Repo.all(from p in RulePharmacy, order_by: [desc: p.inserted_at], limit: 1)
-  end
-
-  def get_rule_sign() do
-    Repo.all(from p in RuleSign, order_by: [desc: p.inserted_at], limit: 1)
-  end
-
-  def get_rule_symptom() do
-    Repo.all(from p in RuleSymptom, order_by: [desc: p.inserted_at], limit: 1)
-  end
-
-  def get_rulemdcs() do
-    Repo.all(from p in RuleMdc)
-  end
-
-  def get_ruleadrgs() do
-    Repo.all(from p in RuleAdrg)
-  end
-
-  def get_ruledrgs() do
-    Repo.all(from p in RuleDrg)
-  end
-
-  def get_ruleicd9s() do
-    Repo.all(from p in RuleIcd9)
-  end
-
-  def get_ruleicd10s() do
-    Repo.all(from p in RuleIcd10)
-  end
-
-  def get_chinese_medicines() do
-    Repo.all(from p in ChineseMedicine)
-  end
-
-  def get_chinese_medicine_patents() do
-    Repo.all(from p in ChineseMedicinePatent)
-  end
-
-  def get_lib_wt4s() do
-    Repo.all(from p in LibWt4)
-  end
-
-  def get_last_lib_wt4() do
-    Repo.all(from p in LibWt4, order_by: [desc: p.inserted_at], limit: 1)
-  end
-
-  def get_rulemdc_num() do
-    Repo.all(from p in RuleMdc, select: count(p.id))|>List.first
-  end
-
-  def get_ruleadrg_num() do
-    Repo.all(from p in RuleAdrg, select: count(p.id))|>List.first
-  end
-
-  def get_ruledrg_num() do
-    Repo.all(from p in RuleDrg, select: count(p.id))|>List.first
-  end
-
-  def get_ruleicd9_num() do
-    Repo.all(from p in RuleIcd9, select: count(p.id))|>List.first
-  end
-
-  def get_ruleicd10_num() do
-    Repo.all(from p in RuleIcd10, select: count(p.id))|>List.first
-  end
-
-  def get_chinese_medicine_num() do
-    Repo.all(from p in ChineseMedicine, select: count(p.id))|>List.first
-  end
-
-  def get_chinese_medicine_patent_num() do
-     Repo.all(from p in ChineseMedicinePatent, select: count(p.id))|>List.first
-  end
-
-  def get_lib_wt4_num() do
-    Repo.all(from p in LibWt4, select: count(p.id))|>List.first
-  end
-
-  def get_rule_cda_icd10_num() do
-    Repo.all(from p in RuleCdaIcd10, select: count(p.id))|>List.first
-  end
-
-  def get_rule_cda_icd9_num() do
-    Repo.all(from p in RuleCdaIcd9, select: count(p.id))|>List.first
-  end
-
-  def get_rule_examine_num() do
-    Repo.all(from p in RuleExamine, select: count(p.id))|>List.first
-  end
-
-  def get_rule_pharmacy_num() do
-    Repo.all(from p in RulePharmacy, select: count(p.id))|>List.first
-  end
-
-  def get_rule_sign_num() do
-    Repo.all(from p in RuleSign, select: count(p.id))|>List.first
-  end
-
-  def get_rule_symptom_num() do
-    Repo.all(from p in RuleSymptom, select: count(p.id))|>List.first
-  end
-
-  def create_cdh(attr) do
-    %Cdh{}
-    |>Cdh.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_rulemdc(attr) do
-    %RuleMdc{}
-    |>RuleMdc.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_ruleadrg(attr) do
-    %RuleAdrg{}
-    |>RuleAdrg.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_ruledrg(attr) do
-    %RuleDrg{}
-    |>RuleDrg.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_ruleicd9(attr) do
-    %RuleIcd9{}
-    |>RuleIcd9.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_ruleicd10(attr) do
-    %RuleIcd10{}
-    |>RuleIcd10.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_chinese_medicine(attr) do
-    %ChineseMedicine{}
-    |>ChineseMedicine.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_chinese_medicine_patent(attr) do
-    %ChineseMedicinePatent{}
-    |>ChineseMedicinePatent.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_libwt4(attr) do
-    %LibWt4{}
-    |>LibWt4.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_rule_cda_icd10(attr) do
-    %RuleCdaIcd10{}
-    |>RuleCdaIcd10.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_rule_cda_icd9(attr) do
-    %RuleCdaIcd9{}
-    |>RuleCdaIcd9.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_rule_examine(attr) do
-    %RuleExamine{}
-    |>RuleExamine.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_rule_pharmacy(attr) do
-    %RulePharmacy{}
-    |>RulePharmacy.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_rule_sign(attr) do
-    %RuleSign{}
-    |>RuleSign.changeset(attr)
-    |>Repo.insert
-  end
-
-  def create_rule_symptom(attr) do
-    %RuleSymptom{}
-    |>RuleSymptom.changeset(attr)
+  def create(table, attr) do
+    case table do
+      "cdh" -> %Cdh{}|>Cdh.changeset(attr)
+      "rule_mdc" -> %RuleMdc{}|>RuleMdc.changeset(attr)
+      "rule_adrg" -> %RuleAdrg{}|>RuleAdrg.changeset(attr)
+      "rule_drg" -> %RuleDrg{}|>RuleDrg.changeset(attr)
+      "rule_icd9" -> %RuleIcd9{}|>RuleIcd9.changeset(attr)
+      "rule_icd10" -> %RuleIcd10{}|>RuleIcd10.changeset(attr)
+      "chinese_medicine" -> %ChineseMedicine{}|>ChineseMedicine.changeset(attr)
+      "chinese_medicine_patent" -> %ChineseMedicinePatent{}|>ChineseMedicinePatent.changeset(attr)
+      "lib_wt4" -> %LibWt4{}|>LibWt4.changeset(attr)
+      "rule_cda_icd10" -> %RuleCdaIcd10{}|>RuleCdaIcd10.changeset(attr)
+      "rule_cda_icd9" -> %RuleCdaIcd9{}|>RuleCdaIcd9.changeset(attr)
+      "rule_examine" -> %RuleExamine{}|>RuleExamine.changeset(attr)
+      "rule_pharmacy" -> %RulePharmacy{}|>RulePharmacy.changeset(attr)
+      "rule_sign" -> %RuleSign{}|>RuleSign.changeset(attr)
+      "rule_symptom" -> %RuleSymptom{}|>RuleSymptom.changeset(attr)
+    end
     |>Repo.insert
   end
 

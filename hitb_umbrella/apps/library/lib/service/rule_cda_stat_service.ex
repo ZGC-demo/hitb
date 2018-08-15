@@ -1,5 +1,4 @@
 defmodule Library.RuleCdaStatService do
-  import Ecto.Query
   alias Hitb.Repo
   alias Hitb.Library.RuleSymptom #主诉
   alias Hitb.Library.RuleSign #生命体征
