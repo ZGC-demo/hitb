@@ -13,6 +13,8 @@ defmodule Block.Library.RuleCdaIcd10 do
     field :examines, {:array, :string} #检查
     field :create_user, :string
     field :update_user, :string
+    field :previous_hash, :string
+    field :hash, :string
     timestamps()
   end
 
@@ -22,8 +24,8 @@ defmodule Block.Library.RuleCdaIcd10 do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:code, :name, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user])
-    |> validate_required([:code, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user])
+    |> cast(params, [:code, :name, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user, :previous_hash, :hash])
+    |> validate_required([:code, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user, :previous_hash, :hash])
   end
 
 end

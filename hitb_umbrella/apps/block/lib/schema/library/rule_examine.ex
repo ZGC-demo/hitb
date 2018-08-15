@@ -9,6 +9,8 @@ defmodule Block.Library.RuleExamine do
     field :icd10_b, {:array, :string}
     field :create_user, :string
     field :update_user, :string
+    field :previous_hash, :string
+    field :hash, :string
     timestamps()
   end
 
@@ -18,8 +20,8 @@ defmodule Block.Library.RuleExamine do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:examine, :icd10_a, :icd10_b, :create_user, :update_user])
-    |> validate_required([:examine, :icd10_a, :icd10_b, :create_user, :update_user])
+    |> cast(params, [:examine, :icd10_a, :icd10_b, :create_user, :update_user, :previous_hash, :hash])
+    |> validate_required([:examine, :icd10_a, :icd10_b, :create_user, :update_user, :previous_hash, :hash])
   end
 
 end

@@ -9,6 +9,8 @@ defmodule Hitb.Library.Repo.Migrations.RuleSymptom do
         add :pharmacys, {:array, :string} #用药
         add :create_user, :string
         add :update_user, :string
+        add :previous_hash, :string
+        add :hash, :string
         timestamps()
       end
       # create unique_index(:stat_cda, [:items])

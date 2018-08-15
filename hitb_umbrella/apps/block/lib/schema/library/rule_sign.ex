@@ -10,6 +10,8 @@ defmodule Block.Library.RuleSign do
     field :pharmacys, {:array, :string}
     field :create_user, :string
     field :update_user, :string
+    field :previous_hash, :string
+    field :hash, :string
     timestamps()
   end
 
@@ -19,8 +21,8 @@ defmodule Block.Library.RuleSign do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:sign, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user])
-    |> validate_required([:sign, :pharmacys, :create_user, :update_user])
+    |> cast(params, [:sign, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
+    |> validate_required([:sign, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
   end
 
 end

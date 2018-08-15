@@ -13,6 +13,8 @@ defmodule Hitb.Library.Repo.Migrations.RuleCdaIcd10 do
       add :examines, {:array, :string} #检查
       add :create_user, :string
       add :update_user, :string
+      add :previous_hash, :string
+      add :hash, :string
       timestamps()
     end
   end

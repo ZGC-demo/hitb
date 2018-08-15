@@ -9,6 +9,8 @@ defmodule Block.Library.RuleSymptom do
     field :pharmacys, {:array, :string}
     field :create_user, :string
     field :update_user, :string
+    field :previous_hash, :string
+    field :hash, :string
     timestamps()
   end
 
@@ -18,8 +20,8 @@ defmodule Block.Library.RuleSymptom do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:symptom, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user])
-    |> validate_required([:symptom, :pharmacys, :create_user, :update_user])
+    |> cast(params, [:symptom, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
+    |> validate_required([:symptom, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
   end
 
 end

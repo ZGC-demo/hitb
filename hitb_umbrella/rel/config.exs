@@ -30,13 +30,13 @@ environment :dev do
   # dev mode.
   set dev_mode: true
   set include_erts: false
-  set cookie: :"gUZvnKss$S5[nNG5Ki{~er</8`fR<H)6VRr5PbS]pF{)[!uf=>Tc6x|15Rg|uVZ^"
+  set cookie: :"57?d;/MpYDM*h~>0LK5d.L,/~P5Ve>a(f%8%5A.NsDS.qL{Im__0rJ.>90vJ<|`r"
 end
 
 environment :prod do
   set include_erts: true
   set include_src: false
-  set cookie: :"K5,ytb8IRCFjD1*y@KV5j7kEdFJVi*qt;/WVS=w[F@zenw:tSJe%F0!a*(T%Knzi"
+  set cookie: :"AbP@i`7Gfq7npK6EnE0yMa,}Mkm{oMJ,Z:86@70zG~I8GWP(9J6g_|6?Sd>OQfJ1"
 end
 
 # You may define one or more releases in this file.
@@ -51,10 +51,11 @@ release :hitb_umbrella do
     block: :permanent,
     block_web: :permanent,
     edit: :permanent,
-    stat: :permanent,
+    hitb: :permanent,
+    hitbserver_web: :permanent,
     library: :permanent,
     server: :permanent,
-    hitb: :permanent,
-    hitbserver_web: :permanent
+    stat: :permanent
   ]
 end
+
