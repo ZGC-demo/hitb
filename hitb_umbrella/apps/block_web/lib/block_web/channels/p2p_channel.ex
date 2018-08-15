@@ -91,19 +91,4 @@ defmodule BlockWeb.P2pChannel do
   defp send(map) do
     Map.drop(map, [:id, :__meta__, :__struct__])
   end
-
-  # defp data(table, hash) do
-  #   case hash do
-  #     nil ->
-  #       case table do
-  #         "rulemdc_hash" -> OtherSyncService.get_rulemdc
-  #         _ -> []
-  #       end
-  #     _ ->
-  #       case table do
-  #         "rulemdc_hash" -> OtherSyncService.get_rulemdc(hash)
-  #         _ -> []
-  #       end
-  #   end
-  # end
 end

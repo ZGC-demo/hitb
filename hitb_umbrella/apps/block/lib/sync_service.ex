@@ -3,6 +3,12 @@ defmodule Block.SyncService do
   alias Block.Repo
   alias Block.Edit.Cda
   alias Block.Edit.CdaFile
+  alias Block.Library.RuleCdaIcd10
+  alias Block.Library.RuleCdaIcd9
+  alias Block.Library.RuleExamine
+  alias Block.Library.RulePharmacy
+  alias Block.Library.RuleSign
+  alias Block.Library.RuleSymptom
   alias Block.Library.Cdh
   alias Block.Library.RuleAdrg
   alias Block.Library.ChineseMedicinePatent
@@ -73,6 +79,30 @@ defmodule Block.SyncService do
     Repo.all(from p in StatCda, select: p.hash)
   end
 
+  def get_rule_cda_icd10_hash do
+    Repo.all(from p in RuleCdaIcd10, select: p.hash)
+  end
+
+  def get_rule_cda_icd9_hash do
+    Repo.all(from p in RuleCdaIcd9, select: p.hash)
+  end
+
+  def get_rule_examine_hash do
+    Repo.all(from p in RuleExamine, select: p.hash)
+  end
+
+  def get_rule_pharmacy_hash do
+    Repo.all(from p in RulePharmacy, select: p.hash)
+  end
+
+  def get_rule_sign_hash do
+    Repo.all(from p in RuleSign, select: p.hash)
+  end
+
+  def get_rule_symptom_hash do
+    Repo.all(from p in RuleSymptom, select: p.hash)
+  end
+
   def get_data(x, hash) do
     hash = if(hash == nil)do [] else hash end
     case x do
@@ -90,6 +120,12 @@ defmodule Block.SyncService do
       "rulemdc_hash" -> Repo.all(RuleMdc)
       "libwt4_hash" -> Repo.all(LibWt4)
       "wt4_hash" -> Repo.all(Wt4)
+      "rule_cda_icd10" -> Repo.all(RuleCdaIcd10)
+      "rule_cda_icd9" -> Repo.all(RuleCdaIcd9)
+      "rule_examine" -> Repo.all(RuleExamine)
+      "rule_pharmacy" -> Repo.all(RulePharmacy)
+      "rule_sign" -> Repo.all(RuleSign)
+      "rule_symptom" -> Repo.all(RuleSymptom)
       _ -> []
     end
     |>Enum.reject(fn x -> x.hash in hash end)

@@ -13,20 +13,27 @@ defmodule Block.P2pClientHandler do
   alias Block.SyncService
   alias Block.P2pSessionManager
   alias Block.TransactionRepository
-  alias Block.Stat.StatOrg, as: BlockStatOrg
-  alias Block.Stat.StatCda, as: BlockStatCda
-  alias Block.Edit.Cda, as: BlockCda
-  alias Block.Edit.CdaFile, as: BlockCdaFIle
-  alias Block.Library.Cdh, as: BlockCdh
-  alias Block.Library.ChineseMedicinePatent, as: BlockChineseMedicinePatent
-  alias Block.Library.ChineseMedicine, as: BlockChineseMedicine
-  alias Block.Library.RuleMdc, as: BlockRuleMdc
-  alias Block.Library.RuleAdrg, as: BlockRuleAdrg
-  alias Block.Library.RuleDrg, as: BlockRuleDrg
-  alias Block.Library.RuleIcd9, as: BlockRuleIcd9
-  alias Block.Library.RuleIcd10, as: BlockRuleIcd10
-  alias Block.Library.LibWt4, as: BlockLibWt4
-  alias Block.Library.Wt4, as: BlockWt4
+  alias Block.Stat.StatOrg
+  alias Block.Stat.StatCda
+  alias Block.Edit.Cda
+  alias Block.Edit.CdaFile
+  alias Block.Library.Cdh
+  alias Block.Library.ChineseMedicinePatent
+  alias Block.Library.ChineseMedicine
+  alias Block.Library.RuleMdc
+  alias Block.Library.RuleAdrg
+  alias Block.Library.RuleDrg
+  alias Block.Library.RuleIcd9
+  alias Block.Library.RuleIcd10
+  alias Block.Library.LibWt4
+  alias Block.Library.Wt4
+  alias Block.Library.RuleCdaIcd10
+  alias Block.Library.RuleCdaIcd9
+  alias Block.Library.RuleExamine
+  alias Block.Library.RulePharmacy
+  alias Block.Library.RuleSign
+  alias Block.Library.RuleSymptom
+  alias Block.Repo
 
 
 
@@ -157,56 +164,80 @@ defmodule Block.P2pClientHandler do
             ruleicd10_hash: SyncService.get_ruleicd10_hash(),
             rulemdc_hash: SyncService.get_rulemdc_hash(),
             libwt4_hash: SyncService.get_libwt4_hash(),
-            wt4_hash: SyncService.get_wt4_hash()})
+            wt4_hash: SyncService.get_wt4_hash(),
+            rulecdaicd10_hash: SyncService.get_rule_cda_icd10_hash(),
+            rulecdaicd9_hash: SyncService.get_rule_cda_icd9_hash(),
+            ruleexamine_hash: SyncService.get_rule_examine_hash(),
+            rulepharmacy_hash: SyncService.get_rule_pharmacy_hash(),
+            rulesign_hash: SyncService.get_rule_sign_hash(),
+            rulesymptom_hash: SyncService.get_rule_symptom_hash()})
       "other_sync" ->
         Map.keys(response)
         |>Enum.each(fn k ->
             Enum.each(Map.get(response, k), fn x ->
               case k do
                 "statorg_hash" ->
-                  %BlockStatOrg{}
-                  |>BlockStatOrg.changeset(x)
+                  %StatOrg{}
+                  |>StatOrg.changeset(x)
                 "statcda_hash" ->
-                  %BlockStatCda{}
-                  |>BlockStatCda.changeset(x)
+                  %StatCda{}
+                  |>StatCda.changeset(x)
                 "cda_hash" ->
-                  %BlockCda{}
-                  |>BlockCda.changeset(x)
+                  %Cda{}
+                  |>Cda.changeset(x)
                 "cda_file_hash" ->
-                  %BlockCdaFIle{}
-                  |>BlockCdaFIle.changeset(x)
+                  %CdaFile{}
+                  |>CdaFile.changeset(x)
                 "cdh_hash" ->
-                  %BlockCdh{}
-                  |>BlockCdh.changeset(x)
+                  %Cdh{}
+                  |>Cdh.changeset(x)
                 "ruleadrg_hash" ->
-                  %BlockRuleAdrg{}
-                  |>BlockRuleAdrg.changeset(x)
+                  %RuleAdrg{}
+                  |>RuleAdrg.changeset(x)
                 "cmp_hash" ->
-                  %BlockChineseMedicinePatent{}
-                  |>BlockChineseMedicinePatent.changeset(x)
+                  %ChineseMedicinePatent{}
+                  |>ChineseMedicinePatent.changeset(x)
                 "cm_hash" ->
-                  %BlockChineseMedicine{}
-                  |>BlockChineseMedicine.changeset(x)
+                  %ChineseMedicine{}
+                  |>ChineseMedicine.changeset(x)
                 "ruledrg_hash" ->
-                  %BlockRuleDrg{}
-                  |>BlockRuleDrg.changeset(x)
+                  %RuleDrg{}
+                  |>RuleDrg.changeset(x)
                 "ruleicd9_hash" ->
-                  %BlockRuleIcd9{}
-                  |>BlockRuleIcd9.changeset(x)
+                  %RuleIcd9{}
+                  |>RuleIcd9.changeset(x)
                 "ruleicd10_hash" ->
-                  %BlockRuleIcd10{}
-                  |>BlockRuleIcd10.changeset(x)
+                  %RuleIcd10{}
+                  |>RuleIcd10.changeset(x)
                 "rulemdc_hash" ->
-                  %BlockRuleMdc{}
-                  |>BlockRuleMdc.changeset(x)
+                  %RuleMdc{}
+                  |>RuleMdc.changeset(x)
                 "libwt4_hash" ->
-                  %BlockLibWt4{}
-                  |>BlockLibWt4.changeset(x)
+                  %LibWt4{}
+                  |>LibWt4.changeset(x)
                 "wt4_hash" ->
-                  %BlockWt4{}
-                  |>BlockWt4.changeset(x)
+                  %Wt4{}
+                  |>Wt4.changeset(x)
+                "rulecdaicd10_hash" ->
+                  %RuleCdaIcd10{}
+                  |>RuleCdaIcd10.changeset(x)
+                "rulecdaicd9_hash" ->
+                  %RuleCdaIcd9{}
+                  |>RuleCdaIcd9.changeset(x)
+                "ruleexamine_hash" ->
+                  %RuleExamine{}
+                  |>RuleExamine.changeset(x)
+                "rulepharmacy_hash" ->
+                  %RulePharmacy{}
+                  |>RulePharmacy.changeset(x)
+                "rulesign_hash" ->
+                  %RuleSign{}
+                  |>RuleSign.changeset(x)
+                "rulesymptom_hash" ->
+                  %RuleSymptom{}
+                  |>RuleSymptom.changeset(x)
               end
-              |>Block.Repo.insert
+              |>Repo.insert
             end)
         end)
         :timer.send_interval(10000, :ping)
