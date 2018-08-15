@@ -10,6 +10,12 @@ defmodule Block.LibraryService do
   alias Block.Library.RuleIcd10
   alias Block.Library.ChineseMedicine
   alias Block.Library.ChineseMedicinePatent
+  alias Block.Library.RuleCdaIcd10
+  alias Block.Library.RuleCdaIcd9
+  alias Block.Library.RuleExamine
+  alias Block.Library.RulePharmacy
+  alias Block.Library.RuleSign
+  alias Block.Library.RuleSymptom
 
 
   def get_cdh() do
@@ -46,6 +52,30 @@ defmodule Block.LibraryService do
 
   def get_lib_wt4(file_name2) do
     Repo.all(from p in LibWt4, where: p.type == ^file_name2, order_by: [desc: p.inserted_at], limit: 1)
+  end
+
+  def get_rule_cda_icd10() do
+    Repo.all(from p in RuleCdaIcd10, order_by: [desc: p.inserted_at], limit: 1)
+  end
+
+  def get_rule_cda_icd9() do
+    Repo.all(from p in RuleCdaIcd9, order_by: [desc: p.inserted_at], limit: 1)
+  end
+
+  def get_rule_examine() do
+    Repo.all(from p in RuleExamine, order_by: [desc: p.inserted_at], limit: 1)
+  end
+
+  def get_rule_pharmacy() do
+    Repo.all(from p in RulePharmacy, order_by: [desc: p.inserted_at], limit: 1)
+  end
+
+  def get_rule_sign() do
+    Repo.all(from p in RuleSign, order_by: [desc: p.inserted_at], limit: 1)
+  end
+
+  def get_rule_symptom() do
+    Repo.all(from p in RuleSymptom, order_by: [desc: p.inserted_at], limit: 1)
   end
 
   def get_rulemdcs() do
@@ -116,6 +146,30 @@ defmodule Block.LibraryService do
     Repo.all(from p in LibWt4, select: count(p.id))|>List.first
   end
 
+  def get_rule_cda_icd10_num() do
+    Repo.all(from p in RuleCdaIcd10, select: count(p.id))|>List.first
+  end
+
+  def get_rule_cda_icd9_num() do
+    Repo.all(from p in RuleCdaIcd9, select: count(p.id))|>List.first
+  end
+
+  def get_rule_examine_num() do
+    Repo.all(from p in RuleExamine, select: count(p.id))|>List.first
+  end
+
+  def get_rule_pharmacy_num() do
+    Repo.all(from p in RulePharmacy, select: count(p.id))|>List.first
+  end
+
+  def get_rule_sign_num() do
+    Repo.all(from p in RuleSign, select: count(p.id))|>List.first
+  end
+
+  def get_rule_symptom_num() do
+    Repo.all(from p in RuleSymptom, select: count(p.id))|>List.first
+  end
+
   def create_cdh(attr) do
     %Cdh{}
     |>Cdh.changeset(attr)
@@ -167,6 +221,42 @@ defmodule Block.LibraryService do
   def create_libwt4(attr) do
     %LibWt4{}
     |>LibWt4.changeset(attr)
+    |>Repo.insert
+  end
+
+  def create_rule_cda_icd10(attr) do
+    %RuleCdaIcd10{}
+    |>RuleCdaIcd10.changeset(attr)
+    |>Repo.insert
+  end
+
+  def create_rule_cda_icd9(attr) do
+    %RuleCdaIcd9{}
+    |>RuleCdaIcd9.changeset(attr)
+    |>Repo.insert
+  end
+
+  def create_rule_examine(attr) do
+    %RuleExamine{}
+    |>RuleExamine.changeset(attr)
+    |>Repo.insert
+  end
+
+  def create_rule_pharmacy(attr) do
+    %RulePharmacy{}
+    |>RulePharmacy.changeset(attr)
+    |>Repo.insert
+  end
+
+  def create_rule_sign(attr) do
+    %RuleSign{}
+    |>RuleSign.changeset(attr)
+    |>Repo.insert
+  end
+
+  def create_rule_symptom(attr) do
+    %RuleSymptom{}
+    |>RuleSymptom.changeset(attr)
     |>Repo.insert
   end
 

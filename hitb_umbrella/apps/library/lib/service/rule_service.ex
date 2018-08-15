@@ -235,6 +235,7 @@ defmodule Library.RuleService do
       #增加传过来数据库中没有的
       Enum.reject(data, fn x -> join(header, x) in result_key end)
       |>Enum.map(fn x ->
+          x = Map.merge(x, %{create_user: username, update_user: username})
           case filename do
             "mdc" -> %HitbRuleMdc{}|>HitbRuleMdc.changeset(x)
             "adrg" -> %HitbRuleAdrg{}|>HitbRuleAdrg.changeset(x)

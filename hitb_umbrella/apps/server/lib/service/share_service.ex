@@ -25,6 +25,12 @@ defmodule Server.ShareService do
   alias Hitb.Library.ChineseMedicine
   alias Hitb.Server.User
   alias Library.RuleService
+  alias Hitb.Library.RuleCdaIcd10
+  alias Hitb.Library.RuleCdaIcd9
+  alias Hitb.Library.RuleExamine
+  alias Hitb.Library.RulePharmacy
+  alias Hitb.Library.RuleSign
+  alias Hitb.Library.RuleSymptom
 
   def share(type, file_name, username, content) do
     content =
@@ -47,6 +53,12 @@ defmodule Server.ShareService do
             "icd10.csv" -> LibraryService.get_ruleicd10()
             "中药.csv" -> LibraryService.get_chinese_medicine()
             "中成药.csv" -> LibraryService.get_chinese_medicine_patent()
+            "诊断规则.csv" -> LibraryService.get_rule_cda_icd10()
+            "手术规则.csv" -> LibraryService.get_rule_cda_icd9()
+            "检查规则.csv" -> LibraryService.get_rule_examine()
+            "药品规则.csv" -> LibraryService.get_rule_pharmacy()
+            "体征规则.csv" -> LibraryService.get_rule_sign()
+            "症状规则.csv" -> LibraryService.get_rule_symptom()
             _ ->
               file_name2 = String.split(file_name, ".")|>List.first
               LibraryService.get_lib_wt4(file_name2)
@@ -86,7 +98,7 @@ defmodule Server.ShareService do
           Enum.reject(stat, fn x -> "#{x.org}-#{x.time}" not in cont end)
         "library" ->
           file_name2 = String.split(file_name, ".")|>List.first
-          RuleService.client(1, "year", file_name2, "BJ", "", "", 0, "server", "asc", "code").library
+          RuleService.client(1, "year", file_name2, "", "", "", 0, "server", "asc", "code", username).library
       end
     data =
       Enum.reduce(data, [[], previous_hash], fn x, acc ->
@@ -101,7 +113,7 @@ defmodule Server.ShareService do
                 file_name in ["mdc.csv", "adrg.csv", "drg.csv", "icd9.csv", "icd10.csv"] ->
                   hash("#{x.code}#{x.name}#{x.version}#{x.year}")
                 true ->
-                  hash("#{x.code}#{x.name}")
+                  hash("#{x.code}")
               end
           end
         x = Map.drop(x, [:id, :__meta__, :__struct__])
@@ -125,6 +137,12 @@ defmodule Server.ShareService do
               "icd10.csv" -> LibraryService.create_ruleicd10(x)
               "中药.csv" -> LibraryService.create_chinese_medicine(x)
               "中成药.csv" -> LibraryService.create_chinese_medicine_patent(x)
+              "诊断规则.csv" -> LibraryService.create_rule_cda_icd10()
+              "手术规则.csv" -> LibraryService.create_rule_cda_icd9()
+              "检查规则.csv" -> LibraryService.create_rule_examine()
+              "药品规则.csv" -> LibraryService.create_rule_pharmacy()
+              "体征规则.csv" -> LibraryService.create_rule_sign()
+              "症状规则.csv" -> LibraryService.create_rule_symptom()
               _ -> LibraryService.create_libwt4(x)
             end
         end
@@ -147,6 +165,13 @@ defmodule Server.ShareService do
     chinese_medicine = LibraryService.get_chinese_medicine_num()
     chinese_medicine_patent = LibraryService.get_chinese_medicine_patent_num()
     lib_wt4 = LibraryService.get_lib_wt4_num()
+    rule_cda_icd10 = LibraryService.get_rule_cda_icd10_num()
+    rule_cda_icd9 = LibraryService.get_rule_cda_icd9_num()
+    rule_examine = LibraryService.get_rule_examine_num()
+    rule_pharmacy = LibraryService.get_rule_pharmacy_num()
+    rule_sign = LibraryService.get_rule_sign_num()
+    rule_symptom = LibraryService.get_rule_symptom_num()
+
     last_edit =
       case edit do
         0 -> "-"
@@ -197,7 +222,37 @@ defmodule Server.ShareService do
         0 -> "-"
         _ -> LibraryService.get_last_lib_wt4|>Map.get(:inserted_at)|>List.first|>Time.stime_ecto
       end
-    [%{key: "edit", val: edit, last: last_edit}, %{key: "stat_org", val: stat_org, last: last_stat_org}, %{key: "mdc", val: mdc, last: last_mdc}, %{key: "adrg", val: adrg, last: last_adrg}, %{key: "drg", val: drg, last: last_drg}, %{key: "icd9", val: icd9, last: last_icd9}, %{key: "icd10", val: icd10, last: last_icd10}, %{key: "chinese_medicine", val: chinese_medicine, last: last_chinese_medicine}, %{key: "chinese_medicine_patent", val: chinese_medicine_patent, last: last_chinese_medicine_patent}, %{key: "lib_wt4", val: lib_wt4, last: last_lib_wt4}]
+    last_rule_cda_icd10 =
+      case rule_cda_icd10 do
+        0 -> "-"
+        _ -> LibraryService.get_last_rule_cda_icd10|>Map.get(:inserted_at)|>List.first|>Time.stime_ecto
+      end
+    last_rule_cda_icd9 =
+      case rule_cda_icd9 do
+        0 -> "-"
+        _ -> LibraryService.get_last_rule_cda_icd9|>Map.get(:inserted_at)|>List.first|>Time.stime_ecto
+      end
+    last_rule_examine =
+      case rule_examine do
+        0 -> "-"
+        _ -> LibraryService.get_last_rule_examine|>Map.get(:inserted_at)|>List.first|>Time.stime_ecto
+      end
+    last_rule_pharmacy =
+      case rule_pharmacy do
+        0 -> "-"
+        _ -> LibraryService.get_last_rule_pharmacy|>Map.get(:inserted_at)|>List.first|>Time.stime_ecto
+      end
+    last_rule_sign =
+      case rule_sign do
+        0 -> "-"
+        _ -> LibraryService.get_last_rule_sign|>Map.get(:inserted_at)|>List.first|>Time.stime_ecto
+      end
+    last_rule_symptom =
+      case rule_symptom do
+        0 -> "-"
+        _ -> LibraryService.get_last_rule_symptom|>Map.get(:inserted_at)|>List.first|>Time.stime_ecto
+      end
+    [%{key: "edit", val: edit, last: last_edit}, %{key: "stat_org", val: stat_org, last: last_stat_org}, %{key: "mdc", val: mdc, last: last_mdc}, %{key: "adrg", val: adrg, last: last_adrg}, %{key: "drg", val: drg, last: last_drg}, %{key: "icd9", val: icd9, last: last_icd9}, %{key: "icd10", val: icd10, last: last_icd10}, %{key: "chinese_medicine", val: chinese_medicine, last: last_chinese_medicine}, %{key: "chinese_medicine_patent", val: chinese_medicine_patent, last: last_chinese_medicine_patent}, %{key: "lib_wt4", val: lib_wt4, last: last_lib_wt4}, %{key: "rule_cda_icd10", val: rule_cda_icd10, last: last_rule_cda_icd10}, %{key: "rule_cda_icd9", val: rule_cda_icd9, last: last_rule_cda_icd9}, %{key: "rule_examine", val: rule_examine, last: last_rule_examine}, %{key: "rule_pharmacy", val: rule_pharmacy, last: last_rule_pharmacy}, %{key: "rule_sign", val: rule_sign, last: last_rule_sign}, %{key: "rule_symptom", val: rule_symptom, last: last_rule_symptom}]
   end
 
   def insert(table, _time) do
@@ -229,6 +284,24 @@ defmodule Server.ShareService do
         table == "chinese_medicine_patent" ->
           Repo.all(from p in ChineseMedicinePatent, select: %{code: p.code, name: p.name})
           |>Enum.map(fn x -> hash("#{x.code}#{x.name}") end)
+        table == "rule_cda_icd10" ->
+          Repo.all(from p in RuleCdaIcd10, select: %{code: p.code})
+          |>Enum.map(fn x -> hash("#{x.code}") end)
+        table == "rule_cda_icd9" ->
+          Repo.all(from p in RuleCdaIcd9, select: %{code: p.code})
+          |>Enum.map(fn x -> hash("#{x.code}") end)
+        table == "rule_examine" ->
+          Repo.all(from p in RuleExamine, select: %{code: p.code})
+          |>Enum.map(fn x -> hash("#{x.code}") end)
+        table == "rule_pharmacy" ->
+          Repo.all(from p in RulePharmacy, select: %{code: p.code})
+          |>Enum.map(fn x -> hash("#{x.code}") end)
+        table == "rule_sign" ->
+          Repo.all(from p in RuleSign, select: %{code: p.code})
+          |>Enum.map(fn x -> hash("#{x.code}") end)
+        table == "rule_symptom" ->
+          Repo.all(from p in RuleSymptom, select: %{code: p.code})
+          |>Enum.map(fn x -> hash("#{x.code}") end)
         true ->
           Repo.all(from p in LibWt4, select: %{code: p.code, name: p.name})
           |>Enum.map(fn x -> hash("#{x.code}#{x.name}") end)
@@ -245,6 +318,12 @@ defmodule Server.ShareService do
         "chinese_medicine" -> LibraryService.get_chinese_medicines()
         "chinese_medicine_patent" -> LibraryService.get_chinese_medicine_patents()
         "lib_wt4" -> LibraryService.get_lib_wt4s()
+        "rule_cda_icd10" -> LibraryService.get_rule_cda_icd10s()
+        "rule_cda_icd9" -> LibraryService.get_rule_cda_icd9s()
+        "rule_examine" -> LibraryService.get_rule_examines()
+        "rule_pharmacy" -> LibraryService.get_rule_pharmacys()
+        "rule_sign" -> LibraryService.get_rule_signs()
+        "rule_symptom" -> LibraryService.get_rule_symptoms()
       end
     data
     |>Enum.reject(fn x -> x.hash in hashs end)
@@ -261,6 +340,12 @@ defmodule Server.ShareService do
           "chinese_medicine" -> %ChineseMedicine{}|>ChineseMedicine.changeset(x)
           "chinese_medicine_patent" -> %ChineseMedicinePatent{}|>ChineseMedicinePatent.changeset(x)
           "lib_wt4" -> %LibWt4{}|>LibWt4.changeset(x)
+          "rule_cda_icd10" -> %RuleCdaIcd10{}|>RuleCdaIcd10.changeset(x)
+          "rule_cda_icd9" -> %RuleCdaIcd9{}|>RuleCdaIcd9.changeset(x)
+          "rule_examine" -> %RuleExamine{}|>RuleExamine.changeset(x)
+          "rule_pharmacy" -> %RulePharmacy{}|>RulePharmacy.changeset(x)
+          "rule_sign" -> %RuleSign{}|>RuleSign.changeset(x)
+          "rule_symptom" -> %RuleSymptom{}|>RuleSymptom.changeset(x)
         end
         |>Repo.insert
       end)
