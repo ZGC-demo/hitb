@@ -41,9 +41,9 @@ defmodule Server.ShareService do
       end
     latest =
       case file_name do
-        "cdh" -> LibraryService.get_last()
-        "edit" -> EditService.get_last()
-        "stat" -> StatService.get_last()
+        "cdh" -> LibraryService.get_last("cda","")
+        "edit" -> EditService.get_cda()
+        "stat" -> StatService.get_stat()
         "library" ->
           cond do
             file_name in ["mdc.csv", "adrg.csv", "drg.csv", "icd9.csv", "icd10.csv", "中药.csv", "中成药.csv", "诊断规则.csv", "手术规则.csv", "检查规则.csv", "药品规则.csv", "体征规则.csv", "症状规则.csv"] ->
@@ -125,9 +125,9 @@ defmodule Server.ShareService do
   def get_share() do
     #分析和病案部分
     stat_org = StatService.get_stat_num()
-    last_stat_org = StatService.get_last()
+    last_stat_org = StatService.get_stat()
     edit = EditService.get_cda_num()
-    last_edit = EditService.get_last()
+    last_edit = EditService.get_cda()
     re = [%{key: "edit", val: edit, last: last_edit}, %{key: "stat_org", val: stat_org, last: last_stat_org}]
     #规则部分
     list = ["cdh", "mdc", "adrg", "drg", "icd9", "icd10", "chinese_medicine", "chinese_medicine_patent", "lib_wt4", "rule_cda_icd10", "rule_cda_icd9", "rule_examine", "rule_pharmacy", "rule_sign", "rule_symptom"]
@@ -139,7 +139,7 @@ defmodule Server.ShareService do
           last =
             case x.val do
               0 -> "-"
-              _ -> LibraryService.get_last(x.key, "")
+              _ -> LibraryService.get_last(x.key, "")|>Map.get(:inserted_at)|>List.first|>Time.stime_ecto
             end
           Map.put(x, :last, last)
         end)
@@ -203,8 +203,7 @@ defmodule Server.ShareService do
         "stat_org" -> StatService.get_stats()
         _ -> LibraryService.get_all(table)
       end
-    data
-    |>Enum.reject(fn x -> x.hash in hashs end)
+    Enum.reject(data, fn x -> x.hash in hashs end)
     |>Enum.map(fn x ->
         x = Map.drop(x, [:id, :__meta__, :__struct__])
         case table do
