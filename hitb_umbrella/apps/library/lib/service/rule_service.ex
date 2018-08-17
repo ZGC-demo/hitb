@@ -52,9 +52,9 @@ defmodule Library.RuleService do
           schema = RuleQuery.tab(server_type, tab_type)
           keys =
             if(tab_type in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"])do
-              Enum.reject(schema.__schema__(:fields), fn x -> x in [:__meta__, :__struct__, :inserted_at, :updated_at, :id, :create_user, :update_user] end)
+              Enum.reject(schema.__schema__(:fields), fn x -> x in [:__meta__, :__struct__, :inserted_at, :updated_at, :create_user, :update_user] end)
             else
-              Enum.reject(schema.__schema__(:fields), fn x -> x in [:__meta__, :__struct__, :inserted_at, :updated_at, :id, :icdc, :icdc_az, :icdcc, :nocc_1, :nocc_a, :nocc_aa, :org, :plat, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :drgs_1, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc, :create_user, :update_user] end)
+              Enum.reject(schema.__schema__(:fields), fn x -> x in [:__meta__, :__struct__, :inserted_at, :updated_at, :icdc, :icdc_az, :icdcc, :nocc_1, :nocc_a, :nocc_aa, :org, :plat, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :drgs_1, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc, :create_user, :update_user] end)
             end
           [Enum.map(keys, fn x -> Key.cn(x) end)]
         _ ->
@@ -209,6 +209,9 @@ defmodule Library.RuleService do
   end
 
   def client_save(filename, server_type, username, data, rows, order_type, order) do
+    schema = RuleQuery.tab(server_type, filename)
+    IO.inspect  schema.__schema__(:type, :name)
+
     if(length(data) > 0)do
       [result, _, _, _, _, _, _, _, _, _] = RuleQuery.get_rule(1, "", filename, "", "", "", rows, server_type, order_type, Key.en(order), "", username)
       #去掉文件头
@@ -223,8 +226,15 @@ defmodule Library.RuleService do
         Enum.map(data, fn x ->
           x = String.split(x, ",")
           Enum.reduce(header, %{}, fn k, acc ->
+            field_type = schema.__schema__(:type, k)
             index = Enum.find_index(header, fn ks -> ks == k end)
             value = Enum.at(x, index)
+            value =
+              if(field_type == {:array, :string})do
+                String.split(value, "，")|>Enum.reject(fn x -> x == "" end)
+              else
+                value
+              end
             Map.put(acc, k, value)
           end)
         end)

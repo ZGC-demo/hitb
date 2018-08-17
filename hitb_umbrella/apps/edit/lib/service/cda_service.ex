@@ -6,12 +6,20 @@ defmodule Edit.CdaService do
   alias Hitb.Edit.Cda, as: HitbCda
   alias Hitb.Edit.CdaFile, as: HitbCdaFile
   alias Hitb.Library.Cdh, as: HitbCdh
+  alias Block.Library.Cdh, as: BlockCdh
   alias Block.Edit.CdaFile, as: BlockCdaFile
   alias Block.Edit.Cda, as: BlockCda
   alias Hitb.Edit.MyMould
   alias Hitb.Time
   alias Hitb.Server.User
   alias Edit.PatientService
+
+  def cda_count(username) do
+    user = HitbRepo.all(from p in HitbCda, where: p.username == ^username, select: count(p.id))|>List.first
+    server = HitbRepo.all(from p in HitbCda, select: count(p.id))|>List.first
+    block = BlockRepo.all(from p in BlockCda, select: count(p.id))|>List.first
+    %{user: user, server: server, block: block}
+  end
 
   def cda_user(server_type) do
     cda_users =
@@ -129,6 +137,7 @@ defmodule Edit.CdaService do
     randSec = :os.system_time(:seconds)
     [randSec, randSecs, randMegaSecs] |> Enum.map(fn x -> to_string(x) end) |> Enum.join("")
   end
+
   def cdh_control(key, value, username) do
     cdh = HitbRepo.get_by(HitbCdh, key: key, username: username)
     result =
@@ -141,5 +150,12 @@ defmodule Edit.CdaService do
         "添加成功"
       end
     %{result: result}
+  end
+
+  def cdh_count(username) do
+    user = HitbRepo.all(from p in HitbCdh, where: p.username == ^username, select: count(p.id))|>List.first
+    server = HitbRepo.all(from p in HitbCdh, select: count(p.id))|>List.first
+    block = BlockRepo.all(from p in BlockCdh, select: count(p.id))|>List.first
+    %{user: user, server: server, block: block}
   end
 end

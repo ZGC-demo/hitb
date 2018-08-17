@@ -1,6 +1,7 @@
 defmodule Library.Key do
   def cn(key) do
     case to_string(key) do
+      "id" -> "ID"
       "code" -> "编码"
       "name" -> "名称"
       "type" -> "分类"
@@ -58,6 +59,7 @@ defmodule Library.Key do
 
   def en(key) do
     case to_string(key) do
+      "ID" -> "id"
       "编码" -> "code"
       "名称" -> "name"
       "分类" -> "type"

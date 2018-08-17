@@ -2,6 +2,9 @@ defmodule HitbserverWeb.OnlineChannel do
   use Phoenix.Channel
   require Logger
   alias Server.UserService
+  alias Edit.CdaService
+  alias Edit.HelpService
+  alias Library.RuleCdaStatService
 
   def join("online:list", message, socket) do
     if(message["username"])do
@@ -49,6 +52,21 @@ defmodule HitbserverWeb.OnlineChannel do
   def handle_in("用户信息", _private, socket) do
     user = Map.get(socket, :assigns)
     broadcast! socket, "用户信息", %{user: user}
+    {:noreply, socket}
+  end
+
+  def handle_in("首页信息", _private, socket) do
+    user = Map.get(socket, :assigns)
+    #文档
+    cda = CdaService.cda_count(user.username)
+    #输入框提示
+    help = HelpService.help_count()
+    #病案质控
+    cdh = CdaService.cdh_count(user.username)
+    #专家提示
+    symptom = RuleCdaStatService.symptom_count(user.username)
+    # 返回
+    broadcast! socket, "首页信息", %{cda: cda, help: help, cdh: cdh, symptom: symptom}
     {:noreply, socket}
   end
 

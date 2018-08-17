@@ -20,7 +20,7 @@ defmodule Edit.HelpService do
         %{success: true, info: "修改成功"}
     end
   end
-  
+
   def help_list() do
     Repo.all(from p in ClinetHelp, select: p.name)
   end
@@ -31,6 +31,11 @@ defmodule Edit.HelpService do
       nil -> []
       _ -> help.content
     end
+  end
+
+  def help_count()do
+     server = help_file()|>String.split("\\n")|>length
+     %{user: "-", server: server, block: 0}
   end
 
 end
