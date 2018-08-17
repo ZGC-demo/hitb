@@ -19,7 +19,7 @@ defmodule Hitb.Library.RuleExamine do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:examine, :icd10_a, :create_user, :update_user])
-    |> validate_required([:examine, :icd10_a, :create_user, :update_user])
+    |> validate_required([:examine, :create_user, :update_user])
   end
 
 end

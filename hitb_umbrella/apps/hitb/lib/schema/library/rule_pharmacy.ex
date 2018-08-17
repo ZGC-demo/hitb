@@ -19,7 +19,7 @@ defmodule Hitb.Library.RulePharmacy do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:pharmacy, :icd10_a, :symptoms, :create_user, :update_user])
-    |> validate_required([:pharmacy, :icd10_a, :symptoms, :create_user, :update_user])
+    |> validate_required([:pharmacy, :create_user, :update_user])
   end
 
 end

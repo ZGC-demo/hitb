@@ -45,16 +45,17 @@ defmodule Library.RuleService do
 
   def client(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order, username) do
     [result, page_list, page_num, count, _, _, _, list, _, _] = RuleQuery.get_rule(page, type, tab_type, version, year, dissect, rows, server_type, order_type, Key.en(order), "", username)
-    result = RuleQuery.del_key(result, tab_type)
+    result = RuleQuery.del_key(result, tab_type, username)
     result =
       case length(result) do
         0 ->
           schema = RuleQuery.tab(server_type, tab_type)
           keys =
-            if(tab_type in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"])do
-              Enum.reject(schema.__schema__(:fields), fn x -> x in [:__meta__, :__struct__, :inserted_at, :updated_at, :create_user, :update_user] end)
-            else
-              Enum.reject(schema.__schema__(:fields), fn x -> x in [:__meta__, :__struct__, :inserted_at, :updated_at, :icdc, :icdc_az, :icdcc, :nocc_1, :nocc_a, :nocc_aa, :org, :plat, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :drgs_1, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc, :create_user, :update_user] end)
+            cond do
+              tab_type in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] ->
+                Enum.reject(schema.__schema__(:fields), fn x -> x in [:__meta__, :__struct__, :inserted_at, :updated_at, :create_user, :update_user] end)
+              true ->
+                Enum.reject(schema.__schema__(:fields), fn x -> x in [:__meta__, :__struct__, :inserted_at, :updated_at, :icdc, :icdc_az, :icdcc, :nocc_1, :nocc_a, :nocc_aa, :org, :plat, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :drgs_1, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc, :create_user, :update_user] end)
             end
           [Enum.map(keys, fn x -> Key.cn(x) end)]
         _ ->
@@ -141,7 +142,7 @@ defmodule Library.RuleService do
   #下载
   def download(filename) do
     [result, _, _, _, _, _, _, _, _, _] = RuleQuery.get_rule(1, "", filename, "", "", "", 0, "server", "", "", "download", "")
-    result = RuleQuery.del_key(result, filename)
+    result = RuleQuery.del_key(result, filename, "")
     result =
       case length(result) do
         0 -> []
@@ -161,7 +162,7 @@ defmodule Library.RuleService do
         "server" -> HitbRepo.all(from p in tab, limit: 1)
         "block" -> BlockRepo.all(from p in tab, limit: 1)
       end
-      |>RuleQuery.del_key(filename)|>List.first|>Map.keys
+      |>RuleQuery.del_key(filename, "")|>List.first|>Map.keys
     query = RuleQuery.table(filename, tab)
     query =
       case tab do
@@ -181,7 +182,7 @@ defmodule Library.RuleService do
         "server" -> HitbRepo.all(query)
         "block" -> BlockRepo.all(query)
       end
-    result = RuleQuery.del_key(result, filename)
+    result = RuleQuery.del_key(result, filename, "")
     result =
       case length(result) do
         0 -> []
@@ -210,17 +211,15 @@ defmodule Library.RuleService do
 
   def client_save(filename, server_type, username, data, rows, order_type, order) do
     schema = RuleQuery.tab(server_type, filename)
-    IO.inspect  schema.__schema__(:type, :name)
-
     if(length(data) > 0)do
       [result, _, _, _, _, _, _, _, _, _] = RuleQuery.get_rule(1, "", filename, "", "", "", rows, server_type, order_type, Key.en(order), "", username)
+      # IO.inspect result
       #去掉文件头
       data = List.delete_at(data, 0)
       #取得表头
       header = data|>List.first|>String.split(",")|>Enum.map(fn x -> Key.en(x)|>String.to_atom end)
       #去掉表头,并拆分行列
       data = List.delete_at(data, 0)|>Enum.reject(fn x -> x == "" end)
-      data_key = data
       #将数组转换为对象
       data =
         Enum.map(data, fn x ->
@@ -230,30 +229,25 @@ defmodule Library.RuleService do
             index = Enum.find_index(header, fn ks -> ks == k end)
             value = Enum.at(x, index)
             value =
-              if(field_type == {:array, :string})do
-                String.split(value, "，")|>Enum.reject(fn x -> x == "" end)
-              else
-                value
+              cond do
+                k == :id and value in ["", "-"] -> ""
+                k == :id -> String.to_integer(value)
+                field_type == {:array, :string} -> String.split(value, "，")|>Enum.reject(fn x -> x == "" end)
+                true -> value
               end
             Map.put(acc, k, value)
           end)
         end)
-      result_key =
-        Enum.map(result, fn x ->
-          Enum.map(header, fn k ->
-            Map.get(x, k)
-          end)
-          |>Enum.join(",")
-        end)
-      #判断是否有旧的需要删除(删除数据库中不在传入的数据内,要么是客户端修改的,要么是删除的)
-      Enum.reject(result, fn x -> join(header, x) in data_key end)
-      |>Enum.map(fn x ->
+      data_id = Enum.map(data, fn x -> x.id end)
+      #判断是否有要删除的
+      Enum.reject(result, fn x -> x.id in data_id end)
+      |>Enum.each(fn x ->
           HitbRepo.delete!(x)
         end)
-      #增加传过来数据库中没有的
-      Enum.reject(data, fn x -> join(header, x) in result_key end)
-      |>Enum.map(fn x ->
-          x = Map.merge(x, %{create_user: username, update_user: username})
+      #判断是否有要添加的
+      Enum.reject(data, fn x -> x.id != "" end)
+      |>Enum.each(fn x ->
+          x = Map.delete(x, :id)|>Map.merge(%{create_user: username, update_user: username})
           case filename do
             "mdc" -> %HitbRuleMdc{}|>HitbRuleMdc.changeset(x)
             "adrg" -> %HitbRuleAdrg{}|>HitbRuleAdrg.changeset(x)
@@ -274,6 +268,23 @@ defmodule Library.RuleService do
               |>HitbLibWt4.changeset(Map.merge(x, %{type: filename}))
           end
           |>HitbRepo.insert
+        end)
+      #用来判断是否修改
+      result_key =
+        Enum.map(result, fn x ->
+          Enum.map(header, fn k ->
+            Map.get(x, k)
+          end)
+          |>Enum.join(",")
+        end)
+      #判断修改
+      Enum.reject(data, fn x -> x.id == "" end)
+      |>Enum.reject(fn x -> join(header, x) in result_key end)
+      |>Enum.each(fn x ->
+          att = HitbRepo.get_by(schema, id: x.id)
+          att
+          |>schema.changeset(x)
+          |>HitbRepo.update
         end)
     end
   end

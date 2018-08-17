@@ -23,7 +23,7 @@ defmodule Hitb.Library.RuleCdaIcd9 do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:code, :name, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user])
-    |> validate_required([:code, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user])
+    |> validate_required([:code, :create_user, :update_user])
   end
 
 end

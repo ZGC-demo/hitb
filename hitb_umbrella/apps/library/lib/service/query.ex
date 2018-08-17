@@ -115,8 +115,12 @@ defmodule Library.RuleQuery do
               from(p in tab)
           end
         tab_type in ["模板", "诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] ->
-          from(w in tab)
-          |>where([w], w.create_user == ^username)
+          case username do
+            "" -> from(w in tab)
+            _ ->
+              from(w in tab)
+              |>where([w], w.create_user == ^username)
+          end
         true->
           cond do
             year != "" and version != "" and dissect == "" -> from(w in tab)|>where([w], w.year == ^year and w.version == ^version)
@@ -213,14 +217,17 @@ defmodule Library.RuleQuery do
     end
   end
 
-  def del_key(result, tab_type) do
+  def del_key(result, tab_type, username) do
     result
     |>Enum.map(fn x ->
-      if(tab_type in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"])do
-        Map.drop(x, [:__meta__, :__struct__, :inserted_at, :updated_at])
-      else
-        Map.drop(x, [:__meta__, :__struct__, :inserted_at, :updated_at, :icdc, :icdc_az, :icdcc, :nocc_1, :nocc_a, :nocc_aa, :org, :plat, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :drgs_1, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc])
-      end
+        cond do
+          tab_type in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] and username == "" ->
+            Map.drop(x, [:__meta__, :__struct__, :inserted_at, :updated_at])
+          tab_type in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] ->
+            Map.drop(x, [:__meta__, :__struct__, :inserted_at, :updated_at, :create_user, :update_user])
+          true ->
+            Map.drop(x, [:__meta__, :__struct__, :inserted_at, :updated_at, :icdc, :icdc_az, :icdcc, :nocc_1, :nocc_a, :nocc_aa, :org, :plat, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :drgs_1, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc])
+        end
       end)
     |>Enum.map(fn x ->
         #根据key取到value值,判断是否是list,是list补充中文逗号
