@@ -290,6 +290,7 @@ defmodule Library.RuleService do
   end
 
   def client_save2(filename, server_type, username, data, rows, order_type, order) do
+    schema = RuleQuery.tab(server_type, filename)
     if(length(data) > 0)do
       #去掉文件头
       data = List.delete_at(data, 0)
