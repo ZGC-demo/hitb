@@ -15,6 +15,7 @@ defmodule HitbserverWeb.RecordView do
       type: record.type,
       mode: record.mode,
       value: record.value,
-      username: record.username}
+      username: record.username,
+      datetime: record.datetime}
   end
 end

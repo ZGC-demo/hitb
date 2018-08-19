@@ -289,6 +289,66 @@ defmodule Library.RuleService do
     end
   end
 
+  def client_save2(filename, server_type, username, data, rows, order_type, order) do
+    if(length(data) > 0)do
+      #去掉文件头
+      data = List.delete_at(data, 0)
+      #取得表头
+      header = data|>List.first|>String.split(",")|>Enum.map(fn x -> Key.en(x)|>String.to_atom end)
+      #去掉表头,并拆分行列
+      data = List.delete_at(data, 0)|>Enum.reject(fn x -> x == "" end)
+      #将数组转换为对象
+      data =
+        Enum.map(data, fn x ->
+          x = String.split(x, ",")
+          Enum.reduce(header, %{}, fn k, acc ->
+            field_type = schema.__schema__(:type, k)
+            index = Enum.find_index(header, fn ks -> ks == k end)
+            value = Enum.at(x, index)
+            value =
+              cond do
+                k == :id and value in ["", "-"] -> ""
+                k == :id -> String.to_integer(value)
+                field_type == {:array, :string} -> String.split(value, "，")|>Enum.reject(fn x -> x == "" end)
+                true -> value
+              end
+            Map.put(acc, k, value)
+          end)
+        end)
+      #判断是否存在id
+      Enum.each(data, fn x ->
+        case x.id do
+          "" ->
+            x = Map.delete(x, :id)|>Map.merge(%{create_user: username, update_user: username})
+            case filename do
+              "mdc" -> %HitbRuleMdc{}|>HitbRuleMdc.changeset(x)
+              "adrg" -> %HitbRuleAdrg{}|>HitbRuleAdrg.changeset(x)
+              "drg" -> %HitbRuleDrg{}|>HitbRuleDrg.changeset(x)
+              "icd9" -> %HitbRuleIcd9{}|>HitbRuleIcd9.changeset(x)
+              "icd10" -> %HitbRuleIcd10{}|>HitbRuleIcd10.changeset(x)
+              "中药" -> %HitbChineseMedicine{}|>HitbChineseMedicine.changeset(x)
+              "中成药" -> %HitbChineseMedicinePatent{}|>HitbChineseMedicinePatent.changeset(x)
+              "西药" -> %HitbWesternMedicine{}|>HitbWesternMedicine.changeset(x)
+              "诊断规则" -> %RuleCdaIcd10{}|>RuleCdaIcd10.changeset(x)
+              "手术规则" -> %RuleCdaIcd9{}|>RuleCdaIcd9.changeset(x)
+              "检查规则" -> %RuleExamine{}|>RuleExamine.changeset(x)
+              "药品规则" -> %RulePharmacy{}|>RulePharmacy.changeset(x)
+              "体征规则" -> %RuleSign{}|>RuleSign.changeset(x)
+              "症状规则" -> %RuleSymptom{}|>RuleSymptom.changeset(x)
+              _ ->
+                %HitbLibWt4{}
+                |>HitbLibWt4.changeset(Map.merge(x, %{type: filename}))
+            end
+            |>HitbRepo.insert
+          _ ->
+            HitbRepo.get_by(schema, id: x.id)
+            |>schema.changeset(x)
+            |>HitbRepo.update
+        end
+      end)
+    end
+  end
+
   defp join(header, data) do
     Enum.map(header, fn k -> Map.get(data, k) end)|>Enum.join(",")
   end

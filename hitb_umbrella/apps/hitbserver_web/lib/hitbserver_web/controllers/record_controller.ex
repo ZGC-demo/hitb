@@ -7,8 +7,9 @@ defmodule HitbserverWeb.RecordController do
   action_fallback HitbserverWeb.FallbackController
 
   def index(conn, %{"page"=> page}) do
-    [count, record] = RecordService.list_record(page, 15)
-    [page_num, page_list, _count] = Hitb.Page.page_list(page, count, 15)
+    %{"rows" => rows} = Map.merge(%{"rows" => 15}, conn.params)
+    [count, record] = RecordService.list_record(page, rows)
+    [page_num, page_list, _count] = Hitb.Page.page_list(page, count, rows)
     render(conn, "index.json", record: record, page_num: page_num, page_list: page_list)
   end
 
