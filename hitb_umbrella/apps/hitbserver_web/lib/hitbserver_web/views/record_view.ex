@@ -11,11 +11,20 @@ defmodule HitbserverWeb.RecordView do
   end
 
   def render("record.json", %{record: record}) do
-    %{id: record.id,
-      type: record.type,
-      mode: record.mode,
-      value: record.value,
-      username: record.username,
-      datetime: record.datetime}
+    case Map.get(record, :datetime) do
+      nil ->
+        %{id: record.id,
+        type: record.type,
+        mode: record.mode,
+        value: record.value,
+        username: record.username}
+      _ ->
+        %{id: record.id,
+        type: record.type,
+        mode: record.mode,
+        value: record.value,
+        username: record.username,
+        datetime: record.datetime}
+    end
   end
 end
