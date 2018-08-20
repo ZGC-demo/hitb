@@ -289,64 +289,67 @@ defmodule Library.RuleService do
     end
   end
 
-  def client_save2(filename, server_type, username, data, rows, order_type, order) do
+  def client_save2(data, type, page, type, filename, version, year, dissect, rows, server_type, order_type, order, username) do
     schema = RuleQuery.tab(server_type, filename)
-    if(length(data) > 0)do
+    if(length(data) > 1)do
       #去掉文件头
-      data = List.delete_at(data, 0)
+      # data = List.delete_at(data, 0)
       #取得表头
-      header = data|>List.first|>String.split(",")|>Enum.map(fn x -> Key.en(x)|>String.to_atom end)
+      header = data|>List.first|>Enum.map(fn x -> Key.en(x)|>String.to_atom end)
       #去掉表头,并拆分行列
-      data = List.delete_at(data, 0)|>Enum.reject(fn x -> x == "" end)
+      data = List.delete_at(data, 0)|>Enum.reject(fn x -> x == "" end)|>hd
       #将数组转换为对象
       data =
-        Enum.map(data, fn x ->
-          x = String.split(x, ",")
-          Enum.reduce(header, %{}, fn k, acc ->
-            field_type = schema.__schema__(:type, k)
-            index = Enum.find_index(header, fn ks -> ks == k end)
-            value = Enum.at(x, index)
-            value =
-              cond do
-                k == :id and value in ["", "-"] -> ""
-                k == :id -> String.to_integer(value)
-                field_type == {:array, :string} -> String.split(value, "，")|>Enum.reject(fn x -> x == "" end)
-                true -> value
-              end
-            Map.put(acc, k, value)
-          end)
+        Enum.reduce(header, %{}, fn k, acc ->
+          field_type = schema.__schema__(:type, k)
+          index = Enum.find_index(header, fn ks -> ks == k end)
+          value = Enum.at(data, index)
+          value =
+            cond do
+              field_type == {:array, :string} -> String.split(value, "，")|>Enum.reject(fn x -> x == "" end)
+              true -> value
+            end
+          Map.put(acc, k, value)
         end)
-      #判断是否存在id
-      Enum.each(data, fn x ->
-        case x.id do
-          "" ->
-            x = Map.delete(x, :id)|>Map.merge(%{create_user: username, update_user: username})
+      file_info = HitbRepo.get_by(HitbLibraryFile, file_name: filename)
+      info =
+        case type do
+          "change" ->
+            HitbRepo.get_by(schema, id: data.id)
+            |>schema.changeset(data)
+            |>HitbRepo.update
+            "字典更新成功!"
+          "add" ->
             case filename do
-              "mdc" -> %HitbRuleMdc{}|>HitbRuleMdc.changeset(x)
-              "adrg" -> %HitbRuleAdrg{}|>HitbRuleAdrg.changeset(x)
-              "drg" -> %HitbRuleDrg{}|>HitbRuleDrg.changeset(x)
-              "icd9" -> %HitbRuleIcd9{}|>HitbRuleIcd9.changeset(x)
-              "icd10" -> %HitbRuleIcd10{}|>HitbRuleIcd10.changeset(x)
-              "中药" -> %HitbChineseMedicine{}|>HitbChineseMedicine.changeset(x)
-              "中成药" -> %HitbChineseMedicinePatent{}|>HitbChineseMedicinePatent.changeset(x)
-              "西药" -> %HitbWesternMedicine{}|>HitbWesternMedicine.changeset(x)
-              "诊断规则" -> %RuleCdaIcd10{}|>RuleCdaIcd10.changeset(x)
-              "手术规则" -> %RuleCdaIcd9{}|>RuleCdaIcd9.changeset(x)
-              "检查规则" -> %RuleExamine{}|>RuleExamine.changeset(x)
-              "药品规则" -> %RulePharmacy{}|>RulePharmacy.changeset(x)
-              "体征规则" -> %RuleSign{}|>RuleSign.changeset(x)
-              "症状规则" -> %RuleSymptom{}|>RuleSymptom.changeset(x)
+              "mdc" -> %HitbRuleMdc{}|>HitbRuleMdc.changeset(data)
+              "adrg" -> %HitbRuleAdrg{}|>HitbRuleAdrg.changeset(data)
+              "drg" -> %HitbRuleDrg{}|>HitbRuleDrg.changeset(data)
+              "icd9" -> %HitbRuleIcd9{}|>HitbRuleIcd9.changeset(data)
+              "icd10" -> %HitbRuleIcd10{}|>HitbRuleIcd10.changeset(data)
+              "中药" -> %HitbChineseMedicine{}|>HitbChineseMedicine.changeset(data)
+              "中成药" -> %HitbChineseMedicinePatent{}|>HitbChineseMedicinePatent.changeset(data)
+              "西药" -> %HitbWesternMedicine{}|>HitbWesternMedicine.changeset(data)
+              "诊断规则" -> %RuleCdaIcd10{}|>RuleCdaIcd10.changeset(data)
+              "手术规则" -> %RuleCdaIcd9{}|>RuleCdaIcd9.changeset(data)
+              "检查规则" -> %RuleExamine{}|>RuleExamine.changeset(data)
+              "药品规则" -> %RulePharmacy{}|>RulePharmacy.changeset(data)
+              "体征规则" -> %RuleSign{}|>RuleSign.changeset(data)
+              "症状规则" -> %RuleSymptom{}|>RuleSymptom.changeset(data)
               _ ->
                 %HitbLibWt4{}
-                |>HitbLibWt4.changeset(Map.merge(x, %{type: filename}))
+                |>HitbLibWt4.changeset(Map.merge(data, %{type: filename}))
             end
             |>HitbRepo.insert
-          _ ->
-            HitbRepo.get_by(schema, id: x.id)
-            |>schema.changeset(x)
-            |>HitbRepo.update
+            "字典新建成功!"
+          "delete" ->
+            HitbRepo.get_by(schema, id: data.id)
+            |>HitbRepo.delete!
+            "字典删除成功!"
         end
-      end)
+      result = client(page, type, filename, version, year, dissect, rows, server_type, order_type, order, username)
+      Map.put(result, :info, "字典新建成功!")
+    else
+      %{info: "字典修改失败,未知错误!"}
     end
   end
 

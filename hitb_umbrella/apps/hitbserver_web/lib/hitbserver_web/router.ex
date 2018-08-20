@@ -160,6 +160,7 @@ defmodule HitbserverWeb.Router do
     get "/rule_symptom", RuleController, :rule_symptom
     post "/symptom_serach", RuleController, :symptom_serach
     post "/client_save", RuleController, :client_save
+    post "/client_save2", RuleController, :client_save2
     get "/client_save", RuleController, :client_save
   end
 

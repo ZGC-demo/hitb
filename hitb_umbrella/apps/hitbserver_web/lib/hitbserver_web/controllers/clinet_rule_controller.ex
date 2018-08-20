@@ -105,4 +105,20 @@ defmodule HitbserverWeb.RuleController do
     RuleService.client_save(tab_type, server_type, username, data, rows, order_type, order)
     json conn, %{result: true}
   end
+
+  #客户端规则保存
+  def client_save2(conn, _params) do
+    IO.inspect conn.params
+    %{"data" => data, "page" => page, "type" => type, "tab_type" => tab_type, "version" => version, "year" => year, "dissect" => dissect, "rows" => rows, "server_type" => server_type, "order_type" => order_type, "order" => order, "username" => username} = Map.merge(%{"data" => "[]", "page" => "1", "type" => "year", "tab_type" => "mdc", "version" => "BJ", "year" => "", "dissect" => "", "rows" => 15, "server_type" => "server", "order_type" => "asc", "order" => "编码", "username" => ""}, conn.params)
+
+    order =
+      cond do
+        tab_type == "西药" and order == "编码" -> "英文名称"
+        tab_type == "cdh" and order == "编码" -> "键"
+        true -> order
+      end
+    data = Poison.decode!(data)
+    result = RuleService.client_save2(data, type, page, type, tab_type, version, year, dissect, rows, server_type, order_type, order, username)
+    json conn, result
+  end
 end
