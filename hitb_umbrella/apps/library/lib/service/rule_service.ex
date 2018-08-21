@@ -213,7 +213,6 @@ defmodule Library.RuleService do
     schema = RuleQuery.tab(server_type, filename)
     if(length(data) > 0)do
       [result, _, _, _, _, _, _, _, _, _] = RuleQuery.get_rule(1, "", filename, "", "", "", rows, server_type, order_type, Key.en(order), "", username)
-      # IO.inspect result
       #去掉文件头
       data = List.delete_at(data, 0)
       #取得表头

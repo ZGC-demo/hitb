@@ -17,6 +17,7 @@ defmodule Library.RuleQuery do
   alias Hitb.Library.RulePharmacy
   alias Hitb.Library.RuleSign
   alias Hitb.Library.RuleSymptom
+  alias Hitb.Library.MdeKnow
   alias Block.Library.RuleMdc, as: BlockRuleMdc
   alias Block.Library.RuleAdrg, as: BlockRuleAdrg
   alias Block.Library.RuleDrg, as: BlockRuleDrg
@@ -47,8 +48,8 @@ defmodule Library.RuleQuery do
         "download" ->
           query
         _ ->
-          if(tab_type in ["模板", "诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"])do
-            query
+          if(tab_type in ["模板", "诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则", "医学知识库"])do
+            query|>limit([w], ^rows)|>offset([w], ^skip)
           else
             my_order(query, order_type, String.to_atom(order))|>limit([w], ^rows)|>offset([w], ^skip)
           end
@@ -114,7 +115,7 @@ defmodule Library.RuleQuery do
             true ->
               from(p in tab)
           end
-        tab_type in ["模板", "诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] ->
+        tab_type in ["模板", "诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则", "医学知识库"] ->
           case username do
             "" -> from(w in tab)
             _ ->
@@ -137,7 +138,7 @@ defmodule Library.RuleQuery do
       cond do
         tab_type in ["mdc", "adrg", "drg", "icd9", "icd10"] ->
           %{time: ["全部"] ++ repo.all(from p in tab, distinct: true, select: p.year), version: ["全部"] ++ repo.all(from p in tab, distinct: true, select: p.version), org: ["全部"] ++ repo.all(from p in tab, distinct: true, select: p.org)}
-        tab_type in ["中药", "中成药", "西药", "模板", "模板", "诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] ->
+        tab_type in ["中药", "中成药", "西药", "模板", "模板", "诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则", "医学知识库"] ->
           %{time: [], org: [], version: []}
         true ->
           %{time: ["全部"] ++ repo.all(from p in tab, distinct: true, select: p.year), org: [], version: []}
@@ -203,6 +204,7 @@ defmodule Library.RuleQuery do
           "中药" -> HitbChineseMedicine
           "中成药" -> HitbChineseMedicinePatent
           "西药" -> HitbWesternMedicine
+          "医学知识库" -> MdeKnow
           _ -> HitbLibWt4
         end
       "block" ->
@@ -221,9 +223,9 @@ defmodule Library.RuleQuery do
     result
     |>Enum.map(fn x ->
         cond do
-          tab_type in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] and username == "" ->
+          tab_type in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则", "医学知识库"] and username == "" ->
             Map.drop(x, [:__meta__, :__struct__, :inserted_at, :updated_at])
-          tab_type in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] ->
+          tab_type in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则", "医学知识库"] ->
             Map.drop(x, [:__meta__, :__struct__, :inserted_at, :updated_at, :create_user, :update_user])
           true ->
             Map.drop(x, [:__meta__, :__struct__, :inserted_at, :updated_at, :icdc, :icdc_az, :icdcc, :nocc_1, :nocc_a, :nocc_aa, :org, :plat, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :drgs_1, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc])
