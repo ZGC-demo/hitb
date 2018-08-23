@@ -163,6 +163,7 @@ defmodule Library.RuleService do
         "block" -> BlockRepo.all(from p in tab, limit: 1)
       end
       |>RuleQuery.del_key(filename, "")|>List.first|>Map.keys
+    query_keys = keys -- [:id]
     query = RuleQuery.table(filename, tab)
     query =
       case tab do
@@ -171,7 +172,7 @@ defmodule Library.RuleService do
           query
           |>where([p], like(p.code, ^value) or like(p.name, ^value) or like(p.year, ^value))
         _ ->
-        Enum.reduce(keys, query, fn x, acc ->
+        Enum.reduce(query_keys, query, fn x, acc ->
           value = "%#{value}%"
           acc
           |>or_where([p],  like(field(p, ^x), ^value))
