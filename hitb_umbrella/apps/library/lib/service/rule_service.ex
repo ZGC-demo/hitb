@@ -311,15 +311,15 @@ defmodule Library.RuleService do
           Map.put(acc, k, value)
         end)
       file_info = HitbRepo.get_by(HitbLibraryFile, file_name: filename)
-      info =
+      [info, id] =
         case type do
           "change" ->
-            HitbRepo.get_by(schema, id: data.id)
+            res = HitbRepo.get_by(schema, id: data.id)
             |>schema.changeset(data)
             |>HitbRepo.update
-            "字典更新成功!"
+            ["字典更新成功!", elem(res, 1).id]
           "add" ->
-            case filename do
+            res = case filename do
               "mdc" -> %HitbRuleMdc{}|>HitbRuleMdc.changeset(data)
               "adrg" -> %HitbRuleAdrg{}|>HitbRuleAdrg.changeset(data)
               "drg" -> %HitbRuleDrg{}|>HitbRuleDrg.changeset(data)
@@ -339,14 +339,14 @@ defmodule Library.RuleService do
                 |>HitbLibWt4.changeset(Map.merge(data, %{type: filename}))
             end
             |>HitbRepo.insert
-            "字典新建成功!"
+            ["字典新建成功!", elem(res, 1).id]
           "delete" ->
             HitbRepo.get_by(schema, id: data.id)
             |>HitbRepo.delete!
-            "字典删除成功!"
+            ["字典新建成功!", "-"]
         end
       result = client(page, type, filename, version, year, dissect, rows, server_type, order_type, order, username)
-      Map.put(result, :info, "字典新建成功!")
+      Map.merge(result, %{info: info, id: id})
     else
       %{info: "字典修改失败,未知错误!"}
     end
