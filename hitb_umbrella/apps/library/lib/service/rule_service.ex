@@ -343,12 +343,12 @@ defmodule Library.RuleService do
           "delete" ->
             HitbRepo.get_by(schema, id: data.id)
             |>HitbRepo.delete!
-            ["字典新建成功!", "-"]
+            ["字典删除成功!", "-"]
         end
       result = client(page, type, filename, version, year, dissect, rows, server_type, order_type, order, username)
       Map.merge(result, %{info: info, id: id})
     else
-      %{info: "字典修改失败,未知错误!"}
+      %{info: "字典操作失败,未知错误!"}
     end
   end
 
