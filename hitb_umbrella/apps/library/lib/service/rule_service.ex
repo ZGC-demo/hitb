@@ -289,15 +289,14 @@ defmodule Library.RuleService do
     end
   end
 
-  def client_save2(data, type, page, type, filename, version, year, dissect, rows, server_type, order_type, order, username) do
+  def client_save2(data, header, type, page, type, filename, version, year, dissect, rows, server_type, order_type, order, username) do
     schema = RuleQuery.tab(server_type, filename)
     if(length(data) > 1)do
       #去掉文件头
       # data = List.delete_at(data, 0)
       #取得表头
       header = data|>List.first|>Enum.map(fn x -> Key.en(x)|>String.to_atom end)
-      #去掉表头,并拆分行列
-      data = List.delete_at(data, 0)|>Enum.reject(fn x -> x == "" end)|>hd
+
       #将数组转换为对象
       data =
         Enum.reduce(header, %{}, fn k, acc ->
@@ -311,14 +310,13 @@ defmodule Library.RuleService do
             end
           Map.put(acc, k, value)
         end)
-      file_info = HitbRepo.get_by(HitbLibraryFile, file_name: filename)
-      [info, id] =
+      [info, id, result] =
         case type do
           "change" ->
             res = HitbRepo.get_by(schema, id: data.id)
             |>schema.changeset(data)
             |>HitbRepo.update
-            ["字典更新成功!", elem(res, 1).id]
+            ["字典更新成功!", elem(res, 1).id, %{}]
           "add" ->
             res = case filename do
               "mdc" -> %HitbRuleMdc{}|>HitbRuleMdc.changeset(data)
@@ -340,13 +338,13 @@ defmodule Library.RuleService do
                 |>HitbLibWt4.changeset(Map.merge(data, %{type: filename}))
             end
             |>HitbRepo.insert
-            ["字典新建成功!", elem(res, 1).id]
+            ["字典新建成功!", elem(res, 1).id, %{}]
           "delete" ->
+            result = client(page, type, filename, version, year, dissect, rows, server_type, order_type, order, username)
             HitbRepo.get_by(schema, id: data.id)
             |>HitbRepo.delete!
-            ["字典删除成功!", "-"]
+            ["字典删除成功!", "-", result]
         end
-      result = client(page, type, filename, version, year, dissect, rows, server_type, order_type, order, username)
       Map.merge(result, %{info: info, id: id})
     else
       %{info: "字典操作失败,未知错误!"}

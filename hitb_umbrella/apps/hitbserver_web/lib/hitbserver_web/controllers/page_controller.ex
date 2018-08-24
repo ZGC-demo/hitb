@@ -18,6 +18,18 @@ defmodule HitbserverWeb.PageController do
   end
 
   def test(conn, _params) do
+    {:ok, str} = File.read("/home/hitb2/a.csv")
+    String.split(str, "\n") -- [""]
+    |>Enum.each(fn x ->
+        [icd10_a, pharmacy, symptoms] = String.split(x, "&")
+        icd10_a = String.split(icd10_a, ",")|>Enum.reject(fn x -> x == "" end)
+        symptoms = String.split(symptoms, ",")|>Enum.reject(fn x -> x == "" end)
+        %Hitb.Library.RulePharmacy{}
+        |>Hitb.Library.RulePharmacy.changeset(%{pharmacy: pharmacy, icd10_a: icd10_a, symptoms: symptoms, create_user: "wangtianao@hitb.com.cn", update_user: "wangtianao@hitb.com.cn"})
+        |>Hitb.Repo.insert
+    end)
+
+
     # {:ok, conn} = Mongo.start_link(url: "mongodb://localhost:27017/test")
     # cursor = Mongo.find(conn, "MedKnow", %{})
     # a = cursor
@@ -50,9 +62,6 @@ defmodule HitbserverWeb.PageController do
     #     |>Hitb.Repo.insert
     #   end)
     #
-
-
-
 
 
     # Gets an enumerable cursor for the results
