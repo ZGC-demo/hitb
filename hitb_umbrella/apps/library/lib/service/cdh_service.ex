@@ -2,20 +2,21 @@ defmodule Library.CdhService do
   # import Ecto
   import Ecto.Query
   alias Hitb.Repo
-  alias Hitb.Library.Cdh, as: HitbCdh
-  alias Block.Library.Cdh, as: BlockCdh
+  alias Hitb.Library.Cdh
   alias Hitb.Page
   alias Library.Key
+  alias Block.Library.Cdh, as: BlockCdh
+  alias Block.Repo, as: BlockRepo
 
   def cdh_list() do
-    Repo.all(HitbCdh)
+    Repo.all(Cdh)
     |>Enum.map(fn x ->
         Map.drop(x, [:__meta__, :__struct__])
       end)
   end
 
   def channel_cdh_list() do
-    Repo.all(HitbCdh)
+    Repo.all(Cdh)
     |>Enum.reduce(%{}, fn x, acc ->
         content = x.content|>String.split(" ")|>Enum.reject(fn x -> x == nil end)
         value = Map.get(acc, x.name)
@@ -35,13 +36,21 @@ defmodule Library.CdhService do
       end
     rows = if(is_integer(rows))do rows else String.to_integer(rows) end
     skip = Page.skip(page, rows)
-    query = if(server_type == "server")do from(w in HitbCdh) else from(w in BlockCdh) end
-    count = query |> select([w], count(w.id)) |> Repo.all |> List.first
+    query = if(server_type == "server")do from(w in Cdh) else from(w in BlockCdh) end
+    count =
+      case server_type  do
+        "server" -> query|>select([w], count(w.id))|>Repo.all|>List.first
+        _ -> query|>select([w], count(w.id))|>BlockRepo.all|>List.first
+      end
     order2 = Key.en(order)|>String.to_atom
-    result = order_by(query, [w], asc: field(w, ^order2))
+    query = order_by(query, [w], asc: field(w, ^order2))
       |> limit([w], ^rows)
       |> offset([w], ^skip)
-      |> Repo.all
+    result =
+      case server_type do
+        "server" -> query|>Repo.all
+        _ -> query|>BlockRepo.all
+      end
     result =
       case length(result) do
         0 -> []

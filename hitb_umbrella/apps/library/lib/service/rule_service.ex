@@ -3,28 +3,29 @@ defmodule Library.RuleService do
   import Ecto.Query
   alias Hitb.Page
   alias Hitb.Time
-  alias Hitb.Repo, as: HitbRepo
-  alias Block.Repo, as: BlockRepo
-  alias Hitb.Library.RuleSymptom, as: HitbRuleSymptom
+  alias Hitb.Repo
+  alias Hitb.Library.RuleSymptom
   alias Library.RuleQuery
-  alias Hitb.Library.LibraryFile, as: HitbLibraryFile
+  alias Hitb.Library.LibraryFile
   alias Library.Key
-  alias Block.LibraryService
-  alias Hitb.Library.RuleMdc, as: HitbRuleMdc
-  alias Hitb.Library.RuleAdrg, as: HitbRuleAdrg
-  alias Hitb.Library.RuleDrg, as: HitbRuleDrg
-  alias Hitb.Library.RuleIcd9, as: HitbRuleIcd9
-  alias Hitb.Library.RuleIcd10, as: HitbRuleIcd10
-  alias Hitb.Library.LibWt4, as: HitbLibWt4
-  alias Hitb.Library.ChineseMedicine, as: HitbChineseMedicine
-  alias Hitb.Library.ChineseMedicinePatent, as: HitbChineseMedicinePatent
-  alias Hitb.Library.WesternMedicine, as: HitbWesternMedicine
+  alias Hitb.Library.RuleMdc
+  alias Hitb.Library.RuleAdrg
+  alias Hitb.Library.RuleDrg
+  alias Hitb.Library.RuleIcd9
+  alias Hitb.Library.RuleIcd10
+  alias Hitb.Library.LibWt4
+  alias Hitb.Library.ChineseMedicine
+  alias Hitb.Library.ChineseMedicinePatent
+  alias Hitb.Library.WesternMedicine
   alias Hitb.Library.RuleCdaIcd10
   alias Hitb.Library.RuleCdaIcd9
   alias Hitb.Library.RuleExamine
   alias Hitb.Library.RulePharmacy
   alias Hitb.Library.RuleSign
   alias Hitb.Library.RuleSymptom
+
+  alias Block.Repo, as: BlockRepo
+  alias Block.LibraryService
 
   def json(page, type, tab_type, version, year, dissect, rows, _, _) do
     #取得分析结果
@@ -38,7 +39,7 @@ defmodule Library.RuleService do
     case server_type do
       "block" -> LibraryService.get_block_file()
       _ ->
-        HitbRepo.all(from p in HitbLibraryFile, select: p.file_name)
+        Repo.all(from p in LibraryFile, select: p.file_name)
         |>Enum.map(fn x -> "#{x}.csv" end)
     end
   end
@@ -62,7 +63,7 @@ defmodule Library.RuleService do
           keys = Map.keys(List.first(result))|>Enum.map(fn x -> Key.cn(x) end)
           [keys] ++ Enum.map(result, fn x -> Map.values(x) end)
       end
-    file_info = HitbRepo.get_by(HitbLibraryFile, file_name: tab_type)
+    file_info = Repo.get_by(LibraryFile, file_name: tab_type)
     result =
       case file_info do
         nil -> []
@@ -78,7 +79,7 @@ defmodule Library.RuleService do
     result = String.split(id, "-")
       |>Enum.map(fn x ->
           x = String.to_integer(x)
-          HitbRepo.all(from p in tab, where: p.id == ^x)
+          Repo.all(from p in tab, where: p.id == ^x)
         end)
       |>List.flatten
     [result, c] =
@@ -109,8 +110,8 @@ defmodule Library.RuleService do
   #维度
   def details(code, table, version) do
     tab = RuleQuery.tab("server", table)
-    result = HitbRepo.all(from p in tab, where: p.code == ^code)
-    result1 = HitbRepo.all(from p in tab, where: p.code == ^code and p.version == ^version)
+    result = Repo.all(from p in tab, where: p.code == ^code)
+    result1 = Repo.all(from p in tab, where: p.code == ^code and p.version == ^version)
     result = Enum.map(result, fn x ->
       Map.drop(x, [:__meta__, :__struct__])
     end)
@@ -129,9 +130,9 @@ defmodule Library.RuleService do
       |> limit([w], 10)
       |> offset([w], ^skip)
       |> order_by([w], [asc: w.id])
-      |> HitbRepo.all
+      |> Repo.all
     query = from w in tab, where: like(w.code, ^code) or like(w.name, ^code), select: count(w.id)
-    count = hd(HitbRepo.all(query))
+    count = hd(Repo.all(query))
     [page_num, page_list, _count] = Page.page_list(page, count, 10)
     result = Enum.map(result, fn x ->
       Map.drop(x, [:__meta__, :__struct__])
@@ -159,7 +160,7 @@ defmodule Library.RuleService do
     #取得要搜索表的表头
     keys =
       case servertype do
-        "server" -> HitbRepo.all(from p in tab, limit: 1)
+        "server" -> Repo.all(from p in tab, limit: 1)
         "block" -> BlockRepo.all(from p in tab, limit: 1)
       end
       |>RuleQuery.del_key(filename, "")|>List.first|>Map.keys
@@ -180,7 +181,7 @@ defmodule Library.RuleService do
       end
     result =
       case servertype do
-        "server" -> HitbRepo.all(query)
+        "server" -> Repo.all(query)
         "block" -> BlockRepo.all(query)
       end
     result = RuleQuery.del_key(result, filename, "")
@@ -195,17 +196,17 @@ defmodule Library.RuleService do
   end
 
   def rule_symptom(symptom, icd9_a, icd10_a, pharmacy) do
-    symptoms = HitbRepo.get_by(HitbRuleSymptom, symptom: symptom)
+    symptoms = Repo.get_by(RuleSymptom, symptom: symptom)
     if symptoms != nil do
       symptoms
-      |> HitbRuleSymptom.changeset(%{icd9_a: icd9_a, icd10_a: icd10_a, pharmacy: pharmacy})
-      |> HitbRepo.update()
+      |> RuleSymptom.changeset(%{icd9_a: icd9_a, icd10_a: icd10_a, pharmacy: pharmacy})
+      |> Repo.update()
       %{success: true, info: "保存成功"}
     else
       body = %{"symptom" => symptom, "icd9_a" => icd9_a, "icd10_a" => icd10_a, "pharmacy" => pharmacy}
-      %HitbRuleSymptom{}
-      |> HitbRuleSymptom.changeset(body)
-      |> HitbRepo.insert()
+      %RuleSymptom{}
+      |> RuleSymptom.changeset(body)
+      |> Repo.insert()
       %{success: true, info: "保存成功"}
     end
   end
@@ -242,21 +243,21 @@ defmodule Library.RuleService do
       #判断是否有要删除的
       Enum.reject(result, fn x -> x.id in data_id end)
       |>Enum.each(fn x ->
-          HitbRepo.delete!(x)
+          Repo.delete!(x)
         end)
       #判断是否有要添加的
       Enum.reject(data, fn x -> x.id != "" end)
       |>Enum.each(fn x ->
           x = Map.delete(x, :id)|>Map.merge(%{create_user: username, update_user: username})
           case filename do
-            "mdc" -> %HitbRuleMdc{}|>HitbRuleMdc.changeset(x)
-            "adrg" -> %HitbRuleAdrg{}|>HitbRuleAdrg.changeset(x)
-            "drg" -> %HitbRuleDrg{}|>HitbRuleDrg.changeset(x)
-            "icd9" -> %HitbRuleIcd9{}|>HitbRuleIcd9.changeset(x)
-            "icd10" -> %HitbRuleIcd10{}|>HitbRuleIcd10.changeset(x)
-            "中药" -> %HitbChineseMedicine{}|>HitbChineseMedicine.changeset(x)
-            "中成药" -> %HitbChineseMedicinePatent{}|>HitbChineseMedicinePatent.changeset(x)
-            "西药" -> %HitbWesternMedicine{}|>HitbWesternMedicine.changeset(x)
+            "mdc" -> %RuleMdc{}|>RuleMdc.changeset(x)
+            "adrg" -> %RuleAdrg{}|>RuleAdrg.changeset(x)
+            "drg" -> %RuleDrg{}|>RuleDrg.changeset(x)
+            "icd9" -> %RuleIcd9{}|>RuleIcd9.changeset(x)
+            "icd10" -> %RuleIcd10{}|>RuleIcd10.changeset(x)
+            "中药" -> %ChineseMedicine{}|>ChineseMedicine.changeset(x)
+            "中成药" -> %ChineseMedicinePatent{}|>ChineseMedicinePatent.changeset(x)
+            "西药" -> %WesternMedicine{}|>WesternMedicine.changeset(x)
             "诊断规则" -> %RuleCdaIcd10{}|>RuleCdaIcd10.changeset(x)
             "手术规则" -> %RuleCdaIcd9{}|>RuleCdaIcd9.changeset(x)
             "检查规则" -> %RuleExamine{}|>RuleExamine.changeset(x)
@@ -264,10 +265,10 @@ defmodule Library.RuleService do
             "体征规则" -> %RuleSign{}|>RuleSign.changeset(x)
             "症状规则" -> %RuleSymptom{}|>RuleSymptom.changeset(x)
             _ ->
-              %HitbLibWt4{}
-              |>HitbLibWt4.changeset(Map.merge(x, %{type: filename}))
+              %LibWt4{}
+              |>LibWt4.changeset(Map.merge(x, %{type: filename}))
           end
-          |>HitbRepo.insert
+          |>Repo.insert
         end)
       #用来判断是否修改
       result_key =
@@ -281,10 +282,10 @@ defmodule Library.RuleService do
       Enum.reject(data, fn x -> x.id == "" end)
       |>Enum.reject(fn x -> join(header, x) in result_key end)
       |>Enum.each(fn x ->
-          att = HitbRepo.get_by(schema, id: x.id)
+          att = Repo.get_by(schema, id: x.id)
           att
           |>schema.changeset(x)
-          |>HitbRepo.update
+          |>Repo.update
         end)
     end
   end
@@ -313,20 +314,20 @@ defmodule Library.RuleService do
       [info, id, result] =
         case type do
           "change" ->
-            res = HitbRepo.get_by(schema, id: data.id)
+            res = Repo.get_by(schema, id: data.id)
             |>schema.changeset(data)
-            |>HitbRepo.update
+            |>Repo.update
             ["字典更新成功!", elem(res, 1).id, %{}]
           "add" ->
             res = case filename do
-              "mdc" -> %HitbRuleMdc{}|>HitbRuleMdc.changeset(data)
-              "adrg" -> %HitbRuleAdrg{}|>HitbRuleAdrg.changeset(data)
-              "drg" -> %HitbRuleDrg{}|>HitbRuleDrg.changeset(data)
-              "icd9" -> %HitbRuleIcd9{}|>HitbRuleIcd9.changeset(data)
-              "icd10" -> %HitbRuleIcd10{}|>HitbRuleIcd10.changeset(data)
-              "中药" -> %HitbChineseMedicine{}|>HitbChineseMedicine.changeset(data)
-              "中成药" -> %HitbChineseMedicinePatent{}|>HitbChineseMedicinePatent.changeset(data)
-              "西药" -> %HitbWesternMedicine{}|>HitbWesternMedicine.changeset(data)
+              "mdc" -> %RuleMdc{}|>RuleMdc.changeset(data)
+              "adrg" -> %RuleAdrg{}|>RuleAdrg.changeset(data)
+              "drg" -> %RuleDrg{}|>RuleDrg.changeset(data)
+              "icd9" -> %RuleIcd9{}|>RuleIcd9.changeset(data)
+              "icd10" -> %RuleIcd10{}|>RuleIcd10.changeset(data)
+              "中药" -> %ChineseMedicine{}|>ChineseMedicine.changeset(data)
+              "中成药" -> %ChineseMedicinePatent{}|>ChineseMedicinePatent.changeset(data)
+              "西药" -> %WesternMedicine{}|>WesternMedicine.changeset(data)
               "诊断规则" -> %RuleCdaIcd10{}|>RuleCdaIcd10.changeset(data)
               "手术规则" -> %RuleCdaIcd9{}|>RuleCdaIcd9.changeset(data)
               "检查规则" -> %RuleExamine{}|>RuleExamine.changeset(data)
@@ -334,15 +335,15 @@ defmodule Library.RuleService do
               "体征规则" -> %RuleSign{}|>RuleSign.changeset(data)
               "症状规则" -> %RuleSymptom{}|>RuleSymptom.changeset(data)
               _ ->
-                %HitbLibWt4{}
-                |>HitbLibWt4.changeset(Map.merge(data, %{type: filename}))
+                %LibWt4{}
+                |>LibWt4.changeset(Map.merge(data, %{type: filename}))
             end
-            |>HitbRepo.insert
+            |>Repo.insert
             ["字典新建成功!", elem(res, 1).id, %{}]
           "delete" ->
             result = client(page, type, filename, version, year, dissect, rows, server_type, order_type, order, username)
-            HitbRepo.get_by(schema, id: data.id)
-            |>HitbRepo.delete!
+            Repo.get_by(schema, id: data.id)
+            |>Repo.delete!
             ["字典删除成功!", "-", result]
         end
       Map.merge(result, %{info: info, id: id})

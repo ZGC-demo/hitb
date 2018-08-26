@@ -146,8 +146,6 @@ defmodule HitbserverWeb.Router do
 
   scope "/library", HitbserverWeb do
     pipe_through :api
-    get "/rule_client", RuleController, :rule_client
-    get "/rule_file", RuleController, :rule_file
     get "/rule", RuleController, :rule
     get "/rule_search", RuleController, :rule_search
     get "/contrast", RuleController, :contrast
@@ -155,13 +153,14 @@ defmodule HitbserverWeb.Router do
     get "/search", RuleController, :search
     get "/wt4", Wt4Controller, :index
     get "/stat_wt4", Wt4Controller, :stat_wt4
-    get "/server_rule", RuleController, :server_rule
-    get "/rule_down", RuleController, :rule_down
-    get "/rule_symptom", RuleController, :rule_symptom
-    post "/symptom_serach", RuleController, :symptom_serach
-    post "/client_save", RuleController, :client_save
-    post "/client_save2", RuleController, :client_save2
-    get "/client_save", RuleController, :client_save
+
+    get "/rule_client", ClinetRuleController, :rule_client
+    get "/rule_file", ClinetRuleController, :rule_file
+    get "/rule_down", ClinetRuleController, :rule_down
+    get "/rule_symptom", ClinetRuleController, :rule_symptom
+    post "/symptom_serach", ClinetRuleController, :symptom_serach
+    post "/client_save", ClinetRuleController, :client_save
+    post "/client_save2", ClinetRuleController, :client_save2
   end
 
   scope "/servers", HitbserverWeb do

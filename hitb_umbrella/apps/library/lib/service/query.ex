@@ -1,16 +1,16 @@
 defmodule Library.RuleQuery do
   import Ecto.Query
   alias Hitb.Page
-  alias Hitb.Library.RuleMdc, as: HitbRuleMdc
-  alias Hitb.Library.RuleAdrg, as: HitbRuleAdrg
-  alias Hitb.Library.RuleDrg, as: HitbRuleDrg
-  alias Hitb.Library.RuleIcd9, as: HitbRuleIcd9
-  alias Hitb.Library.RuleIcd10, as: HitbRuleIcd10
-  alias Hitb.Library.LibWt4, as: HitbLibWt4
-  alias Hitb.Library.Cdh, as: HitbRuleCdh
-  alias Hitb.Library.ChineseMedicine, as: HitbChineseMedicine
-  alias Hitb.Library.ChineseMedicinePatent, as: HitbChineseMedicinePatent
-  alias Hitb.Library.WesternMedicine, as: HitbWesternMedicine
+  alias Hitb.Library.RuleMdc
+  alias Hitb.Library.RuleAdrg
+  alias Hitb.Library.RuleDrg
+  alias Hitb.Library.RuleIcd9
+  alias Hitb.Library.RuleIcd10
+  alias Hitb.Library.LibWt4
+  alias Hitb.Library.Cdh
+  alias Hitb.Library.ChineseMedicine
+  alias Hitb.Library.ChineseMedicinePatent
+  alias Hitb.Library.WesternMedicine
   alias Hitb.Library.RuleCdaIcd10
   alias Hitb.Library.RuleCdaIcd9
   alias Hitb.Library.RuleExamine
@@ -18,20 +18,21 @@ defmodule Library.RuleQuery do
   alias Hitb.Library.RuleSign
   alias Hitb.Library.RuleSymptom
   alias Hitb.Library.MdeKnow
+  alias Hitb.Repo
+
   alias Block.Library.RuleMdc, as: BlockRuleMdc
   alias Block.Library.RuleAdrg, as: BlockRuleAdrg
   alias Block.Library.RuleDrg, as: BlockRuleDrg
   alias Block.Library.RuleIcd9, as: BlockRuleIcd9
   alias Block.Library.RuleIcd10, as: BlockRuleIcd10
   alias Block.Library.LibWt4, as: BlockLibWt4
-  alias Hitb.Repo, as: HitbRepo
   alias Block.Repo, as: BlockRepo
 
   #get_rule(页面,类型,表类型,版本,年份,部位,每页记录数量,服务类型(server祸区块链),排序方式,排序字段,查询类型(查询,下载))
   def get_rule(page, type, tab_type, version, year, dissect, rows, server_type, order_type, order, query_type, username) do
     repo =
       if(server_type == "server")do
-        HitbRepo
+        Repo
       else
         BlockRepo
       end
@@ -107,7 +108,7 @@ defmodule Library.RuleQuery do
               from(p in tab)
           end
         tab_type in ["西药"] ->
-          types = HitbRepo.all(from p in tab, select: fragment("array_agg(distinct ?)", p.dosage_form))|>List.flatten
+          types = Repo.all(from p in tab, select: fragment("array_agg(distinct ?)", p.dosage_form))|>List.flatten
           cond do
             type in types ->
               from(p in tab)
@@ -195,17 +196,17 @@ defmodule Library.RuleQuery do
           "药品规则" -> RulePharmacy
           "体征规则" -> RuleSign
           "症状规则" -> RuleSymptom
-          "icd9" -> HitbRuleIcd9
-          "icd10" -> HitbRuleIcd10
-          "mdc" -> HitbRuleMdc
-          "adrg" -> HitbRuleAdrg
-          "drg" -> HitbRuleDrg
-          "cdh" -> HitbRuleCdh
-          "中药" -> HitbChineseMedicine
-          "中成药" -> HitbChineseMedicinePatent
-          "西药" -> HitbWesternMedicine
+          "icd9" -> RuleIcd9
+          "icd10" -> RuleIcd10
+          "mdc" -> RuleMdc
+          "adrg" -> RuleAdrg
+          "drg" -> RuleDrg
+          "cdh" -> RuleCdh
+          "中药" -> ChineseMedicine
+          "中成药" -> ChineseMedicinePatent
+          "西药" -> WesternMedicine
           "医学知识库" -> MdeKnow
-          _ -> HitbLibWt4
+          _ -> LibWt4
         end
       "block" ->
         case filename do
