@@ -315,9 +315,10 @@ defmodule Library.RuleService do
         case type do
           "change" ->
             res = Repo.get_by(schema, id: data.id)
-            |>schema.changeset(data)
-            |>Repo.update
-            ["字典更新成功!", elem(res, 1).id, %{}]
+              |>schema.changeset(data)
+              |>Repo.update
+              |>elem(1)
+            ["字典更新成功!", res.id, %{}]
           "add" ->
             res = case filename do
               "mdc" -> %RuleMdc{}|>RuleMdc.changeset(data)
@@ -339,7 +340,8 @@ defmodule Library.RuleService do
                 |>LibWt4.changeset(Map.merge(data, %{type: filename}))
             end
             |>Repo.insert
-            ["字典新建成功!", elem(res, 1).id, %{}]
+            |>elem(1)
+            ["字典新建成功!", res.id, %{create_user: res.create_user, update_user: res.update}]
           "delete" ->
             result = client(page, type, filename, version, year, dissect, rows, server_type, order_type, order, username)
             Repo.get_by(schema, id: data.id)
