@@ -296,7 +296,7 @@ defmodule Library.RuleService do
       #去掉文件头
       # data = List.delete_at(data, 0)
       #取得表头
-      header = data|>List.first|>Enum.map(fn x -> Key.en(x)|>String.to_atom end)
+      header = header|>Enum.map(fn x -> Key.en(x)|>String.to_atom end)
 
       #将数组转换为对象
       data =
