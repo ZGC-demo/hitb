@@ -127,14 +127,18 @@ defmodule Stat.ClientSaveService do
     %{stat: stat}
   end
 
-  def clinet_download(page, page_type, type, tool_type, org, time, drg, order, order_type, username) do
+  def clinet_download(page, page_type, type, tool_type, org, time, drg, order, order_type, username, table_name) do
     stat_file = HitbRepo.get_by(HitbStatFile, file_name: "#{page_type}.csv")
     page_type =
       case stat_file do
         nil -> "base"
         _ -> stat_file.page_type
       end
-    StatService.get_download(page, page_type, type, tool_type, org, time, drg, order, order_type, username)
+    stat = StatService.get_download(page, page_type, type, tool_type, org, time, drg, order, order_type, username)
+    Convert.list2map(stat, hd(stat))
+    |>Enum.map(fn x ->
+        Map.put(x, :fileType, table_name)
+      end)
   end
 
   def custom(custom, username) do

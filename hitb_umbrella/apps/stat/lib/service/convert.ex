@@ -20,6 +20,17 @@ defmodule Stat.Convert do
     map
   end
 
+  def list2map(list, key) do
+    Enum.reject(list, fn x -> x == key end)
+    |>Enum.map(fn x ->
+        Enum.reduce(key, %{}, fn k, acc ->
+          index = Enum.find_index(key, fn ks -> ks == k end)
+          value = Enum.at(x, index)
+          Map.put(acc, k, value)
+        end)
+      end)
+  end
+
   def map(map, key) do
     if(List.flatten(map) != [])do
       map

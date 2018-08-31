@@ -33,7 +33,7 @@ defmodule Stat.Query do
               "asc" -> order_by(query, [p], [asc: field(p, ^order)])|>repo.all
               "desc" -> order_by(query, [p], [desc: field(p, ^order)])|>repo.all
             end
-          stat = [[cnkey]] ++ Convert.map2list(stat, key)
+          stat = [cnkey] ++ Convert.map2list(stat, key)
           [[], 0, 15, stat]
         Hitb.ets_get(:stat, cache_key) == nil ->
           order = String.to_atom(order)

@@ -41,9 +41,9 @@ defmodule HitbserverWeb.ClientController do
   end
 
   def download_client(conn, _params)do
-    %{"page" => page, "page_type" => page_type, "type" => type, "tool_type" => tool_type, "org" => org, "time" => time, "drg" => drg, "order" => order, "order_type" => order_type, "username" => username} = Map.merge(%{"page" => "1", "type" => "org", "tool_type" => "total", "org" => "", "time" => "", "drg" => "", "order" => "机构", "page_type" => "base", "order_type" => "asc", "username" => ""}, conn.params)
+    %{"table_name" => table_name, "page" => page, "page_type" => page_type, "type" => type, "tool_type" => tool_type, "org" => org, "time" => time, "drg" => drg, "order" => order, "order_type" => order_type, "username" => username} = Map.merge(%{"page" => "1", "type" => "org", "tool_type" => "total", "org" => "", "time" => "", "drg" => "", "order" => "机构", "page_type" => "base", "order_type" => "asc", "username" => ""}, conn.params)
     order = Key.enkey(order)
-    result = ClientSaveService.clinet_download(page, page_type, type, tool_type, org, time, drg, order, order_type, username)
+    result = ClientSaveService.clinet_download(page, page_type, type, tool_type, org, time, drg, order, order_type, username, table_name)
     json conn, %{stat: result}
   end
 

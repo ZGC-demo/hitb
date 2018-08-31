@@ -145,12 +145,9 @@ defmodule Library.RuleService do
     [result, _, _, _, _, _, _, _, _, _] = RuleQuery.get_rule(1, "", filename, "", "", "", 0, "server", "", "", "download", "")
     result = RuleQuery.del_key(result, filename, "")
     result =
-      case length(result) do
-        0 -> []
-        _ ->
-          keys = Map.keys(List.first(result))|>Enum.map(fn x -> Key.cn(x) end)
-          [keys] ++ Enum.map(result, fn x -> Map.values(x) end)
-      end
+      Enum.map(result, fn x ->
+        Map.keys(x) |>Enum.reduce(%{}, fn k, acc -> Map.put(acc, Key.cn(k), Map.get(x, k)) end)|>Map.put(:fileType, filename)
+      end)
     %{result: result}
   end
 
