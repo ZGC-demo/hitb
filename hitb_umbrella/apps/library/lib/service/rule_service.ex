@@ -54,9 +54,9 @@ defmodule Library.RuleService do
           keys =
             cond do
               tab_type in ["诊断规则", "手术规则", "检查规则", "药品", "药品规则", "体征规则", "症状规则"] ->
-                Enum.reject(schema.__schema__(:fields), fn x -> x in [:__meta__, :__struct__, :inserted_at, :updated_at, :create_user, :update_user] end)
+                Enum.reject(schema.__schema__(:fields), fn x -> x in [:__meta__, :__struct__, :inserted_at, :updated_at] end)
               true ->
-                Enum.reject(schema.__schema__(:fields), fn x -> x in [:__meta__, :__struct__, :inserted_at, :updated_at, :icdc, :icdc_az, :icdcc, :nocc_1, :nocc_a, :nocc_aa, :org, :plat, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :drgs_1, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc, :create_user, :update_user] end)
+                Enum.reject(schema.__schema__(:fields), fn x -> x in [:__meta__, :__struct__, :inserted_at, :updated_at, :icdc, :icdc_az, :icdcc, :nocc_1, :nocc_a, :nocc_aa, :org, :plat, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :drgs_1, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc] end)
             end
           [Enum.map(keys, fn x -> Key.cn(x) end)]
         _ ->
@@ -303,7 +303,8 @@ defmodule Library.RuleService do
           value = Enum.at(data, index)
           value =
             cond do
-              field_type == {:array, :string} -> String.split(value, "，")|>Enum.reject(fn x -> x == "" end)
+              field_type == {:array, :string} -> String.split(value, "，")|>Enum.reject(fn x -> x in ["", "-"] end)
+              k in [:create_user, :update_user] -> username
               true -> value
             end
           Map.put(acc, k, value)
@@ -338,11 +339,11 @@ defmodule Library.RuleService do
             end
             |>Repo.insert
             |>elem(1)
-            ["字典新建成功!", res.id, %{create_user: res.create_user, update_user: res.update}]
+            ["字典新建成功!", res.id, %{create_user: res.create_user, update_user: res.update_user}]
           "delete" ->
-            result = client(page, type, filename, version, year, dissect, rows, server_type, order_type, order, username)
             Repo.get_by(schema, id: data.id)
             |>Repo.delete!
+            result = client(page, type, filename, version, year, dissect, rows, server_type, order_type, order, "")
             ["字典删除成功!", "-", result]
         end
       Map.merge(result, %{info: info, id: id})

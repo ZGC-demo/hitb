@@ -48,11 +48,11 @@ defmodule HitbserverWeb.ClinetRuleController do
 
   # 客户端模糊搜索
   def rule_search(conn, _params) do
-    %{"filename" => filename, "value" => value, "servertype" => servertype} = Map.merge(%{"filename" => "", "value" => "", "servertype" => ""}, conn.params)
-    result = RuleService.rule_search(filename, value, servertype)
+    %{"filename" => filename, "value" => value, "server_type" => server_type} = Map.merge(%{"filename" => "", "value" => "", "server_type" => ""}, conn.params)
+    result = RuleService.rule_search(filename, value, server_type)
     json conn, result
   end
-  
+
   #??????????
   def rule_symptom(conn, _params) do
     %{"symptom" => symptom, "icd9_a" => icd9_a, "icd10_a" => icd10_a, "pharmacy" => pharmacy } = Map.merge(%{"symptom" => "上腹痛", "icd9_a" => [], "icd10_a" => [], "pharmacy" => ["消化系溃疡"]}, conn.params)
