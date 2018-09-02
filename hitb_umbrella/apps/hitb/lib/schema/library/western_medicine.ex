@@ -12,14 +12,15 @@ defmodule Hitb.Library.WesternMedicine do
       field :en_name, :string # 英文名称
       field :dosage_form, :string #剂型
       field :reimbursement_restrictions, :string #报销限制内容
-
+      field :create_user, :string
+      field :update_user, :string
       timestamps()
     end
 
 
     def changeset(%WesternMedicine{} = western_medicine, attrs) do
       western_medicine
-      |> cast(attrs, [:first_level, :second_level, :third_level, :zh_name, :en_name, :dosage_form, :reimbursement_restrictions])
-      |> validate_required([:first_level, :second_level, :third_level, :zh_name, :en_name, :dosage_form])
+      |> cast(attrs, [:first_level, :second_level, :third_level, :zh_name, :en_name, :dosage_form, :reimbursement_restrictions, :create_user, :update_user])
+      |> validate_required([:first_level, :second_level, :third_level, :zh_name, :en_name, :dosage_form, :create_user, :update_user])
     end
   end

@@ -21,6 +21,8 @@ defmodule Hitb.Library.Repo.Migrations.CreateRuleIcd10 do
       add :year, :string
       add :version, :string
       add :plat, :string
+      add :create_user, :string
+      add :update_user, :string
       timestamps()
     end
 

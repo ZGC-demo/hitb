@@ -7,6 +7,8 @@ defmodule Hitb.Library.Repo.Migrations.CreateLibWt4 do
       add :name, :string #名称
       add :year, :string #年份
       add :type, :string #类型
+      add :create_user, :string
+      add :update_user, :string
       timestamps()
     end
 

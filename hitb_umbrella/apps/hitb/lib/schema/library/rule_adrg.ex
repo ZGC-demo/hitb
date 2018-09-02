@@ -23,6 +23,8 @@ defmodule Hitb.Library.RuleAdrg do
     field :year, :string
     field :version, :string
     field :plat, :string
+    field :create_user, :string
+    field :update_user, :string
     timestamps()
   end
 
@@ -32,7 +34,7 @@ defmodule Hitb.Library.RuleAdrg do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:code, :name, :drgs_1, :icd10_a, :icd10_aa, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_a, :icd9_aa, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc, :mdc, :org, :year, :version, :plat])
-    |> validate_required([:code])
+    |> cast(params, [:code, :name, :drgs_1, :icd10_a, :icd10_aa, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_a, :icd9_aa, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc, :mdc, :org, :year, :version, :plat, :create_user, :update_user])
+    |> validate_required([:code, :create_user, :update_user])
   end
 end

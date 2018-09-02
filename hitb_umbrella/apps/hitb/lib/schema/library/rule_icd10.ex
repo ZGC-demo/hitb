@@ -21,6 +21,8 @@ defmodule Hitb.Library.RuleIcd10 do
     field :year, :string
     field :version, :string
     field :plat, :string
+    field :create_user, :string
+    field :update_user, :string
     timestamps()
   end
 
@@ -30,8 +32,8 @@ defmodule Hitb.Library.RuleIcd10 do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:code, :name, :codes, :dissect, :icdcc, :icdc, :icdc_az, :adrg, :cc, :nocc_1, :nocc_a, :nocc_aa, :mcc, :org, :year, :version, :plat, :mdc])
-    |> validate_required([:code])
+    |> cast(params, [:code, :name, :codes, :dissect, :icdcc, :icdc, :icdc_az, :adrg, :cc, :nocc_1, :nocc_a, :nocc_aa, :mcc, :org, :year, :version, :plat, :mdc, :create_user, :update_user])
+    |> validate_required([:code, :create_user, :update_user])
   end
 
 end

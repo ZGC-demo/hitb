@@ -15,6 +15,8 @@ defmodule Hitb.Library.Repo.Migrations.ChineseMedicine do
       add :consumption, :string #用量
       add :need_attention, :string #注意事项
       add :type, :string #分类
+      add :create_user, :string
+      add :update_user, :string
       timestamps()
     end
 

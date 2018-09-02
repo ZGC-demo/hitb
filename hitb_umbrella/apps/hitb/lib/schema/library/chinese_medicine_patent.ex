@@ -16,14 +16,15 @@ defmodule Hitb.Library.ChineseMedicinePatent do
     field :department_limit, :string#限医疗机构等级
     field :user_limit, :string#人员限制
     field :other_limit, :string#其他限制
-
+    field :create_user, :string
+    field :update_user, :string
     timestamps()
   end
 
 
   def changeset(%ChineseMedicinePatent{} = chinese_medicine_patent, attrs) do
     chinese_medicine_patent
-    |> cast(attrs, [:code, :medicine_type, :type, :medicine_code, :name, :name_1, :other_spec, :org_limit, :department_limit, :user_limit, :other_limit])
-    |> validate_required([:code])
+    |> cast(attrs, [:code, :medicine_type, :type, :medicine_code, :name, :name_1, :other_spec, :org_limit, :department_limit, :user_limit, :other_limit, :create_user, :update_user])
+    |> validate_required([:code, :create_user, :update_user])
   end
 end

@@ -14,7 +14,8 @@ defmodule Hitb.Library.Repo.Migrations.ChineseMedicinePatent do
       add :department_limit, :string#限医疗机构等级
       add :user_limit, :string#人员限制
       add :other_limit, :string#其他限制
-
+      add :create_user, :string
+      add :update_user, :string
       timestamps()
     end
 

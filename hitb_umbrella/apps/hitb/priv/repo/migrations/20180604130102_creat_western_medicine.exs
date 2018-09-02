@@ -11,7 +11,8 @@ defmodule Hitb.Library.Repo.Migrations.WesternMedicine do
         add :en_name, :string # 英文名称
         add :dosage_form, :string #剂型
         add :reimbursement_restrictions, :string #报销限制内容
-
+        add :create_user, :string
+        add :update_user, :string
         timestamps()
       end
 

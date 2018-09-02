@@ -9,13 +9,15 @@ defmodule Hitb.Library.LibWt4 do
     field :name, :string #名称
     field :year, :string #年份
     field :type, :string #类型
+    field :create_user, :string
+    field :update_user, :string
     timestamps()
   end
 
   @doc false
   def changeset(%LibWt4{} = lib_wt4, attrs) do
     lib_wt4
-    |> cast(attrs, [:code, :name, :year, :type])
-    |> validate_required([:code, :name, :type])
+    |> cast(attrs, [:code, :name, :year, :type, :create_user, :update_user])
+    |> validate_required([:code, :name, :type, :create_user, :update_user])
   end
 end

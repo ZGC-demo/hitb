@@ -17,14 +17,15 @@ defmodule Hitb.Library.ChineseMedicine do
     field :consumption, :string #用量
     field :need_attention, :string #注意事项
     field :type, :string #分类
-
+    field :create_user, :string
+    field :update_user, :string
     timestamps()
   end
 
 
   def changeset(%ChineseMedicine{} = chinese_medicine, attrs) do
     chinese_medicine
-    |> cast(attrs, [:code, :name, :name_1, :sexual_taste, :toxicity, :meridian, :effect, :indication, :consumption, :need_attention, :type])
-    |> validate_required([:code, :name, :name_1, :sexual_taste, :toxicity, :meridian, :effect, :indication, :consumption, :need_attention, :type])
+    |> cast(attrs, [:code, :name, :name_1, :sexual_taste, :toxicity, :meridian, :effect, :indication, :consumption, :need_attention, :type, :create_user, :update_user])
+    |> validate_required([:code, :name, :name_1, :sexual_taste, :toxicity, :meridian, :effect, :indication, :consumption, :need_attention, :type, :create_user, :update_user])
   end
 end
