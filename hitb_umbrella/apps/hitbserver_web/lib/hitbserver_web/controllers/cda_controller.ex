@@ -22,18 +22,7 @@ defmodule HitbserverWeb.CdaController do
   end
 
   def update(conn, _params) do
-    # IO.inspect Map.merge(%{"content" => "", "doctype" => "" , "file_name" => "", "header" => %{
-    #   "上传时间" => "",
-    #   "下载时间" => "",
-    #   "保存时间" => "",
-    #   "修改时间" => "",
-    #   "创建时间" => "",
-    #   "发布时间" => "",
-    #   "标题" => "",
-    #   "病人" => "",
-    #   "缓存时间" => ""
-    #   }, "id" => "", "save_type" => 1, "mouldtype" => ""}, conn.params)
-      %{"content" => content, "doctype" => doctype, "file_name" => file_name, "header" => header, "id" => id, "save_type" => save_type,  "username"  => username, "mouldtype" => mouldtype} = Map.merge(%{"content" => "", "doctype" => "" , "file_name" => "", "header" => %{
+      %{"content" => content, "doctype" => doctype, "file_name" => file_name, "header" => header, "save_type" => save_type,  "username"  => username, "mouldtype" => mouldtype} = Map.merge(%{"content" => "", "doctype" => "" , "file_name" => "", "header" => %{
         "上传时间" => "",
         "下载时间" => "",
         "保存时间" => "",
@@ -43,11 +32,8 @@ defmodule HitbserverWeb.CdaController do
         "标题" => "",
         "病人" => "",
         "缓存时间" => ""
-        }, "id" => "", "save_type" => 1, "mouldtype" => ""}, conn.params)
-
-
-
-    result = CdaService.update(id, content, file_name, username, doctype, header, save_type, mouldtype)
+        }, "save_type" => 1, "mouldtype" => ""}, conn.params)
+    result = CdaService.update(content, file_name, username, doctype, header, save_type, mouldtype)
     json conn, result
   end
 

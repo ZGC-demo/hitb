@@ -43,8 +43,8 @@ defmodule Edit.CdaService do
     end
   end
 
-  def cda_file(filename, username) do
-    edit = HitbRepo.get_by(HitbCda, username: username, name: filename)
+  def cda_file(file_name, username) do
+    edit = HitbRepo.get_by(HitbCda, username: username, name: file_name)
     cond do
       edit == nil ->
         [%{header: "", content: ""}, ["文件读取失败,无此文件"]]
@@ -57,20 +57,37 @@ defmodule Edit.CdaService do
     end
   end
 
-  def update(id, content, file_name, username, doctype, header, save_type, mouldtype) do
+  def update(content, file_name, username, doctype, header, save_type, mouldtype) do
+    [file_username, file_name] = String.split(file_name, "-")
     if (mouldtype == "模板") do
       myMoulds(file_name, username, content, doctype, header, save_type)
     else
-      {file_username, file_name} =
-        if(String.contains? file_name, "-")do
-          List.to_tuple(String.split(file_name, "-"))
-        else
-          {username, file_name}
-        end
-      patient_id = generate_patient_id()
-      PatientService.patient_insert(content, username, patient_id)
-      myCdas(id, file_name, file_username, content, doctype, username, patient_id, header, save_type)
+      %{"上传时间" => header1, "下载时间" => header2, "保存时间" => header3, "修改时间" => header4, "创建时间" => header5, "发布时间" => header6, "标题" => header7, "病人" => header8, "缓存时间" => header9} = header
+      header = [["上传时间", header1], ["下载时间", header2], ["保存时间", header3], ["修改时间", header4], ["创建时间", header5], ["发布时间", header6], ["标题", header7], ["病人", header8]]
+      cda = Repo.get_by(HItbCda, name: file_name,  username: file_username)
+      case cda do
+        nil ->
+          patient_id = generate_patient_id()
+          %HitbCda{}
+          |> HitbCda.changeset(%{"content" => content, "name" => "#{file_name}.cda", "username" => file_username, "is_change" => false, "is_show" => true, "patient_id" => patient_id, "header" => header})
+          |> HitbRepo.insert()
+          %{success: true, info: "保存成功"}
+        _ ->
+          if(file_username == username)do
+            cda
+            |>HitbCda.changeset(%{content: content, header: header})
+            |>HitbRepo.update
+            %{success: true, info: "保存成功"}
+          else
+            patient_id = generate_patient_id()
+            %HitbCda{}
+            |> HitbCda.changeset(%{"content" => content, "name" => "#{file_name}.cda", "username" => username, "is_change" => false, "is_show" => true, "patient_id" => patient_id, "header" => header})
+            |> HitbRepo.insert()
+            %{success: true, info: "保存成功"}
+          end
+      end
     end
+    %{success: true, info: "测试"}
   end
 
   defp myMoulds(file_name, file_username, content, _doctype, header, _save_type) do
@@ -94,39 +111,6 @@ defmodule Edit.CdaService do
       |> MyMould.changeset(body)
       |> HitbRepo.insert()
       %{success: true, info: "新建成功"}
-    end
-  end
-
-  defp myCdas(id, _file_name, file_username, content, doctype, username, patient_id, header, save_type) do
-    header = Enum.reduce(Map.keys(header), "", fn x, acc ->
-      if acc == "" do
-        "#{acc}#{x}:#{Map.get(header,x)}"
-      else
-        "#{acc};#{x}:#{Map.get(header,x)}"
-      end
-    end)
-    cond do
-      save_type in ["上传", "新建"] ->
-        %HitbCda{}
-        |> HitbCda.changeset(%{"content" => content, "name" => "#{doctype}_#{Time.stime_number}.cda", "username" => file_username, "is_change" => false, "is_show" => true, "patient_id" => patient_id, "header" => header})
-        |> HitbRepo.insert()
-        %{success: true, info: "#{save_type}成功"}
-      id != "" ->
-        cda = HitbRepo.get_by(HitbCda, id: id)
-        cond do
-          username == file_username ->
-            HitbRepo.get!(HitbCda, id)
-            |>HitbCda.changeset(%{content: content, header: header})
-            |>HitbRepo.update
-            %{success: true, info: "保存成功"}
-          cda.is_change == false ->
-            %{success: false, info: "用户设置该文件不允许其他用户修改,请联系该文件拥有者"}
-          true ->
-            HitbRepo.get!(HItbCda, id)
-            |>HitbCda.changeset(%{content: content, header: header})
-            |>HitbRepo.update
-            %{success: true, info: "保存成功"}
-        end
     end
   end
 
