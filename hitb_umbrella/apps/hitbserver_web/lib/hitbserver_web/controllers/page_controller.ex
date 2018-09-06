@@ -18,15 +18,17 @@ defmodule HitbserverWeb.PageController do
   end
 
   def test(conn, _params) do
-    Hitb.Repo.all(Hitb.Edit.Cda)
+    Hitb.Repo.all(Hitb.Stat.StatFile)
     |>Enum.each(fn x ->
-        a = String.split(x.content, ",")
-        |>Enum.map(fn k ->
-            String.split(k, " ")
-          end)
-        a = Poison.encode!([["创建时间", "2018-09-05 10:24:33"]])
+        file_name = Regex.replace(~r/.csv/, x.file_name, "")
+        IO.inspect file_name
+        # a = String.split(x.content, ",")
+        # |>Enum.map(fn k ->
+        #     String.split(k, " ")
+        #   end)
+        # a = Poison.encode!([["创建时间", "2018-09-05 10:24:33"]])
         x
-        |>Hitb.Edit.Cda.changeset(%{header: a})
+        |>Hitb.Stat.StatFile.changeset(%{file_name: file_name})
         |>Hitb.Repo.update
 
       end)

@@ -40,7 +40,7 @@ defmodule Library.RuleService do
       "block" -> LibraryService.get_block_file()
       _ ->
         Repo.all(from p in LibraryFile, select: p.file_name)
-        |>Enum.map(fn x -> "#{x}.csv" end)
+        |>Enum.map(fn x -> "#{x}" end)
     end
   end
 

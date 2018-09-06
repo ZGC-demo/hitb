@@ -71,7 +71,7 @@ defmodule Edit.CdaService do
         nil ->
           patient_id = generate_patient_id()
           %HitbCda{}
-          |> HitbCda.changeset(%{"content" => content, "name" => "#{file_name}.cda", "username" => file_username, "is_change" => false, "is_show" => true, "patient_id" => patient_id, "header" => header})
+          |> HitbCda.changeset(%{"content" => content, "name" => "#{file_name}", "username" => file_username, "is_change" => false, "is_show" => true, "patient_id" => patient_id, "header" => header})
           |> HitbRepo.insert()
           %{success: true, info: "保存成功"}
         _ ->
@@ -83,7 +83,7 @@ defmodule Edit.CdaService do
           else
             patient_id = generate_patient_id()
             %HitbCda{}
-            |> HitbCda.changeset(%{"content" => content, "name" => "#{file_name}.cda", "username" => username, "is_change" => false, "is_show" => true, "patient_id" => patient_id, "header" => header})
+            |> HitbCda.changeset(%{"content" => content, "name" => "#{file_name}", "username" => username, "is_change" => false, "is_show" => true, "patient_id" => patient_id, "header" => header})
             |> HitbRepo.insert()
             %{success: true, info: "保存成功"}
           end
@@ -93,7 +93,7 @@ defmodule Edit.CdaService do
   end
 
   defp myMoulds(file_name, file_username, content, _doctype, header, _save_type) do
-    mymould = HitbRepo.get_by(MyMould, name: "#{file_name}.cdh", username: file_username)
+    mymould = HitbRepo.get_by(MyMould, name: "#{file_name}", username: file_username)
     header = Enum.reduce(Map.keys(header), "", fn x, acc ->
       if acc == "" do
         "#{acc}#{x}:#{Map.get(header,x)}"
@@ -107,7 +107,7 @@ defmodule Edit.CdaService do
       |> HitbRepo.update()
       %{success: true, info: "保存成功"}
     else
-      namea = "#{file_name}.cdh"
+      namea = "#{file_name}"
       body = %{"content" => content, "name" => namea, "username" => file_username, "is_change" => true, "is_show" => true, "header" => header}
       %MyMould{}
       |> MyMould.changeset(body)

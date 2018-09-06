@@ -46,7 +46,7 @@ defmodule Server.ShareService do
         "stat" -> StatService.get_stat()
         "library" ->
           cond do
-            file_name in ["mdc.csv", "adrg.csv", "drg.csv", "icd9.csv", "icd10.csv", "中药.csv", "中成药.csv", "诊断规则.csv", "手术规则.csv", "检查规则.csv", "药品规则.csv", "体征规则.csv", "症状规则.csv"] ->
+            file_name in ["mdc", "adrg", "drg", "icd9", "icd10", "中药", "中成药", "诊断规则", "手术规则", "检查规则", "药品规则", "体征规则", "症状规则"] ->
               LibraryService.get_last(file_name, "")
             true ->
               file_name2 = String.split(file_name, ".")|>List.first
@@ -99,7 +99,7 @@ defmodule Server.ShareService do
             "stat" -> hash("#{x.org}#{x.time}#{x.org_type}#{x.time_type}")
             "library" ->
               cond do
-                file_name in ["mdc.csv", "adrg.csv", "drg.csv", "icd9.csv", "icd10.csv"] ->
+                file_name in ["mdc", "adrg", "drg", "icd9", "icd10"] ->
                   hash("#{x.code}#{x.name}#{x.version}#{x.year}")
                 true ->
                   hash("#{x.code}")

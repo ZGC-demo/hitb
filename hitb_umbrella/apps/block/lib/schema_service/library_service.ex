@@ -131,6 +131,6 @@ defmodule Block.LibraryService do
     ]
     |>List.flatten
     |>Enum.reject(fn x -> x.count == 0 end)
-    |>Enum.map(fn x -> "#{x.table}.csv" end)
+    |>Enum.map(fn x -> "#{x.table}" end)
   end
 end

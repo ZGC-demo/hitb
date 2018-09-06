@@ -15,7 +15,7 @@ defmodule Stat.ClientSaveService do
   alias Hitb.Time
 
   def stat_create(data, username) do
-    filename = Time.stimehour_number <> "对比分析.csv"
+    filename = Time.stimehour_number <> "对比分析"
     case HitbRepo.get_by(HitbClinetStat, filename: filename, username: username) do
       nil ->
         %HitbClinetStat{}
@@ -30,8 +30,8 @@ defmodule Stat.ClientSaveService do
   def stat_client(page, page_type, type, tool_type, org, time, drg, order, order_type, username, rows, server_type) do
     [repo, clinet_stat, stat_file] = if(server_type == "server")do [HitbRepo, HitbClinetStat, HitbStatFile] else [BlockRepo, BlockClinetStat, BlockStatFile] end
     files = repo.all(from p in clinet_stat, where: p.username == ^username, select: p.filename)|>List.flatten|>Enum.uniq
-    if(page_type <> ".csv" in files)do
-      stat = repo.get_by(clinet_stat, filename: page_type <> ".csv", username: username)
+    if(page_type in files)do
+      stat = repo.get_by(clinet_stat, filename: page_type, username: username)
       stat = Poison.decode!(stat.data)
       header = Enum.at(stat, 0)
       #求病历总数
@@ -57,7 +57,7 @@ defmodule Stat.ClientSaveService do
       stat_file =
         case page_type do
           "defind__" -> %{page_type: "defined"}
-          _ -> repo.get_by(stat_file, file_name: "#{page_type}.csv")
+          _ -> repo.get_by(stat_file, file_name: "#{page_type}")
         end
       page_type =
         case stat_file do
@@ -114,7 +114,7 @@ defmodule Stat.ClientSaveService do
 
   def stat_info(page, type, tool_type, drg, order, order_type, page_type, org, time, username, server_type) do
     [repo, stat_file] = if(server_type == "server")do [HitbRepo, HitbStatFile] else [BlockRepo, BlockStatFile] end
-    stat_file = repo.get_by(stat_file, file_name: "#{page_type}.csv")
+    stat_file = repo.get_by(stat_file, file_name: "#{page_type}")
     page_type =
       case stat_file do
         nil -> "base"
@@ -128,7 +128,7 @@ defmodule Stat.ClientSaveService do
   end
 
   def clinet_download(page, page_type, type, tool_type, org, time, drg, order, order_type, username, table_name) do
-    stat_file = HitbRepo.get_by(HitbStatFile, file_name: "#{page_type}.csv")
+    stat_file = HitbRepo.get_by(HitbStatFile, file_name: "#{page_type}")
     page_type =
       case stat_file do
         nil -> "base"
