@@ -51,8 +51,10 @@ defmodule Edit.CdaService do
       edit.is_show == false ->
         [%{header: "", content: ""}, ["文件拥有者不允许他人查看,请联系文件拥有者"]]
       edit.is_change == false ->
+        edit = %{edit | :header => Poison.decode!(edit.header), :content => Poison.decode!(edit.content)}
         [Map.drop(edit, [:__meta__, :__struct__, :id]),["文件读取成功,但文件拥有者不允许修改"]]
       true ->
+        edit = %{edit | :header => Poison.decode!(edit.header), :content => Poison.decode!(edit.content)}
         [Map.drop(edit, [:__meta__, :__struct__]), ["文件读取成功"]]
     end
   end

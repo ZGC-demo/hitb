@@ -18,17 +18,31 @@ defmodule HitbserverWeb.PageController do
   end
 
   def test(conn, _params) do
-    {:ok, file} = File.open "/home/hitb/git/clinet/test_stat_2.json", [:write]
-    {:ok, str} = File.read("/home/hitb/git/clinet/static/test_stat_2.json")
-    a = Poison.decode!(str)
-    |>Enum.map(fn x ->
-        x = Map.put(x, "org", x["\uFEFForg"])
-        x = Map.delete(x, "\uFEFForg")
+    Hitb.Repo.all(Hitb.Edit.Cda)
+    |>Enum.each(fn x ->
+        a = String.split(x.content, ",")
+        |>Enum.map(fn k ->
+            String.split(k, " ")
+          end)
+        a = Poison.encode!([["创建时间", "2018-09-05 10:24:33"]])
+        x
+        |>Hitb.Edit.Cda.changeset(%{header: a})
+        |>Hitb.Repo.update
+
       end)
-    # data = String.split(str, "\n") -- [""]
-    # header = data|>List.first|>String.split(",")
-    # data = data|>List.delete_at(0)|>Enum.map(fn x -> String.split(x, ",") end)
-    IO.binwrite file, Poison.encode!(a)
+
+
+    # {:ok, file} = File.open "/home/hitb/git/clinet/test_stat_2.json", [:write]
+    # {:ok, str} = File.read("/home/hitb/git/clinet/static/test_stat_2.json")
+    # a = Poison.decode!(str)
+    # |>Enum.map(fn x ->
+    #     x = Map.put(x, "org", x["\uFEFForg"])
+    #     x = Map.delete(x, "\uFEFForg")
+    #   end)
+    # # data = String.split(str, "\n") -- [""]
+    # # header = data|>List.first|>String.split(",")
+    # # data = data|>List.delete_at(0)|>Enum.map(fn x -> String.split(x, ",") end)
+    # IO.binwrite file, Poison.encode!(a)
     # data =
     #   Enum.map(data, fn x ->
     #     a = Enum.reduce(header, %{}, fn k, acc ->
