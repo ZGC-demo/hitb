@@ -24,12 +24,14 @@ defmodule Edit.CdaService do
   def cda_user(server_type) do
     cda_users =
       case server_type do
-        "server" -> HitbRepo.all(from p in HitbCdaFile, select: p.username)|>:lists.usort
-        _ -> BlockRepo.all(from p in BlockCdaFile, select: p.username)|>:lists.usort
+        "server" -> HitbRepo.all(from p in HitbCdaFile, group_by: p.username, select: %{username: p.username, count: count(p.id)})|>:lists.usort
+        _ -> BlockRepo.all(from p in BlockCdaFile, group_by: p.username, select: %{username: p.username, count: count(p.id)})|>:lists.usort
       end
     users = HitbRepo.all(from p in User, where: p.is_show == false, select: p.username)
-    users = if(users)do users else [] end
-    [cda_users -- users, "读取成功"]
+    users =
+      Enum.reject(cda_users, fn x -> x.username in users end)
+      |>Enum.map(fn x -> "#{x.username}----------------------#{x.count}" end)
+    [users, "读取成功"]
   end
 
   def cda_files(username, server_type) do
