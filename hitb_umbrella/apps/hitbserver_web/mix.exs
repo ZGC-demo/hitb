@@ -47,6 +47,7 @@ defmodule HitbserverWeb.Mixfile do
       {:distillery, "~> 1.5", runtime: false},
       {:cowboy, "~> 1.0"},
       {:json, "~> 1.0"},
+      {:remote_ip, "~> 0.1.4"},
       {:hitb, in_umbrella: true},
       {:edit, in_umbrella: true},
       {:stat, in_umbrella: true},

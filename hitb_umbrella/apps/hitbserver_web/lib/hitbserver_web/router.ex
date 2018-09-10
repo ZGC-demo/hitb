@@ -6,11 +6,13 @@ defmodule HitbserverWeb.Router do
     plug :fetch_session
     plug :fetch_flash
     plug :protect_from_forgery
+    plug RemoteIp
     plug :put_secure_browser_headers
   end
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug RemoteIp
     plug :fetch_session
   end
 
@@ -152,7 +154,7 @@ defmodule HitbserverWeb.Router do
     get "/search", RuleController, :search
     get "/wt4", Wt4Controller, :index
     get "/stat_wt4", Wt4Controller, :stat_wt4
-    
+
     get "/rule_search", ClinetRuleController, :rule_search
     get "/rule_client", ClinetRuleController, :rule_client
     get "/rule_file", ClinetRuleController, :rule_file

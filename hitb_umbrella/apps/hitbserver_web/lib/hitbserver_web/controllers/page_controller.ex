@@ -208,6 +208,7 @@ defmodule HitbserverWeb.PageController do
     end
   end
   def connect(conn, _params) do
+    IO.inspect conn
     json conn, %{success: true}
   end
 end

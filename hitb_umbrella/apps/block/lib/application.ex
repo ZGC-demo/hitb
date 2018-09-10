@@ -29,8 +29,14 @@ defmodule Block.Application do
       port:  "4000",
       connect: true
     }
+    local_ip = :inet.getifaddrs()
+      |>elem(1)|>List.last|>elem(1)
+      |>List.keyfind(:addr, 0)
+      |>elem(1)|>Tuple.to_list
+      |>Enum.join(":")
+    # IO.inspect local_ip
     if(database != "block_test")do
-      Block.P2pSessionManager.connect(init_peer.host, init_peer.port)
+      # Block.P2pSessionManager.connect(init_peer.host, init_peer.port)
     end
     # peers = Block.PeerRepository.get_all_peers
     # if(peers != [])do
