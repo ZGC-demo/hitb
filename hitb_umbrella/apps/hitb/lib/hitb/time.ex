@@ -35,6 +35,14 @@ defmodule Hitb.Time do
     to_string(year) <> "-" <> to_string(month) <> "-" <> to_string(day)
   end
 
+  #明天日期字符串string
+  def sdate_tom() do
+    {{year, month, day}, _} = :calendar.local_time()
+    days = :calendar.date_to_gregorian_days({year, month, day}) + 1
+    {year, month, day} = :calendar.gregorian_days_to_date(days)
+    to_string(year) <> "-" <> to_string(month) <> "-" <> to_string(day)
+  end
+
   #数据库时间转国标string
   def stime_ecto(time) do
     {:ok, time} =  Ecto.DateTime.cast(time)

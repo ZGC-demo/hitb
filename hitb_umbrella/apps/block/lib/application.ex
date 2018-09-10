@@ -34,9 +34,8 @@ defmodule Block.Application do
       |>List.keyfind(:addr, 0)
       |>elem(1)|>Tuple.to_list
       |>Enum.join(":")
-    # IO.inspect local_ip
     if(database != "block_test")do
-      # Block.P2pSessionManager.connect(init_peer.host, init_peer.port)
+      # Block.P2pSessionManager.connect(init_peer.host, init_peer.port, local_ip)
     end
     # peers = Block.PeerRepository.get_all_peers
     # if(peers != [])do
