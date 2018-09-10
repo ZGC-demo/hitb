@@ -15,6 +15,7 @@ defmodule Block.Application do
   end
 
   def initialize_datastore() do
+    :ets.new(:local_ip, [:set, :public, :named_table])
     :ets.new(:peers, [:set, :public, :named_table])
     :ets.new(:latest_block, [:set, :public, :named_table])
     :ets.new(:client, [:set, :public, :named_table])
@@ -36,8 +37,8 @@ defmodule Block.Application do
       |>Enum.reject(fn x -> String.contains?(elem(x, 0), "docker") end)
       |>Enum.map(fn x -> List.keyfind(elem(x, 1), :addr, 0) end)
       |>Enum.reject(fn x -> x == nil end)
-      |>Enum.map(fn x -> elem(x, 1)|>Tuple.to_list|>Enum.join(":") end)
-    IO.inspect local_ip
+      |>Enum.map(fn x -> elem(x, 1)|>Tuple.to_list|>Enum.join(".") end)
+    # IO.inspect local_ip
       # |>Enum.map(fn x -> elem(x, 1)|>Tuple.to_list|>Enum.join(":") end)
     if(database != "block_test")do
       Block.P2pSessionManager.connect(init_peer.host, init_peer.port, local_ip)

@@ -84,6 +84,7 @@ defmodule Block.P2pClientHandler do
 
   def handle_joined(topic, _payload, transport, state) do
     Logger.info("joined the topic #{topic}.")
+    IO.inspect :ets.lookup(:local_ip, :local_ip)
     GenSocketClient.push(transport, "p2p", @query_all_accounts, %{})
     {:ok, state}
   end

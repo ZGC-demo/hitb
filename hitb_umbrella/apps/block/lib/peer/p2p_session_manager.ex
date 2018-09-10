@@ -20,6 +20,7 @@ defmodule Block.P2pSessionManager do
         end
       end)
     {:ok, pid} = P2pClientHandler.start_link(host, port, local_ip)
+    :ets.insert(:local_ip, {:local_ip, local_ip})
     :ets.insert(:peers, {pid, %{host: host, port: port}})
     :ok
   end
