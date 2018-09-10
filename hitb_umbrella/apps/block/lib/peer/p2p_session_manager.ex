@@ -8,7 +8,7 @@ defmodule Block.P2pSessionManager do
   # @update_block_chain Repos.P2pMessage.update_block_chain
   # @add_peer_request   Repos.P2pMessage.add_peer_request
 
-  def connect(host, port) do
+  def connect(host, port, local_ip) do
     _already_connected = :ets.tab2list(:peers) |> Enum.reduce(false, fn(record, acc) ->
         if acc == false do
           peer_map = record |> elem(1)
@@ -19,7 +19,7 @@ defmodule Block.P2pSessionManager do
           end
         end
       end)
-    {:ok, pid} = P2pClientHandler.start_link(host, port)
+    {:ok, pid} = P2pClientHandler.start_link(host, port, local_ip)
     :ets.insert(:peers, {pid, %{host: host, port: port}})
     :ok
   end

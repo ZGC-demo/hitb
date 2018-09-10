@@ -30,12 +30,17 @@ defmodule Block.Application do
       connect: true
     }
     local_ip = :inet.getifaddrs()
-      |>elem(1)|>List.last|>elem(1)
-      |>List.keyfind(:addr, 0)
-      |>elem(1)|>Tuple.to_list
-      |>Enum.join(":")
+      |>elem(1)
+      |>Enum.map(fn x -> {to_string(elem(x, 0)), elem(x, 1)} end)
+      |>Enum.reject(fn x -> elem(x, 0) == "lo" end)
+      |>Enum.reject(fn x -> String.contains?(elem(x, 0), "docker") end)
+      |>Enum.map(fn x -> List.keyfind(elem(x, 1), :addr, 0) end)
+      |>Enum.reject(fn x -> x == nil end)
+      |>Enum.map(fn x -> elem(x, 1)|>Tuple.to_list|>Enum.join(":") end)
+    IO.inspect local_ip
+      # |>Enum.map(fn x -> elem(x, 1)|>Tuple.to_list|>Enum.join(":") end)
     if(database != "block_test")do
-      # Block.P2pSessionManager.connect(init_peer.host, init_peer.port, local_ip)
+      Block.P2pSessionManager.connect(init_peer.host, init_peer.port, local_ip)
     end
     # peers = Block.PeerRepository.get_all_peers
     # if(peers != [])do

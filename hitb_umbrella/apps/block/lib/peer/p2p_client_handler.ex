@@ -50,7 +50,7 @@ defmodule Block.P2pClientHandler do
   @connection_error   Block.P2pMessage.connection_error
   @connection_success Block.P2pMessage.connection_success
 
-  def start_link(host, port) do
+  def start_link(host, port, local_ip) do
     GenSocketClient.start_link(
           __MODULE__,
           Phoenix.Channels.GenSocketClient.Transport.WebSocketClient,
