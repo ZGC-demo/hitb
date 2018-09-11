@@ -144,7 +144,7 @@ defmodule Block.P2pClientHandler do
         Enum.reject(response, fn x -> x in ip end)
         |>Enum.map(fn x -> PeerService.newPeer(x, "4000") end)
         PeerService.getPeers()
-        |>Enum.map(fn x -> connect(x.host, x.port, []) end)
+        |>Enum.map(fn x -> P2pSessionManager.connect(x.host, x.port, []) end)
       "get_latest_block" ->
         if(BlockService.get_latest_block == nil or Map.get(response, "hash") != Map.get(BlockService.get_latest_block, :hash))do
           GenSocketClient.push(transport, "p2p", @query_all_blocks, %{})
