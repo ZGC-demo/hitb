@@ -2,16 +2,17 @@ defmodule Block.P2pMessage do
   @moduledoc """
   p2p messaging protocol. Defines message options.
   """
-  @query_latest_block   "get_latest_block"
+  @query_latest_block     "get_latest_block"
   @query_all_accounts     "get_all_accounts"
-  @query_all_blocks     "get_all_blocks"
+  @query_all_blocks       "get_all_blocks"
   @query_all_transactions "query_all_transactions"
-  @update_block_chain   "update_block_chain"
-  @add_peer_request     "add_peer_request"
-  @already_connected    "already_connected"
-  @connection_error     "connection_error"
-  @connection_success   "successfully_connected"
-  @sync_block           "sync_block"
+  @update_block_chain     "update_block_chain"
+  @add_peer_request       "add_peer_request"
+  @already_connected      "already_connected"
+  @connection_error       "connection_error"
+  @connection_success     "successfully_connected"
+  @sync_block             "sync_block"
+  @sync_peer              "sync_peer"
 
   def query_latest_block,   do: @query_latest_block
   def query_all_accounts,     do: @query_all_accounts
@@ -23,4 +24,5 @@ defmodule Block.P2pMessage do
   def connection_error,     do: @connection_error
   def connection_success,   do: @connection_success
   def sync_block,           do: @sync_block
+  def sync_peer,            do: @sync_peer
 end

@@ -34,18 +34,16 @@ defmodule BlockWeb.P2pChannel do
     {:reply, {:ok, %{type: @sync_block, data: data}}, socket}
   end
 
-  def handle_in(@query_latest_block, %{"ip" => ip}, socket) do
-    hosts = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
-    new_hosts = ip|>Enum.map(fn x -> x["host"] end)
-    ip = Enum.reject(ip, fn x -> x["host"] in hosts end)
-    IO.inspect ip
-    Enum.each(ip, fn x -> PeerService.newPeer(x["host"], x["port"]) end)
+  def handle_in(@query_latest_block, _payload, socket) do
     Logger.info("sending latest block")
     data = BlockService.get_latest_block()|>send()
     {:reply, {:ok, %{type: @query_latest_block, data: data}}, socket}
   end
 
-  def handle_in(@query_all_accounts, _payload, socket) do
+  def handle_in(@query_all_accounts, %{"ip" => ip}, socket) do
+    hosts = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
+    new_hosts = ip|>Enum.map(fn x -> x["host"] end)
+    ip = Enum.reject(ip, fn x -> x["host"] in hosts end)
     Logger.info("sending all accounts")
     data = AccountRepository.get_all_accounts()|>Enum.map(fn x -> send(x) end)
     {:reply, {:ok, %{type: @query_all_accounts, data: data}}, socket}
