@@ -69,11 +69,13 @@ defmodule Block.P2pClientHandler do
   end
 
   def handle_connected(transport, state) do
-    case :ets.lookup(:client, :transport) do
-      [] -> :ets.insert(:client, {:transport, [transport]})
-      transports ->
-        :ets.insert(:client, {:transport, [transport] ++ transports |> hd |> elem(1)})
-    end
+    # case :ets.lookup(:client, :transport) do
+    #   [] -> :ets.insert(:client, {:transport, [transport]})
+    #   transports ->
+    #     IO.inspect transport
+    #     IO.inspect transports
+    #     :ets.insert(:client, {:transport, [transport] ++ transports |> hd |> elem(1)})
+    # end
     Logger.info("connected")
     GenSocketClient.join(transport, "p2p")
     {:ok, state}
@@ -150,6 +152,15 @@ defmodule Block.P2pClientHandler do
           GenSocketClient.push(transport, "p2p", @query_all_blocks, %{})
         else
           GenSocketClient.push(transport, "p2p", @sync_peer, %{})
+        end
+      "get_all_blocks" ->
+        res_hash = response|>Enum.map(fn x -> x["hash"] end)
+        hash = BlockRepository.get_all_blocks()|>Enum.map(fn x -> x.hash end)
+        response = Enum.reject(response, fn x -> x["hash"] in hash end)
+        if(response === [])do
+          Enum.map(response, fn x -> BlockRepository.insert_block(x) end)
+        else
+          GenSocketClient.push(transport, "p2p", @query_all_transactions, %{})
         end
       "get_all_blocks" ->
         block_hashs = BlockRepository.get_all_block_hashs
