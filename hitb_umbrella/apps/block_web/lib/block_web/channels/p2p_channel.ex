@@ -4,6 +4,7 @@ defmodule BlockWeb.P2pChannel do
 
   @query_latest_block Block.P2pMessage.query_latest_block
   @sync_block         Block.P2pMessage.sync_block
+  @sync_peer          Block.P2pMessage.sync_peer
   @query_all_accounts Block.P2pMessage.query_all_accounts
   @query_all_blocks   Block.P2pMessage.query_all_blocks
   # @update_block_chain Block.P2pMessage.update_block_chain
@@ -29,21 +30,28 @@ defmodule BlockWeb.P2pChannel do
   end
 
   def handle_in(@sync_block, _payload, socket) do
-    Logger.info("sync_block block")
+    Logger.info("sync_block")
     data = BlockService.get_latest_block()|>send()
     {:reply, {:ok, %{type: @sync_block, data: data}}, socket}
   end
 
-  def handle_in(@query_latest_block, _payload, socket) do
+  def handle_in(@sync_peer, _payload, socket) do
+    Logger.info("sync_peer")
+    data = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
+    {:reply, {:ok, %{type: @sync_peer, data: data}}, socket}
+  end
+
+  def handle_in(@query_latest_block, %{"ip" => ip}, socket) do
+    hosts = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
+    new_hosts = ip|>Enum.map(fn x -> x["host"] end)
+    Enum.reject(ip, fn x -> x["host"] in hosts end)
+    |>Enum.each(fn x -> PeerService.newPeer(x["host"], x["port"]) end)
     Logger.info("sending latest block")
     data = BlockService.get_latest_block()|>send()
     {:reply, {:ok, %{type: @query_latest_block, data: data}}, socket}
   end
 
-  def handle_in(@query_all_accounts, %{"ip" => ip}, socket) do
-    hosts = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
-    new_hosts = ip|>Enum.map(fn x -> x["host"] end)
-    ip = Enum.reject(ip, fn x -> x["host"] in hosts end)
+  def handle_in(@query_all_accounts, _payload, socket) do
     Logger.info("sending all accounts")
     data = AccountRepository.get_all_accounts()|>Enum.map(fn x -> send(x) end)
     {:reply, {:ok, %{type: @query_all_accounts, data: data}}, socket}

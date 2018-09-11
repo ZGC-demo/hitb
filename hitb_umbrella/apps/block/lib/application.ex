@@ -26,7 +26,7 @@ defmodule Block.Application do
   defp init_peer() do
     database = Block.Repo.config()|>Enum.reject(fn x -> elem(x, 0) != :database end)|>List.first|>elem(1)
     init_peer = %{
-      host:  "192.168.0.60",
+      host:  "139.129.165.56",
       port:  "4000",
       connect: true
     }

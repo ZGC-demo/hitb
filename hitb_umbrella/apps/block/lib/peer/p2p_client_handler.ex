@@ -93,7 +93,7 @@ defmodule Block.P2pClientHandler do
       end
     hosts = PeerService.getPeers()|>Enum.map(fn x -> %{host: x.host, port: x.port} end)
     ip = (hosts ++ ip)|>:lists.usort
-    GenSocketClient.push(transport, "p2p", @sync_block, %{ip: ip})
+    GenSocketClient.push(transport, "p2p", @query_latest_block, %{ip: ip})
     {:ok, state}
   end
 
@@ -132,18 +132,24 @@ defmodule Block.P2pClientHandler do
       "sync_block" ->
         if(Map.get(response, "hash") != Map.get(BlockService.get_latest_block, :hash))do
           GenSocketClient.push(transport, "p2p", @query_all_blocks, %{})
-        else
-          IO.inspect "sss"
-          IO.inspect @sync_peer
-          GenSocketClient.push(transport, "p2p", @sync_peer, %{})
         end
       "sync_peer" ->
-        IO.inspect response
+        hosts = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
+        ip =
+          case :ets.lookup(:local_ip, :local_ip) do
+            [] -> []
+            local_ip -> local_ip|>List.last|>elem(1)
+          end
+          |>Enum.map(fn x -> x.host end)
+        Enum.reject(response, fn x -> x in ip end)
+        |>Enum.map(fn x -> PeerService.newPeer(x, "4000") end)
+        PeerService.getPeers()
+        |>Enum.map(fn x -> connect(x.host, x.port, []) end)
       "get_latest_block" ->
-        # IO.inspect response["inserted_at"]
-        # IO.inspect BlockService.get_latest_block.inserted_at
         if(BlockService.get_latest_block == nil or Map.get(response, "hash") != Map.get(BlockService.get_latest_block, :hash))do
           GenSocketClient.push(transport, "p2p", @query_all_blocks, %{})
+        else
+          GenSocketClient.push(transport, "p2p", @sync_peer, %{})
         end
       "get_all_blocks" ->
         block_hashs = BlockRepository.get_all_block_hashs
