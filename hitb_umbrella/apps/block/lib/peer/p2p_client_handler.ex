@@ -143,7 +143,8 @@ defmodule Block.P2pClientHandler do
             local_ip -> local_ip|>List.last|>elem(1)
           end
           |>Enum.map(fn x -> x.host end)
-        Enum.reject(response, fn x -> x in ip end)
+        hosts = (ip ++ hosts)|>:lists.usort
+        Enum.reject(response, fn x -> x in hosts end)
         |>Enum.map(fn x -> PeerService.newPeer(x, "4000") end)
         PeerService.getPeers()
         |>Enum.map(fn x -> P2pSessionManager.connect(x.host, x.port, []) end)
