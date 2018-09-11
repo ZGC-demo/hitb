@@ -26,7 +26,7 @@ defmodule Block.Application do
   defp init_peer() do
     database = Block.Repo.config()|>Enum.reject(fn x -> elem(x, 0) != :database end)|>List.first|>elem(1)
     init_peer = %{
-      host:  "139.129.165.56",
+      host:  "192.168.0.60",
       port:  "4000",
       connect: true
     }
@@ -37,7 +37,7 @@ defmodule Block.Application do
       |>Enum.reject(fn x -> String.contains?(elem(x, 0), "docker") end)
       |>Enum.map(fn x -> List.keyfind(elem(x, 1), :addr, 0) end)
       |>Enum.reject(fn x -> x == nil end)
-      |>Enum.map(fn x -> elem(x, 1)|>Tuple.to_list|>Enum.join(".") end)
+      |>Enum.map(fn x -> %{host: elem(x, 1)|>Tuple.to_list|>Enum.join("."), port: "4000"} end)
     # IO.inspect local_ip
       # |>Enum.map(fn x -> elem(x, 1)|>Tuple.to_list|>Enum.join(":") end)
     if(database != "block_test")do

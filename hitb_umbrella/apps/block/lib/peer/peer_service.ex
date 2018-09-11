@@ -14,6 +14,10 @@ defmodule Block.PeerService do
     publicIp
   end
 
+  def getPeers() do
+    PeerRepository.get_all_peers()
+  end
+
   def newPeer(host, port)do
     peer = %{host: host, port: port, connect: true}
     PeerRepository.insert_peer(peer)

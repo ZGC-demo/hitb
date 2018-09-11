@@ -13,6 +13,7 @@ defmodule BlockWeb.P2pChannel do
   @connection_error   Block.P2pMessage.connection_error
   @connection_success Block.P2pMessage.connection_success
   alias Block.BlockService
+  alias Block.PeerService
   alias Block.AccountRepository
   alias Block.BlockRepository
   alias Block.TransactionRepository
@@ -33,7 +34,12 @@ defmodule BlockWeb.P2pChannel do
     {:reply, {:ok, %{type: @sync_block, data: data}}, socket}
   end
 
-  def handle_in(@query_latest_block, _payload, socket) do
+  def handle_in(@query_latest_block, %{"ip" => ip}, socket) do
+    hosts = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
+    new_hosts = ip|>Enum.map(fn x -> x["host"] end)
+    ip = Enum.reject(ip, fn x -> x["host"] in hosts end)
+    IO.inspect ip
+    Enum.each(ip, fn x -> PeerService.newPeer(x["host"], x["port"]) end)
     Logger.info("sending latest block")
     data = BlockService.get_latest_block()|>send()
     {:reply, {:ok, %{type: @query_latest_block, data: data}}, socket}
