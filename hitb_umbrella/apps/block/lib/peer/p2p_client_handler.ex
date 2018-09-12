@@ -79,7 +79,7 @@ defmodule Block.P2pClientHandler do
 
   def handle_disconnected(_reason, state) do
     %{url: url, host: host} = state
-    Logger.error("disconnected:  #{url}  connect error. 20 minutes later attempting to reconnect...")
+    Logger.error("disconnected: #{host} connect error. 20 minutes later attempting to reconnect...")
     # PeerService.getPeers()
     # |>Enum.reject(fn x -> x.host == host end)
     # |>Enum.map(fn x -> P2pSessionManager.connect(x.host, x.port, []) end)
@@ -151,8 +151,6 @@ defmodule Block.P2pClientHandler do
       "get_latest_block" ->
         if(BlockService.get_latest_block == nil or Map.get(response, "hash") != Map.get(BlockService.get_latest_block, :hash))do
           GenSocketClient.push(transport, "p2p", @query_all_blocks, %{})
-        else
-          GenSocketClient.push(transport, "p2p", @sync_peer, %{})
         end
       "get_all_blocks" ->
         res_hash = response|>Enum.map(fn x -> x["hash"] end)

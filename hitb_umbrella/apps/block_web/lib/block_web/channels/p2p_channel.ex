@@ -38,6 +38,7 @@ defmodule BlockWeb.P2pChannel do
   def handle_in(@sync_peer, _payload, socket) do
     Logger.info("sync_peer")
     data = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
+    IO.inspect data
     {:reply, {:ok, %{type: @sync_peer, data: data}}, socket}
   end
 

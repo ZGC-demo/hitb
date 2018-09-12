@@ -41,6 +41,7 @@ defmodule Block.Application do
     # IO.inspect local_ip
       # |>Enum.map(fn x -> elem(x, 1)|>Tuple.to_list|>Enum.join(":") end)
     if(database != "block_test")do
+      Enum.each(local_ip, fn x -> Block.PeerService.newPeer(x.host, x.port) end)
       Block.P2pSessionManager.connect(init_peer.host, init_peer.port, local_ip)
     end
     # peers = Block.PeerRepository.get_all_peers
