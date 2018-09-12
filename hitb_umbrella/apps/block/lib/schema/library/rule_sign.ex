@@ -19,10 +19,12 @@ defmodule Block.Library.RuleSign do
   Builds a changeset based on the `struct` and `params`.
   """
 
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:sign, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
-    |> validate_required([:sign, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
+  def changeset(rule_sign, params \\ %{}) do
+    changeset = rule_sign
+      |> cast(params, [:sign, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
+      |> validate_required([:sign, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
+    Block.create_data_record(changeset, "rule_sign")
+    changeset
   end
 
 end

@@ -15,8 +15,10 @@ defmodule Block.Stat.ClientSaveStat do
 
   @doc false
   def changeset(%ClientSaveStat{} = client_save_stat, attrs) do
-    client_save_stat
-    |> cast(attrs, [:username, :filename, :data, :previous_hash, :hash])
-    |> validate_required([:username, :filename, :data, :previous_hash, :hash])
+    changeset = client_save_stat
+      |> cast(attrs, [:username, :filename, :data, :previous_hash, :hash])
+      |> validate_required([:username, :filename, :data, :previous_hash, :hash])
+    Block.create_data_record(changeset, "client_save_stat")
+    changeset
   end
 end

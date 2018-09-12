@@ -13,8 +13,10 @@ defmodule Block.DataRecord do
 
   @doc false
   def changeset(%DataRecord{} = data_record, attrs) do
-    data_record
-    |> cast(attrs, [:type, :data, :hash])
-    |> validate_required([:host, :data, :hash])
+    changeset = data_record
+      |> cast(attrs, [:type, :data, :hash])
+      |> validate_required([:host, :data, :hash])
+    Block.create_data_record(changeset, "data_record")
+    changeset
   end
 end

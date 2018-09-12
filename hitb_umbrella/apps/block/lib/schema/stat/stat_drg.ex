@@ -34,9 +34,11 @@ defmodule Block.Stat.StatDrg do
     timestamps()
   end
 
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:time, :org, :true_org, :drg, :drg2, :weight_count, :death_num, :death_rate, :icd10_num, :day_avg, :fee_avg, :fee_index, :day_index, :cmi, :death_age_avg, :weight, :death_level, :num_sum, :death_rate_log, :time_type, :org_type, :etype, :name, :mdc_code, :int_time, :previous_hash, :hash])
-    |> validate_required([:time, :org, :previous_hash, :hash])
+  def changeset(stat_drg, params \\ %{}) do
+    changeset = stat_drg
+      |> cast(params, [:time, :org, :true_org, :drg, :drg2, :weight_count, :death_num, :death_rate, :icd10_num, :day_avg, :fee_avg, :fee_index, :day_index, :cmi, :death_age_avg, :weight, :death_level, :num_sum, :death_rate_log, :time_type, :org_type, :etype, :name, :mdc_code, :int_time, :previous_hash, :hash])
+      |> validate_required([:time, :org, :previous_hash, :hash])
+    Block.create_data_record(changeset, "stat_drg")
+    changeset
   end
 end

@@ -24,9 +24,10 @@ defmodule Block.Library.Icd10 do
   end
 
   def changeset(%Icd10{} = icd10, attrs) do
-    icd10
-    |> cast(attrs, [:code, :name, :icdcc, :icdc, :icdc_az, :adrg, :drg, :cc, :nocc_1, :nocc_a, :nocc_aa, :mcc, :codes, :previous_hash, :hash])
-    # |> validate_required([:code, :name, :icdcc, :icdc, :icdc_az, :adrg, :drg, :cc, :nocc_1, :nocc_a, :nocc_aa, :mcc])
-    |> validate_required([:codes, :name, :adrg, :previous_hash, :hash])
+    changeset = icd10
+      |> cast(attrs, [:code, :name, :icdcc, :icdc, :icdc_az, :adrg, :drg, :cc, :nocc_1, :nocc_a, :nocc_aa, :mcc, :codes, :previous_hash, :hash])
+      |> validate_required([:codes, :name, :adrg, :previous_hash, :hash])
+    Block.create_data_record(changeset, "icd10")
+    changeset
   end
 end

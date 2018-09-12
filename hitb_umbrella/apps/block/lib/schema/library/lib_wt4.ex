@@ -16,8 +16,10 @@ defmodule Block.Library.LibWt4 do
 
   @doc false
   def changeset(%LibWt4{} = lib_wt4, attrs) do
-    lib_wt4
-    |> cast(attrs, [:code, :name, :year, :type, :previous_hash, :hash])
-    |> validate_required([:code, :name, :type, :previous_hash, :hash])
+    changeset = lib_wt4
+      |> cast(attrs, [:code, :name, :year, :type, :previous_hash, :hash])
+      |> validate_required([:code, :name, :type, :previous_hash, :hash])
+    Block.create_data_record(changeset, "lib_wt4")
+    changeset
   end
 end

@@ -18,7 +18,8 @@ defmodule Server.UserService do
           if(db_user.block_address == nil)do
             %{publicKey: "", username: ""}
           else
-            AccountService.getAccountByAddress(db_user.block_address)
+            %{publicKey: "", username: ""}
+            # AccountService.getAccountByAddress(db_user.block_address)
           end
         blockchain = %{address: db_user.block_address, publicKey: account.publicKey, secret: account.username}
         #缓存区块链数据

@@ -18,10 +18,12 @@ defmodule Block.Library.RuleSymptom do
   Builds a changeset based on the `struct` and `params`.
   """
 
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:symptom, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
-    |> validate_required([:symptom, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
+  def changeset(rule_symptom, params \\ %{}) do
+    changeset = rule_symptom
+      |> cast(params, [:symptom, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
+      |> validate_required([:symptom, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
+    Block.create_data_record(changeset, "rule_symptom")
+    changeset
   end
 
 end

@@ -32,9 +32,11 @@ defmodule Block.Library.RuleAdrg do
   Builds a changeset based on the `struct` and `params`.
   """
 
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:code, :name, :drgs_1, :icd10_a, :icd10_aa, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_a, :icd9_aa, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc, :mdc, :org, :year, :version, :plat, :previous_hash, :hash])
-    |> validate_required([:code, :previous_hash, :hash])
+  def changeset(rule_adrg, params \\ %{}) do
+    changeset = rule_adrg
+      |> cast(params, [:code, :name, :drgs_1, :icd10_a, :icd10_aa, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_a, :icd9_aa, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc, :mdc, :org, :year, :version, :plat, :previous_hash, :hash])
+      |> validate_required([:code, :previous_hash, :hash])
+    Block.create_data_record(changeset, "rule_adrg")
+    changeset
   end
 end

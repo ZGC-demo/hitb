@@ -22,10 +22,12 @@ defmodule Block.Library.RuleCdaIcd9 do
   Builds a changeset based on the `struct` and `params`.
   """
 
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:code, :name, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user, :previous_hash, :hash])
-    |> validate_required([:code, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user, :previous_hash, :hash])
+  def changeset(rule_cda_icd9, params \\ %{}) do
+    changeset = rule_cda_icd9
+      |> cast(params, [:code, :name, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user, :previous_hash, :hash])
+      |> validate_required([:code, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user, :previous_hash, :hash])
+    Block.create_data_record(changeset, "rule_cda_icd9")
+    changeset
   end
 
 end

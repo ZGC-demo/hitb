@@ -8,15 +8,18 @@ defmodule Block.Stat.StatFile do
     field :second_menu, :string
     field :file_name, :string
     field :page_type, :string
+    field :hash, :string
     # field :insert_user, :string
     # field :update_user, :string
     # field :header, :string
     timestamps()
   end
 
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:first_menu, :second_menu, :file_name, :page_type])
-    |> validate_required([:first_menu, :second_menu, :file_name, :page_type])
+  def changeset(stat_file, params \\ %{}) do
+    changeset = stat_file
+      |> cast(params, [:first_menu, :second_menu, :file_name, :page_type, :hash])
+      |> validate_required([:first_menu, :second_menu, :file_name, :page_type, :hash])
+    Block.create_data_record(changeset, "stat_file")
+    changeset
   end
 end

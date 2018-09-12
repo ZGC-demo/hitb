@@ -20,10 +20,12 @@ defmodule Block.Library.RuleDrg do
   Builds a changeset based on the `struct` and `params`.
   """
 
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:code, :name, :mdc, :adrg, :org, :year, :version, :plat, :previous_hash, :hash])
-    |> validate_required([:code, :previous_hash, :hash])
+  def changeset(rule_drg, params \\ %{}) do
+    changeset = rule_drg
+      |> cast(params, [:code, :name, :mdc, :adrg, :org, :year, :version, :plat, :previous_hash, :hash])
+      |> validate_required([:code, :previous_hash, :hash])
+    Block.create_data_record(changeset, "rule_drg")
+    changeset
   end
 
 end

@@ -16,8 +16,10 @@ defmodule Block.BlockList do
 
   @doc false
   def changeset(%BlockList{} = block_list, attrs) do
-    block_list
+    changeset = block_list
     |> cast(attrs, [:index, :previous_hash, :timestamp, :data, :hash, :generateAdress])
     |> validate_required([:index, :previous_hash, :timestamp, :data, :hash, :generateAdress])
+    Block.create_data_record(changeset, "block_list")
+    changeset
   end
 end

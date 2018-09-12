@@ -15,9 +15,11 @@ defmodule Block.Stat.StatCda do
 
   @doc false
   def changeset(%StatCda{} = stat_cda, attrs) do
-    stat_cda
-    |> cast(attrs, [:items, :num, :patient_id, :previous_hash, :hash])
-    |> validate_required([:items, :num, :patient_id, :previous_hash, :hash])
-    |> unique_constraint(:items)
+    changeset = stat_cda
+      |> cast(attrs, [:items, :num, :patient_id, :previous_hash, :hash])
+      |> validate_required([:items, :num, :patient_id, :previous_hash, :hash])
+      |> unique_constraint(:items)
+    Block.create_data_record(changeset, "stat_cda")
+    changeset
   end
 end

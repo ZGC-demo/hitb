@@ -26,10 +26,12 @@ defmodule Block.Library.RuleIcd9 do
   Builds a changeset based on the `struct` and `params`.
   """
 
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:code, :name, :codes, :dissect, :icdcc, :icdc, :adrg, :p_type, :property, :option, :org, :year, :version, :plat, :previous_hash, :hash])
-    |> validate_required([:code, :previous_hash, :hash])
+  def changeset(rule_icd9, params \\ %{}) do
+    changeset = rule_icd9
+      |> cast(params, [:code, :name, :codes, :dissect, :icdcc, :icdc, :adrg, :p_type, :property, :option, :org, :year, :version, :plat, :previous_hash, :hash])
+      |> validate_required([:code, :previous_hash, :hash])
+    Block.create_data_record(changeset, "rule_icd9")
+    changeset
   end
 
 end

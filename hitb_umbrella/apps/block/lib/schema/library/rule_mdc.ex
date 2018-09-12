@@ -22,10 +22,12 @@ defmodule Block.Library.RuleMdc do
   Builds a changeset based on the `struct` and `params`.
   """
 
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:code, :name, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :org, :year, :version, :plat, :previous_hash, :hash])
-    |> validate_required([:code, :previous_hash, :hash])
+  def changeset(rule_mdc, params \\ %{}) do
+    changeset = rule_mdc
+      |> cast(params, [:code, :name, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :org, :year, :version, :plat, :previous_hash, :hash])
+      |> validate_required([:code, :previous_hash, :hash])
+    Block.create_data_record(changeset, "rule_mdc")
+    changeset
   end
 
 end

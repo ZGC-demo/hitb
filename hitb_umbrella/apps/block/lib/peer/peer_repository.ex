@@ -3,6 +3,10 @@ defmodule Block.PeerRepository do
   alias Block.Repo
   alias Block.Peer
 
+  def get_peer(host) do
+    Repo.get_by(Peer, host: host)
+  end
+
   def insert_peer(peer) do
     %Peer{}
     |> Peer.changeset(peer)

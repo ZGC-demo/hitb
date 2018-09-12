@@ -18,9 +18,11 @@ defmodule Block.Library.DrgRate do
   """
 
   def changeset(%DrgRate{} = drg_rate, attrs) do
-    drg_rate
-    |> cast(attrs, [:drg, :name, :rate, :type, :previous_hash, :hash])
-    |> validate_required([:drg, :name, :rate, :type, :previous_hash, :hash])
+    changeset = drg_rate
+      |> cast(attrs, [:drg, :name, :rate, :type, :previous_hash, :hash])
+      |> validate_required([:drg, :name, :rate, :type, :previous_hash, :hash])
+    Block.create_data_record(changeset, "drg_rate")
+    changeset
   end
 
 end

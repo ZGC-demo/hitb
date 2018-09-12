@@ -14,8 +14,10 @@ defmodule Block.ShareRecord do
 
   @doc false
   def changeset(%ShareRecord{} = share_record, attrs) do
-    share_record
-    |> cast(attrs, [:file_name, :username, :datetime, :type])
-    |> validate_required([:file_name, :username, :datetime, :type])
+    changeset = share_record
+      |> cast(attrs, [:file_name, :username, :datetime, :type])
+      |> validate_required([:file_name, :username, :datetime, :type])
+    Block.create_data_record(changeset, "share_record")
+    changeset
   end
 end

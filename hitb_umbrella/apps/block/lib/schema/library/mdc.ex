@@ -17,8 +17,10 @@ defmodule Block.Library.Mdc do
   end
 
   def changeset(%Mdc{} = mdc, attrs) do
-    mdc
-    |> cast(attrs, [:code, :name, :mdc, :gender, :previous_hash, :hash])
-    |> validate_required([:code, :name, :mdc, :gender, :previous_hash, :hash])
+    changeset = mdc
+      |> cast(attrs, [:code, :name, :mdc, :gender, :previous_hash, :hash])
+      |> validate_required([:code, :name, :mdc, :gender, :previous_hash, :hash])
+    Block.create_data_record(changeset, "mdc")
+    changeset
   end
 end

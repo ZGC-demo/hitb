@@ -13,8 +13,10 @@ defmodule Block.Peer do
 
   @doc false
   def changeset(%Peer{} = peer, attrs) do
-    peer
-    |> cast(attrs, [:host, :port, :connect])
-    |> validate_required([:host, :port, :connect])
+    changeset = peer
+      |> cast(attrs, [:host, :port, :connect])
+      |> validate_required([:host, :port, :connect])
+    Block.create_data_record(changeset, "peer")
+    changeset
   end
 end

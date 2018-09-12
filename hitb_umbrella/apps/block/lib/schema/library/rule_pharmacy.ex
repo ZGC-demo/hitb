@@ -18,10 +18,12 @@ defmodule Block.Library.RulePharmacy do
   Builds a changeset based on the `struct` and `params`.
   """
 
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:pharmacy, :icd10_a, :symptoms, :create_user, :update_user, :previous_hash, :hash])
-    |> validate_required([:pharmacy, :icd10_a, :symptoms, :create_user, :update_user, :previous_hash, :hash])
+  def changeset(rule_pharmacy, params \\ %{}) do
+    changeset = rule_pharmacy
+      |> cast(params, [:pharmacy, :icd10_a, :symptoms, :create_user, :update_user, :previous_hash, :hash])
+      |> validate_required([:pharmacy, :icd10_a, :symptoms, :create_user, :update_user, :previous_hash, :hash])
+    Block.create_data_record(changeset, "rule_pharmacy")
+    changeset
   end
 
 end

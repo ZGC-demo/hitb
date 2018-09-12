@@ -14,9 +14,11 @@ defmodule Block.Library.Cdh do
 
   @doc false
   def changeset(%Cdh{} = cdh, attrs) do
-    cdh
-    |> cast(attrs, [:key, :value, :previous_hash, :hash])
-    |> validate_required([:key, :value, :previous_hash, :hash])
-    |> unique_constraint(:key)
+    changeset = cdh
+      |> cast(attrs, [:key, :value, :previous_hash, :hash])
+      |> validate_required([:key, :value, :previous_hash, :hash])
+      |> unique_constraint(:key)
+    Block.create_data_record(changeset, "cdh")
+    changeset
   end
 end

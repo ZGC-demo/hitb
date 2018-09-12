@@ -10,6 +10,10 @@ defmodule Block do
     :block
   end
 
+  def create_data_record(data, "type") do
+
+  end
+
   def sign do
 
   end
