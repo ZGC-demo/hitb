@@ -61,7 +61,9 @@ defmodule Block.P2pClientHandler do
   end
 
   def init(url) do
-    {:connect, url, [], %{}}
+    host = Regex.replace(~r/ws:\/\//, url, "")
+    host = Regex.replace(~r/:4000\/p2p\/websocket/, host, "")
+    {:connect, url, [], %{host: host, url: url}}
   end
 
   def join(_transport, _topic, _payload \\ %{}) do
@@ -69,20 +71,18 @@ defmodule Block.P2pClientHandler do
   end
 
   def handle_connected(transport, state) do
-    # case :ets.lookup(:client, :transport) do
-    #   [] -> :ets.insert(:client, {:transport, [transport]})
-    #   transports ->
-    #     IO.inspect transport
-    #     IO.inspect transports
-    #     :ets.insert(:client, {:transport, [transport] ++ transports |> hd |> elem(1)})
-    # end
-    Logger.info("connected")
+    %{url: url} = state
+    Logger.info("#{url}  connected")
     GenSocketClient.join(transport, "p2p")
     {:ok, state}
   end
 
-  def handle_disconnected(reason, state) do
-    Logger.error("disconnected: #{inspect reason}. 20 minutes later attempting to reconnect...")
+  def handle_disconnected(_reason, state) do
+    %{url: url, host: host} = state
+    Logger.error("disconnected:  #{url}  connect error. 20 minutes later attempting to reconnect...")
+    # PeerService.getPeers()
+    # |>Enum.reject(fn x -> x.host == host end)
+    # |>Enum.map(fn x -> P2pSessionManager.connect(x.host, x.port, []) end)
     {:ok, state}
   end
 
@@ -285,7 +285,7 @@ defmodule Block.P2pClientHandler do
   end
 
   def handle_info(:ping, transport, state) do
-    GenSocketClient.push(transport, "p2p", @sync_block, %{})
+    GenSocketClient.push(transport, "p2p", @query_latest_block, %{})
     {:ok, state}
   end
 
@@ -301,19 +301,19 @@ defmodule Block.P2pClientHandler do
     {:ok, state}
   end
 
-  def handle_info(@query_latest_block, transport, state) do
-    Logger.info("quering for latest blocks")
-    GenSocketClient.push(transport, "p2p", @query_latest_block, %{})
-    {:ok, state}
-  end
+  # def handle_info(@query_latest_block, transport, state) do
+  #   Logger.info("quering for latest blocks")
+  #   GenSocketClient.push(transport, "p2p", @query_latest_block, %{})
+  #   {:ok, state}
+  # end
 
-  def handle_info(@add_peer_request, transport, state) do
-    Logger.info("sending request to add me as a peer")
-    local_server_host = Application.get_env(:oniichain, BlockWeb.Endpoint)[:url][:host]
-    local_server_port = Application.get_env(:oniichain, BlockWeb.Endpoint)[:http][:port]
-    GenSocketClient.push(transport, "p2p", @add_peer_request, %{host: local_server_host, port: local_server_port})
-    {:ok, state}
-  end
+  # def handle_info(@add_peer_request, transport, state) do
+  #   Logger.info("sending request to add me as a peer")
+  #   local_server_host = Application.get_env(:oniichain, BlockWeb.Endpoint)[:url][:host]
+  #   local_server_port = Application.get_env(:oniichain, BlockWeb.Endpoint)[:http][:port]
+  #   GenSocketClient.push(transport, "p2p", @add_peer_request, %{host: local_server_host, port: local_server_port})
+  #   {:ok, state}
+  # end
 
   def handle_info(message, _transport, state) do
     Logger.warn("Unhandled message #{inspect message}")
@@ -325,4 +325,12 @@ defmodule Block.P2pClientHandler do
     new_state = :new_state
     {:reply, reply, new_state}
   end
+
+  # case :ets.lookup(:client, :transport) do
+  #   [] -> :ets.insert(:client, {:transport, [transport]})
+  #   transports ->
+  #     IO.inspect transport
+  #     IO.inspect transports
+  #     :ets.insert(:client, {:transport, [transport] ++ transports |> hd |> elem(1)})
+  # end
 end
