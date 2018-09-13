@@ -6,6 +6,7 @@ defmodule Block.DataRecord do
 
   schema "data_record" do
     field :type,    :string
+    field :table,   :string
     field :data,    :string
     field :hash,    :string
     timestamps()
@@ -13,10 +14,8 @@ defmodule Block.DataRecord do
 
   @doc false
   def changeset(%DataRecord{} = data_record, attrs) do
-    changeset = data_record
-      |> cast(attrs, [:type, :data, :hash])
-      |> validate_required([:host, :data, :hash])
-    Block.create_data_record(changeset, "data_record")
-    changeset
+    data_record
+    |> cast(attrs, [:type, :data, :hash, :table])
+    |> validate_required([:host, :data, :hash, :table])
   end
 end

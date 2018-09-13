@@ -22,7 +22,7 @@ defmodule Block.Library.RulePharmacy do
     changeset = rule_pharmacy
       |> cast(params, [:pharmacy, :icd10_a, :symptoms, :create_user, :update_user, :previous_hash, :hash])
       |> validate_required([:pharmacy, :icd10_a, :symptoms, :create_user, :update_user, :previous_hash, :hash])
-    Block.create_data_record(changeset, "rule_pharmacy")
+    Block.create_data_record(rule_pharmacy, changeset, "rule_pharmacy")
     changeset
   end
 

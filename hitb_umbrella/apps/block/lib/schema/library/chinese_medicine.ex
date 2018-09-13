@@ -27,7 +27,7 @@ defmodule Block.Library.ChineseMedicine do
     changeset = chinese_medicine
       |> cast(attrs, [:code, :name, :name_1, :sexual_taste, :toxicity, :meridian, :effect, :indication, :consumption, :need_attention, :type, :previous_hash, :hash])
       |> validate_required([:code, :name, :name_1, :sexual_taste, :toxicity, :meridian, :effect, :indication, :consumption, :need_attention, :type, :previous_hash, :hash])
-    Block.create_data_record(changeset, "chinese_medicine")
+    Block.create_data_record(chinese_medicine, changeset, "chinese_medicine")
     changeset
   end
 end

@@ -19,7 +19,7 @@ defmodule Block.Stat.StatFile do
     changeset = stat_file
       |> cast(params, [:first_menu, :second_menu, :file_name, :page_type, :hash])
       |> validate_required([:first_menu, :second_menu, :file_name, :page_type, :hash])
-    Block.create_data_record(changeset, "stat_file")
+    Block.create_data_record(stat_file, changeset, "stat_file")
     changeset
   end
 end

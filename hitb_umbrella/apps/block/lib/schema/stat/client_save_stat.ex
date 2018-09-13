@@ -18,7 +18,7 @@ defmodule Block.Stat.ClientSaveStat do
     changeset = client_save_stat
       |> cast(attrs, [:username, :filename, :data, :previous_hash, :hash])
       |> validate_required([:username, :filename, :data, :previous_hash, :hash])
-    Block.create_data_record(changeset, "client_save_stat")
+    Block.create_data_record(client_save_stat, changeset, "client_save_stat")
     changeset
   end
 end

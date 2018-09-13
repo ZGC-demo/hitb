@@ -1,4 +1,5 @@
 defmodule Block do
+  alias Block.DataRecord
   @moduledoc """
   Documentation for Block.
   """
@@ -10,8 +11,19 @@ defmodule Block do
     :block
   end
 
-  def create_data_record(data, "type") do
-
+  #数据日志
+  def create_data_record(attrs, changeset, table) do
+    if(changeset.errors == [])do
+      data = Poison.encode!(changeset.changes)
+      data_record =
+        case attrs.id do
+          nil -> %{type: "create", table: table, data: data, hash: hash(data)}
+          _ -> %{type: "update", table: table, data: data, hash: hash(data)}
+        end
+      %DataRecord{}
+      |>DataRecord.changeset(data_record)
+      |>Repo.insert
+    end
   end
 
   def sign do
@@ -37,4 +49,13 @@ defmodule Block do
   def calculateFee do
 
   end
+
+  defp hash(s) do
+    s = :crypto.hash(:sha256, s)
+    |> Base.encode64
+
+    [~r/\+/, ~r/ /, ~r/\=/, ~r/\%/, ~r/\//, ~r/\#/, ~r/\$/, ~r/\~/, ~r/\'/, ~r/\@/, ~r/\*/, ~r/\-/]
+    |> Enum.reduce(s, fn x, acc -> Regex.replace(x, acc, "") end)
+  end
+
 end

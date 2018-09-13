@@ -19,7 +19,7 @@ defmodule Block.Library.LibWt4 do
     changeset = lib_wt4
       |> cast(attrs, [:code, :name, :year, :type, :previous_hash, :hash])
       |> validate_required([:code, :name, :type, :previous_hash, :hash])
-    Block.create_data_record(changeset, "lib_wt4")
+    Block.create_data_record(lib_wt4, changeset, "lib_wt4")
     changeset
   end
 end

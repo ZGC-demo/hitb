@@ -42,7 +42,7 @@ defmodule Block.Account do
     changeset = account
       |> cast(attrs, [:index, :username, :u_username, :isDelegate, :u_isDelegate, :secondSignature, :u_secondSignature, :address, :publicKey, :secondPublicKey, :balance, :u_balance, :vote, :rate, :delegates,  :u_delegates, :multisignatures, :u_multisignatures, :multimin, :u_multimin, :multilifetime, :u_multilifetime, :blockId, :nameexist, :u_nameexist, :producedblocks, :missedblocks, :fees, :rewards, :lockHeight])
       |> validate_required([:username, :isDelegate, :u_isDelegate, :secondSignature, :u_secondSignature, :address, :publicKey, :u_balance, :vote, :rate, :multimin, :u_multimin, :multilifetime, :u_multilifetime, :nameexist, :u_nameexist, :producedblocks, :missedblocks, :fees, :rewards, :lockHeight])
-    Block.create_data_record(changeset, "account")
+    Block.create_data_record(account, changeset, "account")
     changeset
   end
 end

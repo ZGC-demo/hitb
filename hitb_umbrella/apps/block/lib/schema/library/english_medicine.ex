@@ -21,7 +21,7 @@ defmodule Hitb.Library.EnglishMedicine do
       changeset = english_medicine
         |> cast(attrs, [:first_level, :second_level, :third_level, :zh_name, :en_name, :dosage_form, :reimbursement_restrictions])
         |> validate_required([:first_level, :second_level, :third_level, :zh_name, :en_name, :dosage_form, :reimbursement_restrictions])
-      Block.create_data_record(changeset, "english_medicine")
+      Block.create_data_record(english_medicine, changeset, "english_medicine")
       changeset
     end
   end

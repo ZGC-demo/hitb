@@ -36,7 +36,7 @@ defmodule Block.Stat.StatDrgHeal do
     changeset = stat_drg_heal
       |> cast(params, [:time, :org, :true_org, :drg, :drg2, :name, :num_sum, :death_rate, :day_avg, :fee_avg, :heal_fee_avg, :self_fee_avg, :fee_gl, :fee_hl, :fee_yj, :fee_yl, :fee_yp, :pay_rate, :selfpay_rate, :time_type, :org_type, :etype, :int_time, :previous_hash, :hash])
       |> validate_required([:time, :org, :previous_hash, :hash])
-    Block.create_data_record(changeset, "stat_drg_heal")
+    Block.create_data_record(stat_drg_heal, changeset, "stat_drg_heal")
     changeset
   end
 end

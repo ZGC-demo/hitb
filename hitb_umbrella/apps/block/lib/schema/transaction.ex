@@ -30,7 +30,7 @@ defmodule Block.Transaction do
     changeset = transaction
       |> cast(attrs, [:transaction_id, :height, :blockId, :type, :timestamp, :datetime, :senderPublicKey,  :requesterPublicKey, :senderId, :recipientId, :amount, :fee, :signature, :signSignature, :asset, :args, :message])
       |> validate_required([:transaction_id, :height, :blockId, :type, :timestamp, :datetime, :senderPublicKey, :recipientId, :amount, :fee, :asset, :args, :message])
-    Block.create_data_record(changeset, "transaction")
+    Block.create_data_record(transaction, changeset, "transaction")
     changeset
   end
 end
