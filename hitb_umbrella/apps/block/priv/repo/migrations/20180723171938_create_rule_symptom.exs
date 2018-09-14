@@ -1,4 +1,4 @@
-defmodule Hitb.Library.Repo.Migrations.RuleSymptom do
+defmodule Block.Library.Repo.Migrations.RuleSymptom do
     use Ecto.Migration
 
     def change do

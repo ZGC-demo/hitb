@@ -1,4 +1,4 @@
-defmodule Hitb.Repo.Migrations.CreateDataRecord do
+defmodule Block.Repo.Migrations.CreateDataRecord do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Hitb.Library.Repo.Migrations.RuleSign do
+defmodule Block.Library.Repo.Migrations.RuleSign do
   use Ecto.Migration
 
   def change do

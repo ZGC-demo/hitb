@@ -1,6 +1,6 @@
-defmodule Hitb.Library.Repo.Migrations.EnglishMedicine do
+defmodule Block.Library.Repo.Migrations.EnglishMedicine do
     use Ecto.Migration
-  
+
     def change do
       create table(:english_medicine) do
         add :first_level, :string #一级分类
@@ -11,9 +11,9 @@ defmodule Hitb.Library.Repo.Migrations.EnglishMedicine do
         add :en_name, :string # 英文名称
         add :dosage_form, :string #剂型
         add :reimbursement_restrictions, :string #报销限制内容
-        
+
         timestamps()
       end
-  
+
     end
   end

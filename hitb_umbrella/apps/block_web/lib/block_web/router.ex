@@ -86,6 +86,8 @@ defmodule BlockWeb.Router do
     put "/putStorage", TransactionController, :putStorage
     get "/getTransactionsByBlockHeight", TransactionController, :getTransactionsByBlockHeight
     get "/getTransactionsByBlockHash", TransactionController, :getTransactionsByBlockHash
+
+    get "/server_service", ServerServiceController, :server_service
   end
 
   #服务器配置
@@ -160,5 +162,6 @@ defmodule BlockWeb.Router do
     put "/putStorage", TransactionController, :putStorage
     get "/getTransactionsByBlockHeight", TransactionController, :getTransactionsByBlockHeight
     get "/getTransactionsByBlockHash", TransactionController, :getTransactionsByBlockHash
+    get "/server_service", ServerServiceController, :server_service
   end
 end

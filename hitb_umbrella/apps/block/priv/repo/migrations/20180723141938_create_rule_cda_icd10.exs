@@ -1,4 +1,4 @@
-defmodule Hitb.Library.Repo.Migrations.RuleCdaIcd10 do
+defmodule Block.Library.Repo.Migrations.RuleCdaIcd10 do
     use Ecto.Migration
 
   def change do

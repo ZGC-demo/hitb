@@ -1,4 +1,4 @@
-defmodule Hitb.Library.Repo.Migrations.RuleExamine do
+defmodule Block.Library.Repo.Migrations.RuleExamine do
   use Ecto.Migration
 
   def change do

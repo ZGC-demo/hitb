@@ -48,8 +48,8 @@ defmodule Server.UserService do
           else
             AccountService.getAccountByAddress(db_user.block_address)
           end
-        blockchain = %{address: db_user.block_address, publicKey: account.publicKey, secret: account.username}
-        user = %{id: db_user.id, org: db_user.org, login: true, username: db_user.username, type: db_user.type, key: db_user.key, blockchain: blockchain, is_show: db_user.is_show}
+        # blockchain = %{address: db_user.block_address, publicKey: account.publicKey, secret: account.username}
+        user = %{id: db_user.id, org: db_user.org, login: true, username: db_user.username, type: db_user.type, key: db_user.key, blockchain: account, is_show: db_user.is_show}
         [true, user]
       true ->
         [false, %{login: false, username: user.username}]

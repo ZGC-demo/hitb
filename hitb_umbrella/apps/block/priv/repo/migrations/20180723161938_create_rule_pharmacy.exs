@@ -1,4 +1,4 @@
-defmodule Hitb.Library.Repo.Migrations.RulePharmacy do
+defmodule Block.Library.Repo.Migrations.RulePharmacy do
     use Ecto.Migration
 
     def change do
