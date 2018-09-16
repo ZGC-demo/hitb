@@ -16,6 +16,7 @@ defmodule Block.DataRecord do
   def changeset(%DataRecord{} = data_record, attrs) do
     data_record
     |> cast(attrs, [:type, :data, :hash, :table])
-    |> validate_required([:host, :data, :hash, :table])
+    |> validate_required([:type, :data, :hash, :table])
+    |> unique_constraint(:hash)
   end
 end

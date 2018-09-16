@@ -26,7 +26,7 @@ defmodule Block.Application do
   defp init_peer() do
     database = Block.Repo.config()|>Enum.reject(fn x -> elem(x, 0) != :database end)|>List.first|>elem(1)
     init_peer = %{
-      host:  "192.168.0.60",
+      host:  "139.129.165.56",
       port:  "4000",
       connect: true
     }
@@ -38,25 +38,11 @@ defmodule Block.Application do
       |>Enum.map(fn x -> List.keyfind(elem(x, 1), :addr, 0) end)
       |>Enum.reject(fn x -> x == nil end)
       |>Enum.map(fn x -> %{host: elem(x, 1)|>Tuple.to_list|>Enum.join("."), port: "4000"} end)
-    # IO.inspect local_ip
-      # |>Enum.map(fn x -> elem(x, 1)|>Tuple.to_list|>Enum.join(":") end)
     if(database != "block_test")do
-      # Enum.each(local_ip, fn x -> Block.PeerService.newPeer(x.host, x.port) end)
+      Enum.each(local_ip, fn x -> Block.PeerService.newPeer(x.host, x.port) end)
       Block.P2pSessionManager.connect(init_peer.host, init_peer.port, local_ip)
     end
-    # peers = Block.PeerRepository.get_all_peers
-    # if(peers != [])do
-    #   peers |> Enum.each(fn x -> Block.P2pSessionManager.connect(x.host, x.port) end)
-    # else
-    #   case Block.P2pSessionManager.connect(init_peer.host, init_peer.port) do
-    #     :ok ->
-    #       Block.PeerRepository.insert_peer(init_peer)
-    #     _ ->
-    #       Block.PeerRepository.insert_peer(%{init_peer | :connect => false})
-    #   end
-    # end
   end
-
 
   # defp generate_initial_block() do
   #   if(Block.BlockRepository.get_all_blocks == [])do

@@ -8,6 +8,7 @@ defmodule Block.Repo.Migrations.CreatePeer do
       add :connect, :boolean, default: false
       timestamps()
     end
+    create unique_index(:peer, [:host])
   end
 
 end

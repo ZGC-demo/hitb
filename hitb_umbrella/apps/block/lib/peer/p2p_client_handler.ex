@@ -93,8 +93,6 @@ defmodule Block.P2pClientHandler do
         [] -> []
         local_ip -> local_ip|>List.last|>elem(1)
       end
-    hosts = PeerService.getPeers()|>Enum.map(fn x -> %{host: x.host, port: x.port} end)
-    ip = (hosts ++ ip)|>:lists.usort
     GenSocketClient.push(transport, "p2p", @query_latest_block, %{ip: ip})
     {:ok, state}
   end
@@ -136,15 +134,7 @@ defmodule Block.P2pClientHandler do
           GenSocketClient.push(transport, "p2p", @query_all_blocks, %{})
         end
       "sync_peer" ->
-        hosts = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
-        ip =
-          case :ets.lookup(:local_ip, :local_ip) do
-            [] -> []
-            local_ip -> local_ip|>List.last|>elem(1)
-          end
-          |>Enum.map(fn x -> x.host end)
-        hosts = (ip ++ hosts)|>:lists.usort
-        Enum.reject(response, fn x -> x in hosts end)
+        response
         |>Enum.map(fn x -> PeerService.newPeer(x, "4000") end)
         PeerService.getPeers()
         |>Enum.map(fn x -> P2pSessionManager.connect(x.host, x.port, []) end)

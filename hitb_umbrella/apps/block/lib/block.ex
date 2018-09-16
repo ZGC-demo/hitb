@@ -1,5 +1,6 @@
 defmodule Block do
   alias Block.DataRecord
+  alias Block.Repo
   @moduledoc """
   Documentation for Block.
   """
@@ -20,6 +21,9 @@ defmodule Block do
           nil -> %{type: "create", table: table, data: data, hash: hash(data)}
           _ -> %{type: "update", table: table, data: data, hash: hash(data)}
         end
+      # IO.inspect data_record
+      # IO.inspect %DataRecord{}
+      # |>DataRecord.changeset(data_record)
       %DataRecord{}
       |>DataRecord.changeset(data_record)
       |>Repo.insert
