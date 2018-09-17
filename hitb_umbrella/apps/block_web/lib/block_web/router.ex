@@ -81,6 +81,7 @@ defmodule BlockWeb.Router do
     get "/unconfirmed/get", TransactionController, :getUnconfirmedTransaction
     get "/unconfirmed", TransactionController, :getUnconfirmedTransactions
     put "/addTransactions", TransactionController, :addTransactions
+    post "/addTransactions", TransactionController, :addTransactions
     get "/getStorage", TransactionController, :getStorage
     get "/getStorage:id", TransactionController, :getStorage
     put "/putStorage", TransactionController, :putStorage
@@ -157,6 +158,7 @@ defmodule BlockWeb.Router do
     get "/unconfirmed/get", TransactionController, :getUnconfirmedTransaction
     get "/unconfirmed", TransactionController, :getUnconfirmedTransactions
     put "/addTransactions", TransactionController, :addTransactions
+    post "/addTransactions", TransactionController, :addTransactions
     get "/getStorage", TransactionController, :getStorage
     get "/getStorage:id", TransactionController, :getStorage
     put "/putStorage", TransactionController, :putStorage
