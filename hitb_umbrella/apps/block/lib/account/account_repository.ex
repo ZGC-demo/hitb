@@ -9,6 +9,12 @@ defmodule Block.AccountRepository do
     |> Repo.insert
   end
 
+  def update_account(account, attrs) do
+    get_account(account.username)
+    |> Account.changeset(attrs)
+    |> Repo.update
+  end
+
   def get_all_accounts() do
     Repo.all(from p in Account, order_by: [asc: p.index])
   end

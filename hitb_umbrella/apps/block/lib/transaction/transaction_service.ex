@@ -16,37 +16,37 @@ defmodule Block.TransactionService do
     case sender do
       nil -> [:error, nil, ""]
       _ ->
-      tran = %{
-        id: transaction.id,
-        height: latest_block.index,
-        blockId: to_string(latest_block.hash),
-        type: transaction.type,
-        timestamp: :os.system_time(:seconds),
-        datetime: TransactionService.generateDateTime,
-        senderPublicKey: sender.publicKey,
-        requesterPublicKey: sender.publicKey,
-        senderId: sender.index,
-        recipientId: transaction.recipientId,
-        amount: transaction.amount,
-        fee: transaction.fee,
-        signature: "",
-        signSignature: "",
-        args: {},
-        asset: %{},
-        message: transaction.message}
-      #验证是否有二级密码
-      case sender.secondPublicKey do
-        nil ->
-          recipient = AccountService.getAccountByPublicKey(tran.recipientId)
-          pay(sender, recipient, transaction, tran)
-        _ ->
-          if(:crypto.hash(:sha256, "#{transaction.secondPassword}")|> Base.encode64|> regex == sender.secondPublicKey)do
+        tran = %{
+          id: transaction.id,
+          height: latest_block.index,
+          blockId: to_string(latest_block.hash),
+          type: transaction.type,
+          timestamp: :os.system_time(:seconds),
+          datetime: TransactionService.generateDateTime,
+          senderPublicKey: sender.publicKey,
+          requesterPublicKey: sender.publicKey,
+          senderId: sender.index,
+          recipientId: transaction.recipientId,
+          amount: transaction.amount,
+          fee: transaction.fee,
+          signature: "",
+          signSignature: "",
+          args: {},
+          asset: %{},
+          message: transaction.message}
+        #验证是否有二级密码
+        case sender.secondPublicKey do
+          nil ->
             recipient = AccountService.getAccountByPublicKey(tran.recipientId)
             pay(sender, recipient, transaction, tran)
-          else
-            [:error, nil, "交易失败,二级密码错误"]
-          end
-      end
+          _ ->
+            if(:crypto.hash(:sha256, "#{transaction.secondPassword}")|> Base.encode64|> regex == sender.secondPublicKey)do
+              recipient = AccountService.getAccountByPublicKey(tran.recipientId)
+              pay(sender, recipient, transaction, tran)
+            else
+              [:error, nil, "交易失败,二级密码错误"]
+            end
+        end
     end
   end
 
@@ -102,12 +102,11 @@ defmodule Block.TransactionService do
             [:error, nil, "交易失败,费用不足"]
           false ->
             TransactionRepository.insert_transaction(insert_tran)
-            sender = %{sender | :balance => sender.balance - transaction.amount - transaction.fee}
-            AccountRepository.insert_account(sender)
-            recipient = %{recipient | :balance => sender.balance + transaction.amount}
-            AccountRepository.insert_account(recipient)
+            AccountRepository.update_account(sender, %{balance: sender.balance - transaction.amount - transaction.fee})
+            AccountRepository.update_account(recipient,  %{balance: recipient.balance + transaction.amount})
             [:ok, %{insert_tran | :args => Tuple.to_list(insert_tran.args)}, "交易成功"]
         end
+        [:error, nil, "交易失败,费用不足"]
       false ->
         [:error, nil, "输入金额有误"]
     end
