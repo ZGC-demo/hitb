@@ -17,7 +17,7 @@ defmodule Block.TransactionService do
       nil -> [:error, nil, ""]
       _ ->
         tran = %{
-          id: transaction.id,
+          transaction_id: transaction.id,
           height: latest_block.index,
           blockId: to_string(latest_block.hash),
           type: transaction.type,
@@ -25,14 +25,14 @@ defmodule Block.TransactionService do
           datetime: TransactionService.generateDateTime,
           senderPublicKey: sender.publicKey,
           requesterPublicKey: sender.publicKey,
-          senderId: sender.index,
+          senderId: to_string(sender.index),
           recipientId: transaction.recipientId,
           amount: transaction.amount,
           fee: transaction.fee,
           signature: "",
           signSignature: "",
-          args: {},
-          asset: %{},
+          args: [],
+          asset: [],
           message: transaction.message}
         #验证是否有二级密码
         case sender.secondPublicKey do
@@ -94,17 +94,17 @@ defmodule Block.TransactionService do
 
   end
   #从一个账户转移到另一个账户
-  def pay(sender, recipient, transaction, insert_tran) do
+  def pay(sender, recipient, transaction, tran) do
     case transaction.amount > 0 do
       true ->
         case sender.balance - transaction.amount - transaction.fee < 0 do
           true ->
             [:error, nil, "交易失败,费用不足"]
           false ->
-            TransactionRepository.insert_transaction(insert_tran)
+            TransactionRepository.insert_transaction(tran)
             AccountRepository.update_account(sender, %{balance: sender.balance - transaction.amount - transaction.fee})
             AccountRepository.update_account(recipient,  %{balance: recipient.balance + transaction.amount})
-            [:ok, %{insert_tran | :args => Tuple.to_list(insert_tran.args)}, "交易成功"]
+            [:ok, tran, "交易成功"]
         end
         [:error, nil, "交易失败,费用不足"]
       false ->
