@@ -38,10 +38,10 @@ defmodule Block.Application do
       |>Enum.map(fn x -> List.keyfind(elem(x, 1), :addr, 0) end)
       |>Enum.reject(fn x -> x == nil end)
       |>Enum.map(fn x -> %{host: elem(x, 1)|>Tuple.to_list|>Enum.join("."), port: "4000"} end)
-    generate_initial_block()
+    # generate_initial_block()
     if(database != "block_test")do
       Enum.each(local_ip, fn x -> Block.PeerService.newPeer(x.host, x.port) end)
-      # Block.P2pSessionManager.connect(init_peer.host, init_peer.port, local_ip)
+      Block.P2pSessionManager.connect(init_peer.host, init_peer.port, local_ip)
     end
   end
 

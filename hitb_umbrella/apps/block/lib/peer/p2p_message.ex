@@ -2,7 +2,7 @@ defmodule Block.P2pMessage do
   @moduledoc """
   p2p messaging protocol. Defines message options.
   """
-  @query_latest_block     "get_latest_block"
+  @latest_block     "latest_block"
   @query_all_accounts     "get_all_accounts"
   @query_all_blocks       "get_all_blocks"
   @query_all_transactions "query_all_transactions"
@@ -14,7 +14,7 @@ defmodule Block.P2pMessage do
   @sync_block             "sync_block"
   @sync_peer              "sync_peer"
 
-  def query_latest_block,   do: @query_latest_block
+  def latest_block,   do: @latest_block
   def query_all_accounts,     do: @query_all_accounts
   def query_all_blocks,     do: @query_all_blocks
   def query_all_transactions, do: @query_all_transactions

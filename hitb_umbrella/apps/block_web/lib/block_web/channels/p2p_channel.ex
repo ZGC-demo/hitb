@@ -2,7 +2,7 @@ defmodule BlockWeb.P2pChannel do
   use Phoenix.Channel
   require Logger
 
-  @query_latest_block Block.P2pMessage.query_latest_block
+  @latest_block       Block.P2pMessage.latest_block
   @sync_block         Block.P2pMessage.sync_block
   @sync_peer          Block.P2pMessage.sync_peer
   @query_all_accounts Block.P2pMessage.query_all_accounts
@@ -21,12 +21,22 @@ defmodule BlockWeb.P2pChannel do
   alias Block.P2pSessionManager
   # alias Block.PeerRepository
 
-  def join(_topic, _payload, socket) do
+  def join("p2p", _payload, socket) do
     {:ok, socket}
   end
 
   def handle_info(_message, socket) do
     {:noreply, socket}
+  end
+
+  def handle_in(@latest_block, %{"ip" => ip}, socket) do
+    hosts = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
+    new_hosts = ip|>Enum.map(fn x -> x["host"] end)
+    Enum.reject(ip, fn x -> x["host"] in hosts end)
+    |>Enum.each(fn x -> PeerService.newPeer(x["host"], x["port"]) end)
+    Logger.info("sending latest block")
+    data = BlockService.get_latest_block()|>send()
+    {:reply, {:ok, %{type: @latest_block, data: data}}, socket}
   end
 
   def handle_in(@sync_block, _payload, socket) do
@@ -40,16 +50,6 @@ defmodule BlockWeb.P2pChannel do
     data = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
     IO.inspect data
     {:reply, {:ok, %{type: @sync_peer, data: data}}, socket}
-  end
-
-  def handle_in(@query_latest_block, %{"ip" => ip}, socket) do
-    hosts = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
-    new_hosts = ip|>Enum.map(fn x -> x["host"] end)
-    Enum.reject(ip, fn x -> x["host"] in hosts end)
-    |>Enum.each(fn x -> PeerService.newPeer(x["host"], x["port"]) end)
-    Logger.info("sending latest block")
-    data = BlockService.get_latest_block()|>send()
-    {:reply, {:ok, %{type: @query_latest_block, data: data}}, socket}
   end
 
   def handle_in(@query_all_accounts, _payload, socket) do
@@ -86,14 +86,9 @@ defmodule BlockWeb.P2pChannel do
   #   {:reply, {:ok, %{type: "acto_sync", data: []}}, socket}
   # end
 
-  def handle_in(@add_peer_request, payload, socket) do
-    Logger.info("attempting to connect...")
-    result = P2pSessionManager.connect(payload["host"], payload["port"])
-    if result != :ok do
-      {:reply, {:ok, %{type: @connection_error}}, socket}
-    else
-      {:reply, {:ok, %{type: @connection_success}}, socket}
-    end
+  def handle_in("add_block", payload, socket) do
+    IO.inspect socket
+    {:reply, {:ok, %{type: "123", data: []}}, socket}
   end
 
   def handle_in(event, payload, socket) do
