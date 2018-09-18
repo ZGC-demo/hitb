@@ -34,8 +34,8 @@ defmodule BlockWeb.TransactionController do
   def addTransactions(conn, %{"publicKey" => publicKey, "amount" => amount, "recipientId" => recipientId, "message" => message}) do
     %{"secondPassword" => secondPassword} = Map.merge(%{"secondPassword" => "dzc944262316"}, conn.params)
     case TransactionService.newTransaction(%{publicKey: publicKey, amount: String.to_integer(amount), recipientId: recipientId, message: message, secondPassword: secondPassword, fee: 1}) do
-      [:ok, transaction, info] -> json(conn,  %{success: true, transaction: transaction, info: info})
-      [:error, _, info] -> json(conn,  %{success: false, transaction: [], info: info})
+      [:ok, transaction, account, info] -> json(conn,  %{success: true, transaction: transaction, info: info, account: account})
+      [:error, _, _, info] -> json(conn,  %{success: false, transaction: [], info: info})
     end
   end
 

@@ -4,10 +4,15 @@ defmodule Block.TransactionRepository do
   alias Block.Transaction
 
   def insert_transaction(transaction) do
-    %Transaction{}
+    changeset = %Transaction{}
     |> Transaction.changeset(transaction)
-    |> Repo.insert
-    :ok
+    case changeset.errors do
+      [] ->
+        Repo.insert(changeset)
+        :ok
+      _ ->
+        :error
+    end
   end
 
   def get_transactions_by_id(id) do

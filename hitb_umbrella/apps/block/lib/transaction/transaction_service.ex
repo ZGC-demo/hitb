@@ -1,4 +1,5 @@
 defmodule Block.TransactionService do
+  alias Block.Time
   alias Block.AccountService
   alias Block.AccountRepository
   alias Block.BlockService
@@ -14,7 +15,7 @@ defmodule Block.TransactionService do
     latest_block = BlockService.get_latest_block()
     sender = AccountService.getAccountByPublicKey(transaction.publicKey)
     case sender do
-      nil -> [:error, nil, ""]
+      nil -> [:error, nil, nil, ""]
       _ ->
         tran = %{
           transaction_id: transaction.id,
@@ -44,7 +45,7 @@ defmodule Block.TransactionService do
               recipient = AccountService.getAccountByPublicKey(tran.recipientId)
               pay(sender, recipient, transaction, tran)
             else
-              [:error, nil, "交易失败,二级密码错误"]
+              [:error, nil, nil, "交易失败,二级密码错误"]
             end
         end
     end
@@ -99,16 +100,31 @@ defmodule Block.TransactionService do
       true ->
         case sender.balance - transaction.amount - transaction.fee < 0 do
           true ->
-            [:error, nil, "交易失败,费用不足"]
+            [:error, nil, nil, "交易失败,费用不足"]
           false ->
-            TransactionRepository.insert_transaction(tran)
-            AccountRepository.update_account(sender, %{balance: sender.balance - transaction.amount - transaction.fee})
-            AccountRepository.update_account(recipient,  %{balance: recipient.balance + transaction.amount})
-            [:ok, tran, "交易成功"]
+            case addTransaction(tran, sender) do
+              :error ->
+                [:error, nil, nil, "交易失败,未知错误"]
+              _ ->
+                AccountRepository.update_account(sender, %{balance: sender.balance - transaction.amount - transaction.fee})
+                AccountRepository.update_account(recipient,  %{balance: recipient.balance + transaction.amount})
+                sender = AccountService.getAccountByPublicKey(tran.senderPublicKey)
+                [:ok, tran, sender, "交易成功"]
+            end
         end
-        [:error, nil, "交易失败,费用不足"]
       false ->
-        [:error, nil, "输入金额有误"]
+        [:error, nil, nil, "输入金额有误"]
+    end
+  end
+
+  def addTransaction(transaction, sender)do
+    case TransactionRepository.insert_transaction(transaction) do
+      :ok ->
+        BlockService.create_next_block(Time.stime_local(), sender.username)
+        |>BlockService.add_block
+        :ok
+      s ->
+        s
     end
   end
 

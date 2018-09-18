@@ -161,7 +161,6 @@ $(document).ready(function() {
           this.$ajax({
             type: 'POST',
             url: BASE_URL + '/block',
-            data: {"data": new Date().toLocaleString()},
             dataType: 'json',
             success: (res)=> {
               this.items = res

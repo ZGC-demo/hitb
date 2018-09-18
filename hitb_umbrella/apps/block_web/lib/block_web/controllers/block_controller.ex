@@ -2,6 +2,7 @@ defmodule BlockWeb.BlockController do
   use BlockWeb, :controller
   plug BlockWeb.Access
   alias Block
+  alias Block.Time
   alias BlockWeb.Login
   alias Block.BlockService
   alias Block.BlockRepository
@@ -13,7 +14,7 @@ defmodule BlockWeb.BlockController do
 
   def add_block(conn, payload) do
     [conn, user] = Login.user(conn)
-    block = BlockService.create_next_block(payload["data"], user.username)
+    block = BlockService.create_next_block(Time.stime_local(), user.username)
     BlockService.add_block(block)
     json(conn, %{})
   end
