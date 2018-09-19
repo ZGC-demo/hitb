@@ -24,5 +24,6 @@ defmodule Block.Stat.Repo.Migrations.CreateStatWt4 do
       add :hash, :string
       timestamps()
     end
+    create unique_index(:stat_wt4, [:hash])
   end
 end

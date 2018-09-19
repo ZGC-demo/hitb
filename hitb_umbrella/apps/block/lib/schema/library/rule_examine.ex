@@ -22,6 +22,7 @@ defmodule Block.Library.RuleExamine do
     changeset = rule_examine
       |> cast(params, [:examine, :icd10_a, :icd10_b, :create_user, :update_user, :previous_hash, :hash])
       |> validate_required([:examine, :icd10_a, :icd10_b, :create_user, :update_user, :previous_hash, :hash])
+      |> unique_constraint(:hash)
     Block.create_data_record(rule_examine, changeset, "rule_examine")
     changeset
   end

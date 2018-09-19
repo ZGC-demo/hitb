@@ -5,6 +5,12 @@ defmodule Block.BlockService do
   Operations for blocks
   TODO: refactor :ets work into its own module
   """
+  def get_blocks() do
+    BlockRepository.get_all_blocks()
+    |>Enum.map(fn x ->
+        Map.drop(x, [:__meta__, :__struct__, :id])
+      end)
+  end
 
   def synchronize_blockchain([_|_] = remote_block_chain) do
     # find latest block in this chain

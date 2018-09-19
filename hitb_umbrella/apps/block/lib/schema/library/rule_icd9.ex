@@ -30,6 +30,7 @@ defmodule Block.Library.RuleIcd9 do
     changeset = rule_icd9
       |> cast(params, [:code, :name, :codes, :dissect, :icdcc, :icdc, :adrg, :p_type, :property, :option, :org, :year, :version, :plat, :previous_hash, :hash])
       |> validate_required([:code, :previous_hash, :hash])
+      |> unique_constraint(:hash)
     Block.create_data_record(rule_icd9, changeset, "rule_icd9")
     changeset
   end

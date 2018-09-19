@@ -22,114 +22,91 @@ defmodule Block.SyncService do
   alias Block.Stat.StatOrg
   alias Block.Stat.StatCda
 
-  def get_cda_hash do
-    Repo.all(from p in Cda, select: p.hash)
+  def get_data() do
+    %{stat_org: query(StatOrg, "limit"),
+      stat_cda: query(StatCda, "limit"),
+      cda: query(Cda, "limit"),
+      cda_file: query(CdaFile, "limit"),
+      cdh: query(Cdh, "limit"),
+      ruleadrg: query(RuleAdrg, "limit"),
+      cmp: query(ChineseMedicinePatent, "limit"),
+      cm: query(ChineseMedicine, "limit"),
+      ruledrg: query(RuleDrg, "limit"),
+      ruleicd9: query(RuleIcd9, "limit"),
+      ruleicd10: query(RuleIcd10, "limit"),
+      rulemdc: query(RuleMdc, "limit"),
+      libwt4: query(LibWt4, "limit"),
+      wt4: query(Wt4, "limit"),
+      rule_cda_icd10: query(RuleCdaIcd10, "limit"),
+      rule_cda_icd9: query(RuleCdaIcd9, "limit"),
+      rule_examine: query(RuleExamine, "limit"),
+      rule_pharmacy: query(RulePharmacy, "limit"),
+      rule_sign: query(RuleSign, "limit"),
+      rule_symptom: query(RuleSymptom, "limit")}
   end
 
-  def get_cda_file_hash do
-    Repo.all(from p in CdaFile, select: p.hash)
-  end
-
-  def get_cah_hash do
-    Repo.all(from p in Cdh, select: p.hash)
-  end
-
-  def get_statorg_hash do
-    Repo.all(from p in StatOrg, select: p.hash)
-  end
-
-
-  def get_ruleadrg_hash do
-    Repo.all(from p in RuleAdrg, select: p.hash)
-  end
-
-  def get_cmp_hash do
-    Repo.all(from p in ChineseMedicinePatent, select: p.hash)
-  end
-
-  def get_cm_hash do
-    Repo.all(from p in ChineseMedicine, select: p.hash)
-  end
-
-  def get_ruledrg_hash do
-    Repo.all(from p in RuleDrg, select: p.hash)
-  end
-
-  def get_ruleicd9_hash do
-    Repo.all(from p in RuleIcd9, select: p.hash)
-  end
-
-  def get_ruleicd10_hash do
-    Repo.all(from p in RuleIcd10, select: p.hash)
-  end
-
-  def get_rulemdc_hash do
-    Repo.all(from p in RuleMdc, select: p.hash)
-  end
-
-  def get_libwt4_hash do
-    Repo.all(from p in LibWt4, select: p.hash)
-  end
-
-  def get_wt4_hash do
-    Repo.all(from p in Wt4, select: p.hash)
-  end
-
-  def get_stat_cda_hash do
-    Repo.all(from p in StatCda, select: p.hash)
-  end
-
-  def get_rule_cda_icd10_hash do
-    Repo.all(from p in RuleCdaIcd10, select: p.hash)
-  end
-
-  def get_rule_cda_icd9_hash do
-    Repo.all(from p in RuleCdaIcd9, select: p.hash)
-  end
-
-  def get_rule_examine_hash do
-    Repo.all(from p in RuleExamine, select: p.hash)
-  end
-
-  def get_rule_pharmacy_hash do
-    Repo.all(from p in RulePharmacy, select: p.hash)
-  end
-
-  def get_rule_sign_hash do
-    Repo.all(from p in RuleSign, select: p.hash)
-  end
-
-  def get_rule_symptom_hash do
-    Repo.all(from p in RuleSymptom, select: p.hash)
-  end
-
-  def get_data(x, hash) do
-    hash = if(hash == nil)do [] else hash end
-    case x do
-      "statorg_hash" -> Repo.all(StatOrg)
-      "statcda_hash" -> Repo.all(StatCda)
-      "cda_hash" -> Repo.all(Cda)
-      "cda_file_hash" -> Repo.all(CdaFile)
-      "cdh_hash" -> Repo.all(Cdh)
-      "ruleadrg_hash" -> Repo.all(RuleAdrg)
-      "cmp_hash" -> Repo.all(ChineseMedicinePatent)
-      "cm_hash" -> Repo.all(ChineseMedicine)
-      "ruledrg_hash" -> Repo.all(RuleDrg)
-      "ruleicd9_hash" -> Repo.all(RuleIcd9)
-      "ruleicd10_hash" -> Repo.all(RuleIcd10)
-      "rulemdc_hash" -> Repo.all(RuleMdc)
-      "libwt4_hash" -> Repo.all(LibWt4)
-      "wt4_hash" -> Repo.all(Wt4)
-      "rule_cda_icd10" -> Repo.all(RuleCdaIcd10)
-      "rule_cda_icd9" -> Repo.all(RuleCdaIcd9)
-      "rule_examine" -> Repo.all(RuleExamine)
-      "rule_pharmacy" -> Repo.all(RulePharmacy)
-      "rule_sign" -> Repo.all(RuleSign)
-      "rule_symptom" -> Repo.all(RuleSymptom)
-      _ -> []
+  def get(table) do
+    case table do
+      "stat_org"-> query(StatOrg, "all")
+      "stat_cda"-> query(StatCda, "all")
+      "cda"-> query(Cda, "all")
+      "cda_file"-> query(CdaFile, "all")
+      "cdh"-> query(Cdh, "all")
+      "ruleadrg"-> query(RuleAdrg, "all")
+      "cmp"-> query(ChineseMedicinePatent, "all")
+      "cm"-> query(ChineseMedicine, "all")
+      "ruledrg"-> query(RuleDrg, "all")
+      "ruleicd9"-> query(RuleIcd9, "all")
+      "ruleicd10"-> query(RuleIcd10, "all")
+      "rulemdc"-> query(RuleMdc, "all")
+      "libwt4"-> query(LibWt4, "all")
+      "wt4"-> query(Wt4, "all")
+      "rule_cda_icd10"-> query(RuleCdaIcd10, "all")
+      "rule_cda_icd9"-> query(RuleCdaIcd9, "all")
+      "rule_examine"-> query(RuleExamine, "all")
+      "rule_pharmacy"-> query(RulePharmacy, "all")
+      "rule_sign"-> query(RuleSign, "all")
+      "rule_symptom"-> query(RuleSymptom, "all")
     end
-    |>Enum.reject(fn x -> x.hash in hash end)
-    |>Enum.map(fn x -> Map.drop(x, [:__meta__, :__struct__, :id]) end)
+  end
+
+  def insert(table, data) do
+    case table do
+      "stat_org"-> %StatOrg{}|>StatOrg.changeset(data)
+      "stat_cda"-> %StatCda{}|>StatCda.changeset(data)
+      "cda"-> %Cda{}|>Cda.changeset(data)
+      "cda_file"-> %CdaFile{}|>CdaFile.changeset(data)
+      "cdh"-> %Cdh{}|>Cdh.changeset(data)
+      "ruleadrg"-> %RuleAdrg{}|>RuleAdrg.changeset(data)
+      "cmp"-> %ChineseMedicinePatent{}|>ChineseMedicinePatent.changeset(data)
+      "cm"-> %ChineseMedicine{}|>ChineseMedicine.changeset(data)
+      "ruledrg"-> %RuleDrg{}|>RuleDrg.changeset(data)
+      "ruleicd9"-> %RuleIcd9{}|>RuleIcd9.changeset(data)
+      "ruleicd10"-> %RuleIcd10{}|>RuleIcd10.changeset(data)
+      "rulemdc"-> %RuleMdc{}|>RuleMdc.changeset(data)
+      "libwt4"-> %LibWt4{}|>LibWt4.changeset(data)
+      "wt4"-> %Wt4{}|>Wt4.changeset(data)
+      "rule_cda_icd10"-> %RuleCdaIcd10{}|>RuleCdaIcd10.changeset(data)
+      "rule_cda_icd9"-> %RuleCdaIcd9{}|>RuleCdaIcd9.changeset(data)
+      "rule_examine"-> %RuleExamine{}|>RuleExamine.changeset(data)
+      "rule_pharmacy"-> %RulePharmacy{}|>RulePharmacy.changeset(data)
+      "rule_sign"-> %RuleSign{}|>RuleSign.changeset(data)
+      "rule_symptom"-> %RuleSymptom{}|>RuleSymptom.changeset(data)
+    end
+    |>Repo.insert
+  end
+
+  defp query(table, type) do
+    case type do
+      "limit" ->
+        from(p in table)
+        |> select([p], p.inserted_at)
+        |> order_by([p], [desc: p.inserted_at])
+        |> limit([p], 1)
+      _ ->
+        from(p in table)
+    end
+    |> Repo.all
   end
 
 end

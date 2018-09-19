@@ -11,5 +11,6 @@ defmodule Block.Server.Repo.Migrations.CreateChatRecord do
       add :hash, :string
       timestamps()
     end
+    create unique_index(:chat_record, [:hash])
   end
 end

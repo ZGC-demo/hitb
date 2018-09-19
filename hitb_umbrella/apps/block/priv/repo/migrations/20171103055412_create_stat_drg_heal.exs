@@ -30,6 +30,6 @@ defmodule Block.Stat.Repo.Migrations.CreateStatDrgHeal do
       add :hash, :string
       timestamps()
     end
-
+    create unique_index(:stat_drg_heal, [:hash])
   end
 end

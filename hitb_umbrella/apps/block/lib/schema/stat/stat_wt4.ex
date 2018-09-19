@@ -31,6 +31,7 @@ defmodule Block.Stat.StatWt4 do
     changeset = stat_wt4
       |> cast(params, [:time, :org, :num_sum, :stat_num_sum, :remove_num_sum, :n_num_sum, :n_mdc_num_sum, :drg_rate, :department_num, :doctor_num, :time_type, :org_type, :day_avg, :fee_avg, :death_rate, :int_time, :previous_hash, :hash])
       |> validate_required([:time, :org, :previous_hash, :hash])
+      |> unique_constraint(:hash)
     Block.create_data_record(stat_wt4, changeset, "stat_wt4")
     changeset
   end

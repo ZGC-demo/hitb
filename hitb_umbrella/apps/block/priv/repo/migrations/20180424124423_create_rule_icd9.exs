@@ -21,6 +21,6 @@ defmodule Block.Library.Repo.Migrations.CreateRuleIcd9 do
       add :hash, :string
       timestamps()
     end
-
+    create unique_index(:rule_icd9, [:hash])
   end
 end

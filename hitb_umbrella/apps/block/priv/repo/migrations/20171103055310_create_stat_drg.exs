@@ -32,6 +32,6 @@ defmodule Block.Stat.Repo.Migrations.CreateStatDrg do
       add :hash, :string
       timestamps()
     end
-
+    create unique_index(:stat_drg, [:hash])
   end
 end

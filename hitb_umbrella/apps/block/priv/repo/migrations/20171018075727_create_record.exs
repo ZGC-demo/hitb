@@ -12,6 +12,6 @@ defmodule Block.Server.Repo.Migrations.CreateRecord do
       add :hash, :string
       timestamps()
     end
-
+    create unique_index(:record, [:hash])
   end
 end

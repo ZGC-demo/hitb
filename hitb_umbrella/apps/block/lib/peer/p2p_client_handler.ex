@@ -43,14 +43,15 @@ defmodule Block.P2pClientHandler do
   # can't inherit attributes and use them inside matches, so this is necessary
   @sync_peer     Block.P2pMessage.sync_peer
   @sync_block     Block.P2pMessage.sync_block
-  @query_all_accounts   Block.P2pMessage.query_all_accounts
+  @all_accounts   Block.P2pMessage.all_accounts
   @latest_block     Block.P2pMessage.latest_block
-  @query_all_blocks       Block.P2pMessage.query_all_blocks
-  @query_all_transactions   Block.P2pMessage.query_all_transactions
+  @all_blocks       Block.P2pMessage.all_blocks
+  @all_transactions   Block.P2pMessage.all_transactions
   # @update_block_chain Peers.P2pMessage.update_block_chain
   @add_peer_request   Block.P2pMessage.add_peer_request
   @connection_error   Block.P2pMessage.connection_error
   @connection_success Block.P2pMessage.connection_success
+  @add_block         "add_block"
 
   def start_link(host, port, local_ip) do
     GenSocketClient.start_link(
@@ -118,166 +119,80 @@ defmodule Block.P2pClientHandler do
     {:ok, state}
   end
 
-  def handle_reply("p2p", _ref, %{"response" => %{"type" => @connection_error}} = _payload, _transport, state) do
+  def handle_reply("p2p", _ref, %{"response" => %{"type" => @connection_error}} = payload, _transport, state) do
     Logger.info("connection to server failed...")
     P2pSessionManager.terminate_session(self())
     {:ok, state}
   end
 
+  # def handle_reply("p2p", _ref, %{"response" => %{"type" => @latest_block, "data" => data}}, transport, state) do
   def handle_reply("p2p", _ref, %{"response" => %{"type" => @latest_block, "data" => data}}, transport, state) do
-    if(BlockService.get_latest_block().index > data["index"])do
-      block = BlockRepository.get_all_blocks()
-      IO.inspect block
-      GenSocketClient.push(transport, "p2p", "add_block", %{block: block})
-    else
-      IO.inspect "ssss"
+    cond do
+      BlockService.get_latest_block() == nil ->
+        GenSocketClient.push(transport, "p2p", @all_blocks, %{})
+      BlockService.get_latest_block().index > data["index"] ->
+        block = BlockService.get_blocks()
+        GenSocketClient.push(transport, "p2p", @add_block, %{block: block})
+      BlockService.get_latest_block().index < data["index"] ->
+        GenSocketClient.push(transport, "p2p", @all_blocks, %{})
+      BlockService.get_latest_block().index == data["index"] ->
+        GenSocketClient.push(transport, "p2p", @all_blocks, %{})
     end
     {:ok, state}
   end
 
-  def handle_reply(topic, ref, payload, transport, state) do
-    # IO.inspect topic
-    # IO.inspect ref
-    # IO.inspect payload
-    # type = payload["response"]["type"]
-    # response = payload["response"]["data"]
-    # # @query_all_accounts
-    # case type do
-    #   "sync_block" ->
-    #     if(Map.get(response, "hash") != Map.get(BlockService.get_latest_block, :hash))do
-    #       GenSocketClient.push(transport, "p2p", @query_all_blocks, %{})
-    #     end
-    #   "sync_peer" ->
-    #     response
-    #     |>Enum.map(fn x -> PeerService.newPeer(x, "4000") end)
-    #     PeerService.getPeers()
-    #     |>Enum.map(fn x -> P2pSessionManager.connect(x.host, x.port, []) end)
-    #   "get_latest_block" ->
-    #     if(BlockService.get_latest_block == nil or Map.get(response, "hash") != Map.get(BlockService.get_latest_block, :hash))do
-    #       GenSocketClient.push(transport, "p2p", @query_all_blocks, %{})
-    #     end
-    #   "get_all_blocks" ->
-    #     res_hash = response|>Enum.map(fn x -> x["hash"] end)
-    #     hash = BlockRepository.get_all_blocks()|>Enum.map(fn x -> x.hash end)
-    #     response = Enum.reject(response, fn x -> x["hash"] in hash end)
-    #     if(response === [])do
-    #       Enum.map(response, fn x -> BlockRepository.insert_block(x) end)
-    #     else
-    #       GenSocketClient.push(transport, "p2p", @query_all_transactions, %{})
-    #     end
-    #   "get_all_blocks" ->
-    #     block_hashs = BlockRepository.get_all_block_hashs
-    #     blocks = response
-    #     |> Enum.reject(fn x -> x["hash"] in block_hashs end)
-    #     #区块不全后同步其他部分
-    #     if(blocks != [] and blocks != nil)do
-    #       blocks|> Enum.each(fn x -> BlockRepository.insert_block(x) end)
-    #       GenSocketClient.push(transport, "p2p", @query_all_transactions, %{})
-    #     end
-    #   "get_all_accounts" ->
-    #     usernames = AccountRepository.get_all_usernames()
-    #     response
-    #     |> Enum.reject(fn x -> x["username"] in usernames end)
-    #     |> Enum.each(fn x -> AccountRepository.insert_account(x) end)
-    #     GenSocketClient.push(transport, "p2p", @query_latest_block, %{})
-    #   "query_all_transactions" ->
-    #     transactios_id = TransactionRepository.get_all_transactions_id()
-    #     response
-    #     |> Enum.reject(fn x -> x["transaction_id"] in transactios_id end)
-    #     |> Enum.each(fn x -> TransactionRepository.insert_transaction(x) end)
-    #     GenSocketClient.push(transport, "p2p", "other_sync",
-    #       %{
-    #         statorg_hash: SyncService.get_statorg_hash(),
-    #         statcda_hash: SyncService.get_stat_cda_hash(),
-    #         cda_hash: SyncService.get_cda_hash(),
-    #         cda_file_hash: SyncService.get_cda_file_hash(),
-    #         cdh_hash: SyncService.get_cah_hash(),
-    #         ruleadrg_hash: SyncService.get_ruleadrg_hash(),
-    #         cmp_hash: SyncService.get_cmp_hash(),
-    #         cm_hash: SyncService.get_cm_hash(),
-    #         ruledrg_hash: SyncService.get_ruledrg_hash(),
-    #         ruleicd9_hash: SyncService.get_ruleicd9_hash(),
-    #         ruleicd10_hash: SyncService.get_ruleicd10_hash(),
-    #         rulemdc_hash: SyncService.get_rulemdc_hash(),
-    #         libwt4_hash: SyncService.get_libwt4_hash(),
-    #         wt4_hash: SyncService.get_wt4_hash(),
-    #         rulecdaicd10_hash: SyncService.get_rule_cda_icd10_hash(),
-    #         rulecdaicd9_hash: SyncService.get_rule_cda_icd9_hash(),
-    #         ruleexamine_hash: SyncService.get_rule_examine_hash(),
-    #         rulepharmacy_hash: SyncService.get_rule_pharmacy_hash(),
-    #         rulesign_hash: SyncService.get_rule_sign_hash(),
-    #         rulesymptom_hash: SyncService.get_rule_symptom_hash()})
-    #   "other_sync" ->
-    #     Map.keys(response)
-    #     |>Enum.each(fn k ->
-    #         Enum.each(Map.get(response, k), fn x ->
-    #           case k do
-    #             "statorg_hash" ->
-    #               %StatOrg{}
-    #               |>StatOrg.changeset(x)
-    #             "statcda_hash" ->
-    #               %StatCda{}
-    #               |>StatCda.changeset(x)
-    #             "cda_hash" ->
-    #               %Cda{}
-    #               |>Cda.changeset(x)
-    #             "cda_file_hash" ->
-    #               %CdaFile{}
-    #               |>CdaFile.changeset(x)
-    #             "cdh_hash" ->
-    #               %Cdh{}
-    #               |>Cdh.changeset(x)
-    #             "ruleadrg_hash" ->
-    #               %RuleAdrg{}
-    #               |>RuleAdrg.changeset(x)
-    #             "cmp_hash" ->
-    #               %ChineseMedicinePatent{}
-    #               |>ChineseMedicinePatent.changeset(x)
-    #             "cm_hash" ->
-    #               %ChineseMedicine{}
-    #               |>ChineseMedicine.changeset(x)
-    #             "ruledrg_hash" ->
-    #               %RuleDrg{}
-    #               |>RuleDrg.changeset(x)
-    #             "ruleicd9_hash" ->
-    #               %RuleIcd9{}
-    #               |>RuleIcd9.changeset(x)
-    #             "ruleicd10_hash" ->
-    #               %RuleIcd10{}
-    #               |>RuleIcd10.changeset(x)
-    #             "rulemdc_hash" ->
-    #               %RuleMdc{}
-    #               |>RuleMdc.changeset(x)
-    #             "libwt4_hash" ->
-    #               %LibWt4{}
-    #               |>LibWt4.changeset(x)
-    #             "wt4_hash" ->
-    #               %Wt4{}
-    #               |>Wt4.changeset(x)
-    #             "rulecdaicd10_hash" ->
-    #               %RuleCdaIcd10{}
-    #               |>RuleCdaIcd10.changeset(x)
-    #             "rulecdaicd9_hash" ->
-    #               %RuleCdaIcd9{}
-    #               |>RuleCdaIcd9.changeset(x)
-    #             "ruleexamine_hash" ->
-    #               %RuleExamine{}
-    #               |>RuleExamine.changeset(x)
-    #             "rulepharmacy_hash" ->
-    #               %RulePharmacy{}
-    #               |>RulePharmacy.changeset(x)
-    #             "rulesign_hash" ->
-    #               %RuleSign{}
-    #               |>RuleSign.changeset(x)
-    #             "rulesymptom_hash" ->
-    #               %RuleSymptom{}
-    #               |>RuleSymptom.changeset(x)
-    #           end
-    #           |>Repo.insert
-    #         end)
-    #     end)
-    #     :timer.send_interval(10000, :ping)
-    # end
+  def handle_reply(topic, ref, %{"response" => %{"type" => @all_blocks, "data" => block}}, transport, state) do
+    # Enum.each(block, fn x -> BlockRepository.insert_block(x) end)
+    GenSocketClient.push(transport, "p2p", @all_accounts, %{})
+    {:ok, state}
+  end
+
+  def handle_reply(topic, ref, %{"response" => %{"type" => @all_accounts, "data" => account}}, transport, state) do
+    Enum.each(account, fn x -> AccountRepository.insert_account(x) end)
+    GenSocketClient.push(transport, "p2p", @all_transactions, %{})
+    {:ok, state}
+  end
+
+  def handle_reply(topic, ref, %{"response" => %{"type" => @all_transactions, "data" => transactions}}, transport, state) do
+    Enum.each(transactions, fn x -> TransactionRepository.insert_transaction(x) end)
+    GenSocketClient.push(transport, "p2p", "other_sync", %{})
+    {:ok, state}
+  end
+
+  def handle_reply(topic, ref, %{"response" => %{"type" => "other_sync", "data" => data}}, transport, state) do
+    local = SyncService.get_data()
+    data = Map.keys(data)
+      |>Enum.map(fn x ->
+        case Map.get(data, x) do
+          [] -> []
+          v ->
+            v2 = Map.get(local, String.to_atom(x))
+            if(List.first(v) > List.first(v2))do x else [] end
+        end
+      end)
+      |>List.flatten
+    GenSocketClient.push(transport, "p2p", "other_sync2", %{data: data})
+    {:ok, state}
+  end
+
+  def handle_reply(topic, ref, %{"response" => %{"type" => "other_sync2", "data" => data}}, transport, state) do
+    Map.keys(data)
+    |>Enum.map(fn key ->
+        Map.get(data, key)
+        |>Enum.each(fn x ->
+            SyncService.insert(key, x)
+        end)
+    end)
+    GenSocketClient.push(transport, "p2p", "sync_peer", %{data: data})
+    {:ok, state}
+  end
+
+  def handle_reply(topic, ref, %{"response" => %{"type" => "sync_peer", "data" => data}}, transport, state) do
+    Enum.each(data, fn x -> Block.PeerService.newPeer(x, "4000") end)
+    PeerService.getPeers()
+    |>Enum.each(fn x -> Block.P2pSessionManager.connect(x.host, x.port, []) end)
+    Logger.warn("Sync over.")
+    :timer.send_interval(10000, :ping)
     {:ok, state}
   end
 
@@ -287,7 +202,7 @@ defmodule Block.P2pClientHandler do
   end
 
   def handle_info(:ping, transport, state) do
-    GenSocketClient.push(transport, "p2p", @latest_block, %{})
+    GenSocketClient.push(transport, "p2p", @latest_block, %{ip: []})
     {:ok, state}
   end
 
@@ -302,21 +217,6 @@ defmodule Block.P2pClientHandler do
 
     {:ok, state}
   end
-
-  # def handle_info(@query_latest_block, transport, state) do
-  #   Logger.info("quering for latest blocks")
-  #   GenSocketClient.push(transport, "p2p", @query_latest_block, %{})
-  #   {:ok, state}
-  # end
-
-  # def handle_info(@add_peer_request, transport, state) do
-  #   Logger.info("sending request to add me as a peer")
-  #   local_server_host = Application.get_env(:oniichain, BlockWeb.Endpoint)[:url][:host]
-  #   local_server_port = Application.get_env(:oniichain, BlockWeb.Endpoint)[:http][:port]
-  #   GenSocketClient.push(transport, "p2p", @add_peer_request, %{host: local_server_host, port: local_server_port})
-  #   {:ok, state}
-  # end
-
   def handle_info(message, _transport, state) do
     Logger.warn("Unhandled message #{inspect message}")
     {:ok, state}
@@ -328,11 +228,4 @@ defmodule Block.P2pClientHandler do
     {:reply, reply, new_state}
   end
 
-  # case :ets.lookup(:client, :transport) do
-  #   [] -> :ets.insert(:client, {:transport, [transport]})
-  #   transports ->
-  #     IO.inspect transport
-  #     IO.inspect transports
-  #     :ets.insert(:client, {:transport, [transport] ++ transports |> hd |> elem(1)})
-  # end
 end

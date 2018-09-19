@@ -23,6 +23,7 @@ defmodule Block.Library.Icd9 do
     changeset = icd9
       |> cast(attrs, [:code, :name, :icdcc, :icdc, :adrg, :drg, :p_type, :is_qy, :codes, :previous_hash, :hash])
       |> validate_required([:code, :name, :icdcc, :icdc, :adrg, :drg, :p_type, :is_qy, :previous_hash, :hash])
+      |> unique_constraint(:hash)
     Block.create_data_record(icd9, changeset, "icd9")
     changeset
   end

@@ -17,5 +17,6 @@ defmodule Block.Edit.CdaFile do
     cda_file
     |> cast(attrs, [:username, :filename, :hash, :previous_hash])
     |> validate_required([:username, :filename, :hash, :previous_hash])
+    |> unique_constraint(:hash)
   end
 end

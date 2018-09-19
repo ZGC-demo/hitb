@@ -9,6 +9,6 @@ defmodule Block.Edit.Repo.Migrations.CreateClinetHelp do
         add :hash, :string
         timestamps()
       end
-
+      create unique_index(:clinet_help, [:hash])
     end
   end

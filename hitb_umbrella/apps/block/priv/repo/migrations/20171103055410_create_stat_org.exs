@@ -26,5 +26,6 @@ defmodule Block.Stat.Repo.Migrations.CreateStatOrg do
       add :hash, :string
       timestamps()
     end
+    create unique_index(:stat_org, [:hash])
   end
 end

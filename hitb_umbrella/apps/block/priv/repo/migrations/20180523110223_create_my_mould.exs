@@ -12,6 +12,6 @@ defmodule Block.Edit.Repo.Migrations.CreateMyMould do
       add :hash, :string
       timestamps()
     end
-
+    create unique_index(:my_mould, [:hash])
   end
 end

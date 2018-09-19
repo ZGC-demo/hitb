@@ -15,6 +15,6 @@ defmodule Block.Library.Repo.Migrations.CreateRuleDrg do
       add :hash, :string
       timestamps()
     end
-
+    create unique_index(:rule_drg, [:hash])
   end
 end

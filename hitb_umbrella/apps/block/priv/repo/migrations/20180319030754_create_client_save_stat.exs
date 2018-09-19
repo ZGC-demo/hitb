@@ -10,5 +10,6 @@ defmodule Block.Stat.Repo.Migrations.CreateClientSaveStat do
       add :hash, :string
       timestamps()
     end
+    create unique_index(:client_save_stat, [:hash])
   end
 end

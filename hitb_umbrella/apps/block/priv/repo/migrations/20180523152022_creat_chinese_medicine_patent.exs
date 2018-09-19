@@ -18,6 +18,6 @@ defmodule Block.Library.Repo.Migrations.ChineseMedicinePatent do
       add :hash, :string
       timestamps()
     end
-
+    create unique_index(:chinese_medicine_patent, [:hash])
   end
 end

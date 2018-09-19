@@ -9,6 +9,6 @@ defmodule Block.Library.Repo.Migrations.CdaFile do
         add :previous_hash, :string
         timestamps()
       end
-
+      create unique_index(:cda_file, [:hash])
     end
   end

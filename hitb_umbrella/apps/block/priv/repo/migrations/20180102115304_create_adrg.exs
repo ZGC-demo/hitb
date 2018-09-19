@@ -22,6 +22,6 @@ defmodule Block.Library.Repo.Migrations.CreateAdrg do
       add :hash, :string
       timestamps()
     end
-
+    create unique_index(:adrg, [:hash])
   end
 end

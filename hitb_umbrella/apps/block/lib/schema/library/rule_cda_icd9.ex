@@ -26,6 +26,7 @@ defmodule Block.Library.RuleCdaIcd9 do
     changeset = rule_cda_icd9
       |> cast(params, [:code, :name, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user, :previous_hash, :hash])
       |> validate_required([:code, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user, :previous_hash, :hash])
+      |> unique_constraint(:hash)
     Block.create_data_record(rule_cda_icd9, changeset, "rule_cda_icd9")
     changeset
   end

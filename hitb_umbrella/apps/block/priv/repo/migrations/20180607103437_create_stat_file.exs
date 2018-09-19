@@ -9,6 +9,5 @@ defmodule Block.Library.Repo.Migrations.StatFile do
         add :page_type, :string
         timestamps()
       end
-
     end
   end

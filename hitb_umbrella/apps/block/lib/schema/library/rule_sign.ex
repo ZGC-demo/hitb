@@ -23,6 +23,7 @@ defmodule Block.Library.RuleSign do
     changeset = rule_sign
       |> cast(params, [:sign, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
       |> validate_required([:sign, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
+      |> unique_constraint(:hash)
     Block.create_data_record(rule_sign, changeset, "rule_sign")
     changeset
   end

@@ -26,6 +26,7 @@ defmodule Block.Library.Drg do
     changeset = drg
       |> cast(attrs, [:code, :name, :mdc, :adrg, :age, :sf0108, :mcc, :cc, :diags_code, :day, :previous_hash, :hash])
       |> validate_required([:code, :mdc, :adrg, :age, :sf0108, :mcc, :cc, :previous_hash, :hash])
+      |> unique_constraint(:hash)
     Block.create_data_record(drg, changeset, "drg")
     changeset
   end

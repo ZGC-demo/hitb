@@ -25,7 +25,7 @@ defmodule Block.Library.ChineseMedicinePatent do
   def changeset(%ChineseMedicinePatent{} = chinese_medicine_patent, attrs) do
     changeset = chinese_medicine_patent
       |> cast(attrs, [:code, :medicine_type, :type, :medicine_code, :name, :name_1, :other_spec, :org_limit, :department_limit, :user_limit, :other_limit, :previous_hash, :hash])
-      |> validate_required([:previous_hash, :hash])
+      |> unique_constraint(:hash)
     Block.create_data_record(chinese_medicine_patent, changeset, "chinese_medicine_patent")
     changeset
   end

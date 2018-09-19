@@ -21,6 +21,6 @@ defmodule Block.Edit.Cda do
     cda
     |> cast(attrs, [:username, :name, :content, :is_change, :is_show, :previous_hash, :hash, :patient_id])
     |> validate_required([:username, :name, :content, :is_change, :is_show, :hash, :patient_id])
-    |> unique_constraint(:patient_id)
+    |> unique_constraint(:hash)
   end
 end

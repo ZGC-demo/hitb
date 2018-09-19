@@ -21,6 +21,7 @@ defmodule Block.Library.DrgRate do
     changeset = drg_rate
       |> cast(attrs, [:drg, :name, :rate, :type, :previous_hash, :hash])
       |> validate_required([:drg, :name, :rate, :type, :previous_hash, :hash])
+      |> unique_constraint(:hash)
     Block.create_data_record(drg_rate, changeset, "drg_rate")
     changeset
   end

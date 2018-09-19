@@ -27,6 +27,6 @@ defmodule Block.Library.Repo.Migrations.CreateRuleAdrg do
       add :hash, :string
       timestamps()
     end
-
+    create unique_index(:rule_adrg, [:hash])
   end
 end

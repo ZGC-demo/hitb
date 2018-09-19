@@ -26,6 +26,7 @@ defmodule Block.Library.RuleMdc do
     changeset = rule_mdc
       |> cast(params, [:code, :name, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :org, :year, :version, :plat, :previous_hash, :hash])
       |> validate_required([:code, :previous_hash, :hash])
+      |> unique_constraint(:hash)
     Block.create_data_record(rule_mdc, changeset, "rule_mdc")
     changeset
   end

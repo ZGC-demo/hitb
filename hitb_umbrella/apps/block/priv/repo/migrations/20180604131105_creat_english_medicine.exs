@@ -11,9 +11,10 @@ defmodule Block.Library.Repo.Migrations.EnglishMedicine do
         add :en_name, :string # 英文名称
         add :dosage_form, :string #剂型
         add :reimbursement_restrictions, :string #报销限制内容
-
+        add :hash, :string
+        add :previous_hash, :string
         timestamps()
       end
-
+      create unique_index(:english_medicine, [:hash])
     end
   end

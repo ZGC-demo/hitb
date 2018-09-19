@@ -14,7 +14,7 @@ defmodule Block.Edit.Repo.Migrations.CreateCda do
       add :header, :string, default: false
       timestamps()
     end
-    create unique_index(:cda, [:patient_id])
+    create unique_index(:cda, [:hash])
 
   end
 end

@@ -11,6 +11,6 @@ defmodule Block.Library.Repo.Migrations.CreateLibWt4 do
       add :hash, :string
       timestamps()
     end
-
+    create unique_index(:lib_wt4, [:hash])
   end
 end

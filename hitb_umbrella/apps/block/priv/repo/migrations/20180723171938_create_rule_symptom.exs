@@ -13,6 +13,6 @@ defmodule Block.Library.Repo.Migrations.RuleSymptom do
         add :hash, :string
         timestamps()
       end
-      # create unique_index(:stat_cda, [:items])
+      create unique_index(:rule_symptom, [:hash])
     end
   end

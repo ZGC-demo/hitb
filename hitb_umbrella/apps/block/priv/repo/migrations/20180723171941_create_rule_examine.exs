@@ -12,6 +12,6 @@ defmodule Block.Library.Repo.Migrations.RuleExamine do
       add :hash, :string
       timestamps()
     end
-    # create unique_index(:stat_cda, [:items])
+    create unique_index(:rule_examine, [:hash])
   end
 end

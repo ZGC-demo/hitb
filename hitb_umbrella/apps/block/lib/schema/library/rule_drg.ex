@@ -24,6 +24,7 @@ defmodule Block.Library.RuleDrg do
     changeset = rule_drg
       |> cast(params, [:code, :name, :mdc, :adrg, :org, :year, :version, :plat, :previous_hash, :hash])
       |> validate_required([:code, :previous_hash, :hash])
+      |> unique_constraint(:hash)
     Block.create_data_record(rule_drg, changeset, "rule_drg")
     changeset
   end

@@ -14,6 +14,6 @@ defmodule Block.Library.Repo.Migrations.CreateMdc do
       add :hash, :string
       timestamps()
     end
-
+    create unique_index(:mdc, [:hash])
   end
 end

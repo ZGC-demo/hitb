@@ -21,6 +21,6 @@ defmodule Block.Library.Repo.Migrations.CreateIcd10 do
       add :hash, :string
       timestamps()
     end
-
+    create unique_index(:icd10, [:hash])
   end
 end
