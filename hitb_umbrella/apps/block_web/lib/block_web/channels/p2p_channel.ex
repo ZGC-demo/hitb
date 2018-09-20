@@ -54,14 +54,13 @@ defmodule BlockWeb.P2pChannel do
   def handle_in(@sync_peer, _payload, socket) do
     Logger.info("sync_peer")
     data = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
-    IO.inspect data
     {:reply, {:ok, %{type: @sync_peer, data: data}}, socket}
   end
 
-  def handle_in(@query_all_accounts, _payload, socket) do
+  def handle_in(@all_accounts, _payload, socket) do
     Logger.info("sending all accounts")
     data = AccountRepository.get_all_accounts()|>Enum.map(fn x -> send(x) end)
-    {:reply, {:ok, %{type: @query_all_accounts, data: data}}, socket}
+    {:reply, {:ok, %{type: @all_accounts, data: data}}, socket}
   end
 
   def handle_in(@all_blocks, _payload, socket) do
@@ -76,14 +75,17 @@ defmodule BlockWeb.P2pChannel do
     {:reply, {:ok, %{type: @all_transactions, data: data}}, socket}
   end
 
-  def handle_in("other_sync", payload, socket) do
-    data =
-      Map.keys(payload)
-      |>Enum.reduce(%{}, fn x, acc ->
-          data = SyncService.get_data(x, Map.get(payload, x))
-          Map.put(acc, String.to_atom(x), data)
-        end)
+  def handle_in("other_sync", _payload, socket) do
+    data = SyncService.get_data()
     {:reply, {:ok, %{type: "other_sync", data: data}}, socket}
+  end
+
+  def handle_in("other_sync2", %{"data" => data}, socket) do
+    data = Enum.reduce(data, %{}, fn x, acc ->
+      attrs = SyncService.get(x)|>Enum.map(fn x -> send(x) end)
+      Map.put(acc, x, attrs)
+    end)
+    {:reply, {:ok, %{type: "other_sync2", data: data}}, socket}
   end
 
   # def handle_in("acto_sync", payload, socket) do

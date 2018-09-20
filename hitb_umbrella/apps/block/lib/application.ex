@@ -41,7 +41,7 @@ defmodule Block.Application do
     # generate_initial_block()
     if(database != "block_test")do
       Enum.each(local_ip, fn x -> Block.PeerService.newPeer(x.host, x.port) end)
-      Block.P2pSessionManager.connect(init_peer.host, init_peer.port, local_ip)
+      # Block.P2pSessionManager.connect(init_peer.host, init_peer.port, local_ip)
     end
   end
 
