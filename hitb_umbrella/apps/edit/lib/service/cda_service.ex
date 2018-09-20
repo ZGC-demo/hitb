@@ -1,7 +1,7 @@
 defmodule Edit.CdaService do
   # import Ecto
   import Ecto.Query
-  alias Hitb.Repo, as: HitbRepo
+  alias Hitb.Repo
   alias Block.Repo, as: BlockRepo
   alias Hitb.Edit.Cda, as: HitbCda
   alias Hitb.Edit.CdaFile, as: HitbCdaFile
@@ -9,14 +9,12 @@ defmodule Edit.CdaService do
   alias Block.Library.Cdh, as: BlockCdh
   alias Block.Edit.CdaFile, as: BlockCdaFile
   alias Block.Edit.Cda, as: BlockCda
-  alias Hitb.Edit.MyMould
-  alias Hitb.Time
   alias Hitb.Server.User
-  alias Edit.PatientService
+  alias Hitb.Edit.MyMould
 
   def cda_count(username) do
-    user = HitbRepo.all(from p in HitbCda, where: p.username == ^username, select: count(p.id))|>List.first
-    server = HitbRepo.all(from p in HitbCda, select: count(p.id))|>List.first
+    user = Repo.all(from p in HitbCda, where: p.username == ^username, select: count(p.id))|>List.first
+    server = Repo.all(from p in HitbCda, select: count(p.id))|>List.first
     block = BlockRepo.all(from p in BlockCda, select: count(p.id))|>List.first
     %{user: user, server: server, block: block}
   end
@@ -24,10 +22,10 @@ defmodule Edit.CdaService do
   def cda_user(server_type) do
     cda_users =
       case server_type do
-        "server" -> HitbRepo.all(from p in HitbCdaFile, group_by: p.username, select: %{username: p.username, count: count(p.id)})|>:lists.usort
+        "server" -> Repo.all(from p in HitbCdaFile, group_by: p.username, select: %{username: p.username, count: count(p.id)})|>:lists.usort
         _ -> BlockRepo.all(from p in BlockCdaFile, group_by: p.username, select: %{username: p.username, count: count(p.id)})|>:lists.usort
       end
-    users = HitbRepo.all(from p in User, where: p.is_show == false, select: p.username)
+    users = Repo.all(from p in User, where: p.is_show == false, select: p.username)
     users =
       Enum.reject(cda_users, fn x -> x.username in users end)
       |>Enum.map(fn x -> "#{x.username}----------------------#{x.count}" end)
@@ -39,14 +37,14 @@ defmodule Edit.CdaService do
       server_type == "block" ->
         [BlockRepo.all(from p in BlockCda, select: [p.username, p.name]) |> Enum.map(fn x -> Enum.join(x, "-") end), "读取成功"]
       username == "" ->
-        [HitbRepo.all(from p in HitbCda, select: [p.username, p.name]) |> Enum.map(fn x -> Enum.join(x, "-") end), "读取成功"]
+        [Repo.all(from p in HitbCda, select: [p.username, p.name]) |> Enum.map(fn x -> Enum.join(x, "-") end), "读取成功"]
       true ->
-        [HitbRepo.all(from p in HitbCda, where: p.username == ^username, select: [p.username, p.name]) |> Enum.map(fn x -> Enum.join(x, "-") end), "读取成功"]
+        [Repo.all(from p in HitbCda, where: p.username == ^username, select: [p.username, p.name]) |> Enum.map(fn x -> Enum.join(x, "-") end), "读取成功"]
     end
   end
 
   def cda_file(file_name, username) do
-    edit = HitbRepo.get_by(HitbCda, username: username, name: file_name)
+    edit = Repo.get_by(HitbCda, username: username, name: file_name)
     cond do
       edit == nil ->
         [%{header: "", content: ""}, ["文件读取失败,无此文件"]]
@@ -66,7 +64,7 @@ defmodule Edit.CdaService do
     if (mouldtype == "模板") do
       myMoulds(file_name, username, content, doctype, header, save_type)
     else
-      %{"上传时间" => header1, "下载时间" => header2, "保存时间" => header3, "修改时间" => header4, "创建时间" => header5, "发布时间" => header6, "标题" => header7, "病人" => header8, "缓存时间" => header9} = header
+      %{"上传时间" => header1, "下载时间" => header2, "保存时间" => header3, "修改时间" => header4, "创建时间" => header5, "发布时间" => header6, "标题" => header7, "病人" => header8} = header
       header = [["上传时间", header1], ["下载时间", header2], ["保存时间", header3], ["修改时间", header4], ["创建时间", header5], ["发布时间", header6], ["标题", header7], ["病人", header8]]
       cda = Repo.get_by(HItbCda, name: file_name,  username: file_username)
       case cda do
@@ -74,19 +72,19 @@ defmodule Edit.CdaService do
           patient_id = generate_patient_id()
           %HitbCda{}
           |> HitbCda.changeset(%{"content" => content, "name" => "#{file_name}", "username" => file_username, "is_change" => false, "is_show" => true, "patient_id" => patient_id, "header" => header})
-          |> HitbRepo.insert()
+          |> Repo.insert()
           %{success: true, info: "保存成功"}
         _ ->
           if(file_username == username)do
             cda
             |>HitbCda.changeset(%{content: content, header: header})
-            |>HitbRepo.update
+            |>Repo.update
             %{success: true, info: "保存成功"}
           else
             patient_id = generate_patient_id()
             %HitbCda{}
             |> HitbCda.changeset(%{"content" => content, "name" => "#{file_name}", "username" => username, "is_change" => false, "is_show" => true, "patient_id" => patient_id, "header" => header})
-            |> HitbRepo.insert()
+            |> Repo.insert()
             %{success: true, info: "保存成功"}
           end
       end
@@ -95,7 +93,7 @@ defmodule Edit.CdaService do
   end
 
   defp myMoulds(file_name, file_username, content, _doctype, header, _save_type) do
-    mymould = HitbRepo.get_by(MyMould, name: "#{file_name}", username: file_username)
+    mymould = Repo.get_by(MyMould, name: "#{file_name}", username: file_username)
     header = Enum.reduce(Map.keys(header), "", fn x, acc ->
       if acc == "" do
         "#{acc}#{x}:#{Map.get(header,x)}"
@@ -106,14 +104,14 @@ defmodule Edit.CdaService do
     if(mymould)do
       mymould
       |> MyMould.changeset(%{content: content, header: header})
-      |> HitbRepo.update()
+      |> Repo.update()
       %{success: true, info: "保存成功"}
     else
       namea = "#{file_name}"
       body = %{"content" => content, "name" => namea, "username" => file_username, "is_change" => true, "is_show" => true, "header" => header}
       %MyMould{}
       |> MyMould.changeset(body)
-      |> HitbRepo.insert()
+      |> Repo.insert()
       %{success: true, info: "新建成功"}
     end
   end
@@ -127,22 +125,22 @@ defmodule Edit.CdaService do
   end
 
   def cdh_control(key, value, username) do
-    cdh = HitbRepo.get_by(HitbCdh, key: key, username: username)
+    cdh = Repo.get_by(HitbCdh, key: key, username: username)
     result =
       if (cdh) do
         "该条已经存在"
       else
         %HitbCdh{}
         |> HitbCdh.changeset(%{"key" => key,  "value" => value, "username" => username})
-        |> HitbRepo.insert()
+        |> Repo.insert()
         "添加成功"
       end
     %{result: result}
   end
 
   def cdh_count(username) do
-    user = HitbRepo.all(from p in HitbCdh, where: p.username == ^username, select: count(p.id))|>List.first
-    server = HitbRepo.all(from p in HitbCdh, select: count(p.id))|>List.first
+    user = Repo.all(from p in HitbCdh, where: p.username == ^username, select: count(p.id))|>List.first
+    server = Repo.all(from p in HitbCdh, select: count(p.id))|>List.first
     block = BlockRepo.all(from p in BlockCdh, select: count(p.id))|>List.first
     %{user: user, server: server, block: block}
   end

@@ -8,18 +8,18 @@ defmodule BlockWeb.P2pChannel do
   @all_accounts       Block.P2pMessage.all_accounts
   @all_blocks   Block.P2pMessage.all_blocks
   # @update_block_chain Block.P2pMessage.update_block_chain
-  @add_peer_request   Block.P2pMessage.add_peer_request
+  # @add_peer_request   Block.P2pMessage.add_peer_request
   @all_transactions "all_transactions"
   @add_block  "add_block"
   alias Block.SyncService
-  @connection_error   Block.P2pMessage.connection_error
-  @connection_success Block.P2pMessage.connection_success
+  # @connection_error   Block.P2pMessage.connection_error
+  # @connection_success Block.P2pMessage.connection_success
   alias Block.BlockService
   alias Block.PeerService
   alias Block.AccountRepository
   alias Block.BlockRepository
   alias Block.TransactionRepository
-  alias Block.P2pSessionManager
+  # alias Block.P2pSessionManager
   # alias Block.PeerRepository
 
   def join("p2p", _payload, socket) do
@@ -31,10 +31,7 @@ defmodule BlockWeb.P2pChannel do
   end
 
   def handle_in(@latest_block, %{"ip" => ip}, socket) do
-    hosts = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
-    new_hosts = ip|>Enum.map(fn x -> x["host"] end)
-    Enum.reject(ip, fn x -> x["host"] in hosts end)
-    |>Enum.each(fn x -> PeerService.newPeer(x["host"], x["port"]) end)
+    Enum.each(ip, fn x -> PeerService.newPeer(x["host"], x["port"]) end)
     Logger.info("sending latest block")
     data = BlockService.get_latest_block()|>send()
     {:reply, {:ok, %{type: @latest_block, data: data}}, socket}

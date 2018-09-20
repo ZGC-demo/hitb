@@ -2,8 +2,6 @@ defmodule HitbserverWeb.RuleController do
   use HitbserverWeb, :controller
   # alias Server.UserService
   alias Library.RuleService
-  alias Library.CdhService
-  alias Library.RuleCdaStatService
   plug HitbserverWeb.Access
   plug :put_layout, "app_stat.html"
 
@@ -28,7 +26,7 @@ defmodule HitbserverWeb.RuleController do
     result = RuleService.details(code, table, version)
     json conn, result
   end
-  
+
 # 模糊搜索
   def search(conn, _params) do
     %{"page" => page, "table" => table, "code" => code} = Map.merge(%{"page" => "1", "table" => "", "code" => ""}, conn.params)

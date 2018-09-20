@@ -7,7 +7,6 @@ defmodule Library.RuleQuery do
   alias Hitb.Library.RuleIcd9
   alias Hitb.Library.RuleIcd10
   alias Hitb.Library.LibWt4
-  alias Hitb.Library.Cdh
   alias Hitb.Library.ChineseMedicine
   alias Hitb.Library.ChineseMedicinePatent
   alias Hitb.Library.WesternMedicine

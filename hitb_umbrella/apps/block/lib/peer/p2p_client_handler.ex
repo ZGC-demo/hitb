@@ -8,52 +8,30 @@ defmodule Block.P2pClientHandler do
   # alias Block.PeerRepository
   alias Block.AccountRepository
   alias Block.BlockService
-  alias Block.BlockRepository
   alias Block.PeerService
   alias Phoenix.Channels.GenSocketClient
   alias Block.SyncService
   alias Block.P2pSessionManager
   alias Block.TransactionRepository
-  alias Block.Stat.StatOrg
-  alias Block.Stat.StatCda
-  alias Block.Edit.Cda
-  alias Block.Edit.CdaFile
-  alias Block.Library.Cdh
-  alias Block.Library.ChineseMedicinePatent
-  alias Block.Library.ChineseMedicine
-  alias Block.Library.RuleMdc
-  alias Block.Library.RuleAdrg
-  alias Block.Library.RuleDrg
-  alias Block.Library.RuleIcd9
-  alias Block.Library.RuleIcd10
-  alias Block.Library.LibWt4
-  alias Block.Library.Wt4
-  alias Block.Library.RuleCdaIcd10
-  alias Block.Library.RuleCdaIcd9
-  alias Block.Library.RuleExamine
-  alias Block.Library.RulePharmacy
-  alias Block.Library.RuleSign
-  alias Block.Library.RuleSymptom
-  alias Block.Repo
 
 
 
   @behaviour GenSocketClient
 
   # can't inherit attributes and use them inside matches, so this is necessary
-  @sync_peer     Block.P2pMessage.sync_peer
-  @sync_block     Block.P2pMessage.sync_block
+  # @sync_peer     Block.P2pMessage.sync_peer
+  # @sync_block     Block.P2pMessage.sync_block
   @all_accounts   Block.P2pMessage.all_accounts
   @latest_block     Block.P2pMessage.latest_block
   @all_blocks       Block.P2pMessage.all_blocks
   @all_transactions   Block.P2pMessage.all_transactions
   # @update_block_chain Peers.P2pMessage.update_block_chain
-  @add_peer_request   Block.P2pMessage.add_peer_request
+  # @add_peer_request   Block.P2pMessage.add_peer_request
   @connection_error   Block.P2pMessage.connection_error
   @connection_success Block.P2pMessage.connection_success
   @add_block         "add_block"
 
-  def start_link(host, port, local_ip) do
+  def start_link(host, port, _ip) do
     GenSocketClient.start_link(
           __MODULE__,
           Phoenix.Channels.GenSocketClient.Transport.WebSocketClient,
@@ -79,7 +57,7 @@ defmodule Block.P2pClientHandler do
   end
 
   def handle_disconnected(_reason, state) do
-    %{url: url, host: host} = state
+    %{host: host} = state
     Logger.error("disconnected: #{host} connect error. 20 minutes later attempting to reconnect...")
     # PeerService.getPeers()
     # |>Enum.reject(fn x -> x.host == host end)
@@ -119,7 +97,7 @@ defmodule Block.P2pClientHandler do
     {:ok, state}
   end
 
-  def handle_reply("p2p", _ref, %{"response" => %{"type" => @connection_error}} = payload, _transport, state) do
+  def handle_reply("p2p", _ref, %{"response" => %{"type" => @connection_error}}, _transport, state) do
     Logger.info("connection to server failed...")
     P2pSessionManager.terminate_session(self())
     {:ok, state}
@@ -141,25 +119,19 @@ defmodule Block.P2pClientHandler do
     {:ok, state}
   end
 
-  def handle_reply(topic, ref, %{"response" => %{"type" => @all_blocks, "data" => block}}, transport, state) do
-    # Enum.each(block, fn x -> BlockRepository.insert_block(x) end)
-    GenSocketClient.push(transport, "p2p", @all_accounts, %{})
-    {:ok, state}
-  end
-
-  def handle_reply(topic, ref, %{"response" => %{"type" => @all_accounts, "data" => account}}, transport, state) do
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => @all_accounts, "data" => account}}, transport, state) do
     Enum.each(account, fn x -> AccountRepository.insert_account(x) end)
     GenSocketClient.push(transport, "p2p", @all_transactions, %{})
     {:ok, state}
   end
 
-  def handle_reply(topic, ref, %{"response" => %{"type" => @all_transactions, "data" => transactions}}, transport, state) do
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => @all_transactions, "data" => transactions}}, transport, state) do
     Enum.each(transactions, fn x -> TransactionRepository.insert_transaction(x) end)
     GenSocketClient.push(transport, "p2p", "other_sync", %{})
     {:ok, state}
   end
 
-  def handle_reply(topic, ref, %{"response" => %{"type" => "other_sync", "data" => data}}, transport, state) do
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => "other_sync", "data" => data}}, transport, state) do
     local = SyncService.get_data()
     data = Map.keys(data)
       |>Enum.map(fn x ->
@@ -175,7 +147,7 @@ defmodule Block.P2pClientHandler do
     {:ok, state}
   end
 
-  def handle_reply(topic, ref, %{"response" => %{"type" => "other_sync2", "data" => data}}, transport, state) do
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => "other_sync2", "data" => data}}, transport, state) do
     Map.keys(data)
     |>Enum.map(fn key ->
         Map.get(data, key)
@@ -187,12 +159,17 @@ defmodule Block.P2pClientHandler do
     {:ok, state}
   end
 
-  def handle_reply(topic, ref, %{"response" => %{"type" => "sync_peer", "data" => data}}, transport, state) do
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => "sync_peer", "data" => data}}, transport, state) do
     Enum.each(data, fn x -> Block.PeerService.newPeer(x, "4000") end)
     PeerService.getPeers()
     |>Enum.each(fn x -> Block.P2pSessionManager.connect(x.host, x.port, []) end)
     Logger.warn("Sync over.")
     :timer.send_interval(10000, :ping)
+    {:ok, state}
+  end
+
+  def handle_reply(_topic, _ref, _payload, transport, state) do
+    GenSocketClient.push(transport, "p2p", @all_accounts, %{})
     {:ok, state}
   end
 
