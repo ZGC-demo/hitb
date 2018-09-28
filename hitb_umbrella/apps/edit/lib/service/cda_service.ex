@@ -19,43 +19,65 @@ defmodule Edit.CdaService do
     %{user: user, server: server, block: block}
   end
 
-  def cda_user(server_type) do
+  defp cda_user(server_type) do
     cda_users =
       case server_type do
-        "server" -> Repo.all(from p in HitbCdaFile, group_by: p.username, select: %{username: p.username, count: count(p.id)})|>:lists.usort
-        _ -> BlockRepo.all(from p in BlockCdaFile, group_by: p.username, select: %{username: p.username, count: count(p.id)})|>:lists.usort
+        "server" -> Repo.all(from p in HitbCdaFile, group_by: p.username, select: %{value: p.username, count: count(p.id)})|>:lists.usort
+        _ -> BlockRepo.all(from p in BlockCdaFile, group_by: p.username, select: %{value: p.username, count: count(p.id)})|>:lists.usort
       end
     users = Repo.all(from p in User, where: p.is_show == false, select: p.username)
-    users =
-      Enum.reject(cda_users, fn x -> x.username in users end)
-      |>Enum.map(fn x -> "#{x.username}----------------------#{x.count}" end)
-    [users, "读取成功"]
+    Enum.reject(cda_users, fn x -> x.value in users end)
+    # |>Enum.map(fn x -> "#{x.username}----------------------#{x.count}" end)
   end
 
-  def cda_files(username, server_type) do
-    cond do
-      server_type == "block" ->
-        [BlockRepo.all(from p in BlockCda, select: [p.username, p.name]) |> Enum.map(fn x -> Enum.join(x, "-") end), "读取成功"]
-      username == "" ->
-        [Repo.all(from p in HitbCda, select: [p.username, p.name]) |> Enum.map(fn x -> Enum.join(x, "-") end), "读取成功"]
-      true ->
-        [Repo.all(from p in HitbCda, where: p.username == ^username, select: [p.username, p.name]) |> Enum.map(fn x -> Enum.join(x, "-") end), "读取成功"]
+  defp cda_customer(server_type) do
+    case server_type do
+      "server" -> Repo.all(from p in HitbCda, group_by: p.patient_id, select: %{value: p.patient_id, count: count(p.id)})|>:lists.usort
+      _ -> BlockRepo.all(from p in BlockCda, group_by: p.patient_id, select: %{value: p.patient_id, count: count(p.id)})|>:lists.usort
     end
+    # |>Enum.map(fn x -> "#{x.patient_id}----------------------#{x.count}" end)
   end
 
-  def cda_file(file_name, username) do
-    edit = Repo.get_by(HitbCda, username: username, name: file_name)
-    cond do
-      edit == nil ->
-        [%{header: "", content: ""}, ["文件读取失败,无此文件"]]
-      edit.is_show == false ->
-        [%{header: "", content: ""}, ["文件拥有者不允许他人查看,请联系文件拥有者"]]
-      edit.is_change == false ->
-        edit = %{edit | :header => Poison.decode!(edit.header), :content => Poison.decode!(edit.content)}
-        [Map.drop(edit, [:__meta__, :__struct__, :id]),["文件读取成功,但文件拥有者不允许修改"]]
-      true ->
-        edit = %{edit | :header => Poison.decode!(edit.header), :content => Poison.decode!(edit.content)}
-        [Map.drop(edit, [:__meta__, :__struct__]), ["文件读取成功"]]
+  def cda_files(username, type, server_type) do
+    res =
+      case type do
+        "user" -> cda_user(server_type)
+        "customer" ->  cda_customer(server_type)
+        "file" -> Repo.all(from p in HitbCda, group_by: p.type, select: %{value: p.type, count: count(p.id)})|>:lists.usort
+        "model" -> Repo.all(from p in MyMould, group_by: p.name, select: %{value: p.name, count: count(p.id)})|>:lists.usort
+      end
+    # cond do
+    #   server_type == "block" ->
+    #     [BlockRepo.all(from p in BlockCda, select: [p.username, p.name]) |> Enum.map(fn x -> Enum.join(x, "-") end), "读取成功"]
+    #   username == "" ->
+    #     [Repo.all(from p in HitbCda, select: [p.username, p.name]) |> Enum.map(fn x -> Enum.join(x, "-") end), "读取成功"]
+    #   true ->
+    #     [Repo.all(from p in HitbCda, where: p.username == ^username, select: [p.username, p.name]) |> Enum.map(fn x -> Enum.join(x, "-") end), "读取成功"]
+    # end
+    [res, "读取成功"]
+  end
+
+  def cda_file(file_name, type, username) do
+    case type do
+      "user" -> [Repo.all(from p in HitbCdaFile, select: p.filename, where: p.username == ^file_name), ["文件列表读取成功"]]
+      "customer" -> [Repo.all(from p in HitbCda, select: p.name, where: p.patient_id == ^file_name), ["文件列表读取成功"]]
+      "file" -> [Repo.all(from p in HitbCda, select: p.name, where: p.type == ^file_name), ["文件列表读取成功"]]
+      "model" ->
+        [Repo.all(from p in MyMould, select: %{name: p.name, username: p.username}, where: p.name == ^file_name)|>Enum.map(fn x -> "#{x.username}-#{x.name}" end), ["文件列表读取成功"]]
+      "content" ->
+        edit = Repo.get_by(HitbCda, username: username, name: file_name)
+        cond do
+          edit == nil ->
+            [%{header: "", content: ""}, ["文件读取失败,无此文件"]]
+          edit.is_show == false ->
+            [%{header: "", content: ""}, ["文件拥有者不允许他人查看,请联系文件拥有者"]]
+          edit.is_change == false ->
+            edit = %{edit | :header => Poison.decode!(edit.header), :content => Poison.decode!(edit.content)}
+            [Map.drop(edit, [:__meta__, :__struct__, :id]),["文件读取成功,但文件拥有者不允许修改"]]
+          true ->
+            edit = %{edit | :header => Poison.decode!(edit.header), :content => Poison.decode!(edit.content)}
+            [Map.drop(edit, [:__meta__, :__struct__]), ["文件读取成功"]]
+        end
     end
   end
 

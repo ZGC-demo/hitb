@@ -4,20 +4,21 @@ defmodule HitbserverWeb.CdaController do
   # alias Hitb.Time
   plug HitbserverWeb.Access
 
-  def cda_user(conn, %{"server_type" => server_type}) do
-    [cda, info] = CdaService.cda_user(server_type)
-    json conn, %{cda: cda, info: info}
-  end
+  # def cda_user(conn, %{"server_type" => server_type}) do
+  #   [cda, info] = CdaService.cda_user(server_type)
+  #   json conn, %{cda: cda, info: info}
+  # end
 
   def cda_file(conn, _params) do
-    %{"username" => username, "server_type" => server_type} = Map.merge(%{"username" => "", "server_type" => "server"}, conn.params)
-    [cda, info] = CdaService.cda_files(username, server_type)
-    json conn, %{cda: cda, info: info}
+    %{"username" => username, "server_type" => server_type, "type" => type} = Map.merge(%{"username" => "", "server_type" => "server", "type" => "user"}, conn.params)
+    res = CdaService.cda_files(username, type, server_type)
+    # json conn, %{cda: cda, info: info}
+    json conn, %{result: res, cda: [], info: []}
   end
 
   def index(conn, _params) do
-    %{"filename" => filename, "username" => username} = Map.merge(%{"filename" => "", "username" => ""}, conn.params)
-    [cda, info] = CdaService.cda_file(filename, username)
+    %{"filename" => filename, "username" => username, "type" => type} = Map.merge(%{"filename" => "", "username" => "", "type" => "file"}, conn.params)
+    [cda, info] = CdaService.cda_file(filename, type, username)
     json conn, %{cda: cda, info: info}
   end
 

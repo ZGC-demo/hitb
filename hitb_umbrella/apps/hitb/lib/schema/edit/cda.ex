@@ -12,14 +12,15 @@ defmodule Hitb.Edit.Cda do
     field :is_change, :boolean, default: false
     field :is_show, :boolean, default: false
     field :header, :string
+    field :type, :string
     timestamps()
   end
 
   @doc false
   def changeset(%Cda{} = cda, attrs) do
     cda
-    |> cast(attrs, [:username, :name, :content, :is_change, :is_show, :patient_id, :header])
-    |> validate_required([:username, :name, :content, :is_change, :is_show])
+    |> cast(attrs, [:username, :name, :content, :is_change, :is_show, :patient_id, :header, :type])
+    |> validate_required([:username, :name, :content, :is_change, :is_show, :type])
     |> unique_constraint(:patient_id)
   end
 end
