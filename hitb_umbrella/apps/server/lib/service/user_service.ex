@@ -7,7 +7,7 @@ defmodule Server.UserService do
   # alias ServerWeb.MyUser
 
   #登录,返回conn
-  def login(user, blockchain) do
+  def login(user, _blockchain) do
     db_user = Repo.get_by(User, username: user.username)
     cond do
       db_user == nil ->

@@ -1,6 +1,6 @@
 defmodule Server.ShareServiceTest do
   use Hitb.DataCase, async: false
-  alias Server.ShareService
+  # alias Server.ShareService
 
 
   # test "test share" do

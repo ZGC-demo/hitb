@@ -41,7 +41,7 @@ defmodule Server.OrgService do
         |> Repo.insert()
       _ ->
         changeset = Org.changeset(%Org{}, attrs)
-        changeset = %{changeset | :errors => ["error": "编码已存在！"]}
+        changeset = %{changeset | :errors => [error: "编码已存在！"]}
         {:error, changeset}
     end
   end
@@ -62,7 +62,7 @@ defmodule Server.OrgService do
         |> Repo.update()
       true ->
         changeset = Org.changeset(%Org{}, attrs)
-        changeset = %{changeset | :errors => ["error": "编码已存在！"]}
+        changeset = %{changeset | :errors => [error: "编码已存在！"]}
         {:error, changeset}
     end
   end

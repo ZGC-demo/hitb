@@ -12,7 +12,7 @@ defmodule HitbserverWeb.OnlineChannel do
       socket = Map.merge(socket, %{username: username})
       cond do
         username in ["hitb", "test@test.com.cn"] ->
-          [success, user] = UserService.socket_login(%{password: password, username: username})
+          [_success, user] = UserService.socket_login(%{password: password, username: username})
           Hitb.ets_insert(:socket_user, username, true)
           Logger.warn("用户「#{username}」登录")
           socket = %{socket | :assigns => user}

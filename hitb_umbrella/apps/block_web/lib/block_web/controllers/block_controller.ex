@@ -12,7 +12,7 @@ defmodule BlockWeb.BlockController do
     Functionality related to blocks in the block chain
   """
 
-  def add_block(conn, payload) do
+  def add_block(conn, _payload) do
     [conn, user] = Login.user(conn)
     block = BlockService.create_next_block(Time.stime_local(), user.username)
     BlockService.add_block(block)

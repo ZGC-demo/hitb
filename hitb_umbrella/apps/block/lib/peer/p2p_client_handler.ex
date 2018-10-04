@@ -159,7 +159,7 @@ defmodule Block.P2pClientHandler do
     {:ok, state}
   end
 
-  def handle_reply(_topic, _ref, %{"response" => %{"type" => "sync_peer", "data" => data}}, transport, state) do
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => "sync_peer", "data" => data}}, _transport, state) do
     Enum.each(data, fn x -> Block.PeerService.newPeer(x, "4000") end)
     PeerService.getPeers()
     |>Enum.each(fn x -> Block.P2pSessionManager.connect(x.host, x.port, []) end)

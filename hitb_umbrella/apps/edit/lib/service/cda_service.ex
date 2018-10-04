@@ -38,7 +38,7 @@ defmodule Edit.CdaService do
     # |>Enum.map(fn x -> "#{x.patient_id}----------------------#{x.count}" end)
   end
 
-  def cda_files(username, type, server_type) do
+  def cda_files(_username, type, server_type) do
     res =
       case type do
         "user" -> cda_user(server_type)
