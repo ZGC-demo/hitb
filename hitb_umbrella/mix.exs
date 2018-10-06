@@ -10,6 +10,6 @@ defmodule Hitb.Umbrella.Mixfile do
   end
 
   defp deps do
-    [{:distillery, "~> 1.5", runtime: false}]
+    [{:distillery, "~> 2.0", runtime: false}]
   end
 end

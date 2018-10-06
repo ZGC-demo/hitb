@@ -12,3 +12,5 @@ erl_crash.dump
 /download
 /wt4
 .wget-hsts
+.DS_Store
+./mix.lock

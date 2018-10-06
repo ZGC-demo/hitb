@@ -44,7 +44,7 @@ defmodule HitbserverWeb.Mixfile do
       {:httpoison, "~> 1.0"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
-      {:distillery, "~> 1.5", runtime: false},
+      {:distillery, "~> 2.0", runtime: false},
       {:cowboy, "~> 1.0"},
       {:json, "~> 1.0"},
       {:remote_ip, "~> 0.1.4"},
