@@ -77,12 +77,13 @@ defmodule BlockWeb.P2pChannel do
     {:reply, {:ok, %{type: "other_sync", data: data}}, socket}
   end
 
-  def handle_in("other_sync2", %{"data" => data}, socket) do
+  def handle_in("sync_data", %{"data" => data}, socket) do
     data = Enum.reduce(data, %{}, fn x, acc ->
       attrs = SyncService.get(x)|>Enum.map(fn x -> send(x) end)
       Map.put(acc, x, attrs)
     end)
-    {:reply, {:ok, %{type: "other_sync2", data: data}}, socket}
+    IO.inspect data
+    {:reply, {:ok, %{type: "sync_data", data: data}}, socket}
   end
 
   # def handle_in("acto_sync", payload, socket) do
@@ -95,6 +96,7 @@ defmodule BlockWeb.P2pChannel do
     Logger.warn("unhandled event #{event} #{inspect payload}")
     {:noreply, socket}
   end
+
 
   defp send(map) do
     Map.drop(map, [:id, :__meta__, :__struct__])

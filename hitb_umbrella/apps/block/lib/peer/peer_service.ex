@@ -20,7 +20,10 @@ defmodule Block.PeerService do
 
   def newPeer(host, port)do
     peer = %{host: host, port: port, connect: true}
-    PeerRepository.insert_peer(peer)
+    hosts = getPeers()|>Enum.map(fn x -> x.host end)
+    unless(host in hosts)do
+      PeerRepository.insert_peer(peer)
+    end
   end
 
 end

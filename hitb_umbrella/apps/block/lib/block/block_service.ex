@@ -12,6 +12,11 @@ defmodule Block.BlockService do
       end)
   end
 
+  def get_all_block_hashs() do
+    BlockRepository.get_all_blocks()
+    |>Enum.map(fn x -> x.hash end)
+  end
+
   def synchronize_blockchain([_|_] = remote_block_chain) do
     # find latest block in this chain
     remote_latest_block = remote_block_chain

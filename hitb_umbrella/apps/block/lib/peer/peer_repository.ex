@@ -29,4 +29,5 @@ defmodule Block.PeerRepository do
   def get_all_peers() do
     Repo.all(Peer)
   end
+
 end

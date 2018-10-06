@@ -59,9 +59,6 @@ defmodule Block.P2pClientHandler do
   def handle_disconnected(_reason, state) do
     %{host: host} = state
     Logger.error("disconnected: #{host} connect error. 20 minutes later attempting to reconnect...")
-    # PeerService.getPeers()
-    # |>Enum.reject(fn x -> x.host == host end)
-    # |>Enum.map(fn x -> P2pSessionManager.connect(x.host, x.port, []) end)
     {:ok, state}
   end
 
@@ -114,48 +111,77 @@ defmodule Block.P2pClientHandler do
       BlockService.get_latest_block().index < data["index"] ->
         GenSocketClient.push(transport, "p2p", @all_blocks, %{})
       BlockService.get_latest_block().index == data["index"] ->
-        GenSocketClient.push(transport, "p2p", @all_blocks, %{})
+        :timer.send_interval(10000, :ping)
     end
     {:ok, state}
   end
 
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => @all_blocks, "data" => block}}, transport, state) do
+    # #取得区块
+    hashs = BlockService.get_all_block_hashs()
+    #同步
+    Enum.reject(block, fn x -> x["hash"] in hashs end)
+    |>Enum.map(fn x ->
+        Enum.reduce(Map.keys(x), %{}, fn k, acc ->
+          Map.put(acc, String.to_atom(k), Map.get(x, k))
+        end)
+      end)
+    |>Enum.each(fn x -> BlockService.add_block(x) end)
+    # #下一个同步
+    GenSocketClient.push(transport, "p2p", @all_accounts, %{})
+    {:ok, state}
+  end
+
   def handle_reply(_topic, _ref, %{"response" => %{"type" => @all_accounts, "data" => account}}, transport, state) do
-    Enum.each(account, fn x -> AccountRepository.insert_account(x) end)
+    #取得全部用户名
+    usernames = AccountRepository.get_all_usernames()
+    #同步
+    Enum.reject(account, fn x -> x["username"] in usernames end)
+    |>Enum.each(fn x -> AccountRepository.insert_account(x) end)
+    #下一个同步
     GenSocketClient.push(transport, "p2p", @all_transactions, %{})
     {:ok, state}
   end
 
   def handle_reply(_topic, _ref, %{"response" => %{"type" => @all_transactions, "data" => transactions}}, transport, state) do
-    Enum.each(transactions, fn x -> TransactionRepository.insert_transaction(x) end)
+    transactions_id = TransactionRepository.get_all_transactions_id()
+    #同步
+    Enum.reject(transactions, fn x -> x["transaction_id"] in transactions_id end)
+    |>Enum.each(fn x -> TransactionRepository.insert_transaction(x) end)
     GenSocketClient.push(transport, "p2p", "other_sync", %{})
     {:ok, state}
   end
 
   def handle_reply(_topic, _ref, %{"response" => %{"type" => "other_sync", "data" => data}}, transport, state) do
     local = SyncService.get_data()
-    data = Map.keys(data)
-      |>Enum.map(fn x ->
-        case Map.get(data, x) do
-          [] -> []
-          v ->
-            v2 = Map.get(local, String.to_atom(x))
-            if(List.first(v) > List.first(v2))do x else [] end
+    data = Enum.map(local, fn x ->
+        {key, local_time} = x
+        server_time = Map.get(data, to_string(key))
+        cond do
+          local_time == server_time -> []
+          local_time == "" -> key
+          server_time > local_time -> key
+          true -> []
         end
-      end)
-      |>List.flatten
-    GenSocketClient.push(transport, "p2p", "other_sync2", %{data: data})
+      end)|>List.flatten
+    case data do
+      [] -> :timer.send_interval(10000, :ping)
+      _ -> GenSocketClient.push(transport, "p2p", "sync_data", %{data: data})
+    end
     {:ok, state}
   end
 
-  def handle_reply(_topic, _ref, %{"response" => %{"type" => "other_sync2", "data" => data}}, transport, state) do
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => "sync_data", "data" => data}}, transport, state) do
     Map.keys(data)
     |>Enum.map(fn key ->
+        local = SyncService.get_hashs(key)
         Map.get(data, key)
+        |>Enum.reject(fn x -> x["hash"] in local end)
         |>Enum.each(fn x ->
             SyncService.insert(key, x)
         end)
     end)
-    GenSocketClient.push(transport, "p2p", "sync_peer", %{data: data})
+    :timer.send_interval(10000, :ping)
     {:ok, state}
   end
 
@@ -179,6 +205,7 @@ defmodule Block.P2pClientHandler do
   end
 
   def handle_info(:ping, transport, state) do
+    # Logger.info("sync_block")
     GenSocketClient.push(transport, "p2p", @latest_block, %{ip: []})
     {:ok, state}
   end

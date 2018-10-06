@@ -1,6 +1,7 @@
 defmodule Block.SyncService do
   import Ecto.Query, warn: false
   alias Block.Repo
+  alias Block.Time
   alias Block.Edit.Cda
   alias Block.Edit.CdaFile
   alias Block.Library.RuleCdaIcd10
@@ -43,6 +44,13 @@ defmodule Block.SyncService do
       rule_pharmacy: query(RulePharmacy, "limit"),
       rule_sign: query(RuleSign, "limit"),
       rule_symptom: query(RuleSymptom, "limit")}
+    |>Enum.reduce(%{}, fn x, acc ->
+        {key, value} = x
+        case value|>List.first do
+          nil -> Map.put(acc, key, "")
+          value -> Map.put(acc, key, time(value))
+        end
+      end)
   end
 
   def get(table) do
@@ -67,6 +75,31 @@ defmodule Block.SyncService do
       "rule_pharmacy"-> query(RulePharmacy, "all")
       "rule_sign"-> query(RuleSign, "all")
       "rule_symptom"-> query(RuleSymptom, "all")
+    end
+  end
+
+  def get_hashs(table) do
+    case table do
+      "stat_org"-> query(StatOrg, "hsahs")
+      "stat_cda"-> query(StatCda, "hsahs")
+      "cda"-> query(Cda, "hsahs")
+      "cda_file"-> query(CdaFile, "hsahs")
+      "cdh"-> query(Cdh, "hsahs")
+      "ruleadrg"-> query(RuleAdrg, "hsahs")
+      "cmp"-> query(ChineseMedicinePatent, "hsahs")
+      "cm"-> query(ChineseMedicine, "hsahs")
+      "ruledrg"-> query(RuleDrg, "hsahs")
+      "ruleicd9"-> query(RuleIcd9, "hsahs")
+      "ruleicd10"-> query(RuleIcd10, "hsahs")
+      "rulemdc"-> query(RuleMdc, "hsahs")
+      "libwt4"-> query(LibWt4, "hsahs")
+      "wt4"-> query(Wt4, "hsahs")
+      "rule_cda_icd10"-> query(RuleCdaIcd10, "hsahs")
+      "rule_cda_icd9"-> query(RuleCdaIcd9, "hsahs")
+      "rule_examine"-> query(RuleExamine, "hsahs")
+      "rule_pharmacy"-> query(RulePharmacy, "hsahs")
+      "rule_sign"-> query(RuleSign, "hsahs")
+      "rule_symptom"-> query(RuleSymptom, "hsahs")
     end
   end
 
@@ -103,10 +136,17 @@ defmodule Block.SyncService do
         |> select([p], p.inserted_at)
         |> order_by([p], [desc: p.inserted_at])
         |> limit([p], 1)
+      "hsahs" ->
+        from(p in table)
+        |>select([p], p.hash)
       _ ->
         from(p in table)
     end
     |> Repo.all
+  end
+
+  defp time(x)do
+    Time.stime_ecto(x)
   end
 
 end

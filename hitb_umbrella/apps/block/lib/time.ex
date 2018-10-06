@@ -48,7 +48,7 @@ defmodule Block.Time do
     {:ok, time} =  Ecto.DateTime.cast(time)
     time = :calendar.universal_time_to_local_time(Ecto.DateTime.to_erl(time))
     {year, month, day, hour, minute, second} = gb_time(time)
-    to_string(year) <> "-" <> to_string(month) <> "-" <> to_string(day) <> "　" <> to_string(hour) <> ":" <> to_string(minute) <> ":" <> to_string(second)
+    "#{year}-#{month}-#{day} #{hour}:#{minute}:#{second}"
   end
 
   #数据库日期转国标string
