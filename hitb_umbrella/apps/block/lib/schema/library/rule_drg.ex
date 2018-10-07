@@ -13,6 +13,7 @@ defmodule Block.Library.RuleDrg do
     field :plat, :string
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
@@ -22,10 +23,10 @@ defmodule Block.Library.RuleDrg do
 
   def changeset(rule_drg, params \\ %{}) do
     changeset = rule_drg
-      |> cast(params, [:code, :name, :mdc, :adrg, :org, :year, :version, :plat, :previous_hash, :hash])
-      |> validate_required([:code, :previous_hash, :hash])
+      |> cast(params, [:code, :name, :mdc, :adrg, :org, :year, :version, :plat, :previous_hash, :hash, :datetime])
+      |> validate_required([:code, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(rule_drg, changeset, "rule_drg")
+    # Block.create_data_record(rule_drg, changeset, "rule_drg")
     changeset
   end
 

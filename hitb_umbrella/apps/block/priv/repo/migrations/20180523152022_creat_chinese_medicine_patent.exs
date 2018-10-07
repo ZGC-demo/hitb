@@ -16,6 +16,7 @@ defmodule Block.Library.Repo.Migrations.ChineseMedicinePatent do
       add :other_limit, :string#其他限制
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:chinese_medicine_patent, [:hash])

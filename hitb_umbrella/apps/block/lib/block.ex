@@ -1,6 +1,7 @@
 defmodule Block do
   alias Block.DataRecord
   alias Block.Repo
+  alias Block.Time
   @moduledoc """
   Documentation for Block.
   """
@@ -14,20 +15,20 @@ defmodule Block do
 
   #数据日志
   def create_data_record(attrs, changeset, table) do
-    if(changeset.errors == [])do
-      data = Poison.encode!(changeset.changes)
-      data_record =
-        case attrs.id do
-          nil -> %{type: "create", table: table, data: data, hash: hash(data)}
-          _ -> %{type: "update", table: table, data: data, hash: hash(data)}
-        end
-      # IO.inspect data_record
-      # IO.inspect %DataRecord{}
-      # |>DataRecord.changeset(data_record)
-      %DataRecord{}
-      |>DataRecord.changeset(data_record)
-      |>Repo.insert
-    end
+    # if(changeset.errors == [])do
+    #   data = Poison.encode!(changeset.changes)
+    #   data_record =
+    #     case attrs.id do
+    #       nil -> %{type: "create", table: table, data: data, hash: hash(data)}
+    #       _ -> %{type: "update", table: table, data: data, hash: hash(data)}
+    #     end
+    #   # IO.inspect data_record
+    #   # IO.inspect %DataRecord{}
+    #   # |>DataRecord.changeset(data_record)
+    #   %DataRecord{}
+    #   |>DataRecord.changeset(data_record)
+    #   |>Repo.insert
+    # end
   end
 
   def sign do
@@ -52,6 +53,13 @@ defmodule Block do
 
   def calculateFee do
 
+  end
+
+  def merge_time(attrs)do
+    case Map.keys(attrs)|>List.first|>is_bitstring do
+      true -> Map.merge(%{"datetime" => Time.stime_local()}, attrs)
+      false -> Map.merge(%{datetime: Time.stime_local()}, attrs)
+    end
   end
 
   defp hash(s) do

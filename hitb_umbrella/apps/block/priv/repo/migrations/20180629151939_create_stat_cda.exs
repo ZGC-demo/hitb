@@ -8,6 +8,7 @@ defmodule Block.Stat.Repo.Migrations.StatCda do
         add :previous_hash, :string
         add :hash, :string
         add :patient_id, {:array, :string}
+        add :datetime, :string
         timestamps()
       end
       create unique_index(:stat_cda, [:hash])

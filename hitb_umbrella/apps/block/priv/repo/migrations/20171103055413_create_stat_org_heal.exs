@@ -24,6 +24,7 @@ defmodule Block.Stat.Repo.Migrations.CreateStatOrgHeal do
       add :int_time, :integer #时间排序
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:stat_org_heal, [:hash])

@@ -25,6 +25,7 @@ defmodule Block.Library.Repo.Migrations.CreateRuleAdrg do
       add :plat, :string
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:rule_adrg, [:hash])

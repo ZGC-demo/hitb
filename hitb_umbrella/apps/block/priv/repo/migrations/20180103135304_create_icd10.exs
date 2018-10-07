@@ -19,6 +19,7 @@ defmodule Block.Library.Repo.Migrations.CreateIcd10 do
       add :mcc, :boolean, default: false
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:icd10, [:hash])

@@ -13,15 +13,16 @@ defmodule Block.Library.Mdc do
     field :year, :string
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
   def changeset(%Mdc{} = mdc, attrs) do
     changeset = mdc
-      |> cast(attrs, [:code, :name, :mdc, :gender, :previous_hash, :hash])
-      |> validate_required([:code, :name, :mdc, :gender, :previous_hash, :hash])
+      |> cast(attrs, [:code, :name, :mdc, :gender, :previous_hash, :hash, :datetime])
+      |> validate_required([:code, :name, :mdc, :gender, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(mdc, changeset, "mdc")
+    # Block.create_data_record(mdc, changeset, "mdc")
     changeset
   end
 end

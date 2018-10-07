@@ -19,16 +19,17 @@ defmodule Block.Library.ChineseMedicine do
     field :type, :string #分类
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
 
   def changeset(%ChineseMedicine{} = chinese_medicine, attrs) do
     changeset = chinese_medicine
-      |> cast(attrs, [:code, :name, :name_1, :sexual_taste, :toxicity, :meridian, :effect, :indication, :consumption, :need_attention, :type, :previous_hash, :hash])
-      |> validate_required([:code, :name, :name_1, :sexual_taste, :toxicity, :meridian, :effect, :indication, :consumption, :need_attention, :type, :previous_hash, :hash])
+      |> cast(attrs, [:code, :name, :name_1, :sexual_taste, :toxicity, :meridian, :effect, :indication, :consumption, :need_attention, :type, :previous_hash, :hash, :datetime])
+      |> validate_required([:code, :name, :name_1, :sexual_taste, :toxicity, :meridian, :effect, :indication, :consumption, :need_attention, :type, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(chinese_medicine, changeset, "chinese_medicine")
+    # Block.create_data_record(chinese_medicine, changeset, "chinese_medicine")
     changeset
   end
 end

@@ -16,6 +16,7 @@ defmodule Block.Library.RuleMdc do
     field :plat, :string
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
   @doc """
@@ -24,10 +25,10 @@ defmodule Block.Library.RuleMdc do
 
   def changeset(rule_mdc, params \\ %{}) do
     changeset = rule_mdc
-      |> cast(params, [:code, :name, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :org, :year, :version, :plat, :previous_hash, :hash])
-      |> validate_required([:code, :previous_hash, :hash])
+      |> cast(params, [:code, :name, :mdc, :icd9_a, :icd9_aa, :icd10_a, :icd10_aa, :org, :year, :version, :plat, :previous_hash, :hash, :datetime])
+      |> validate_required([:code, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(rule_mdc, changeset, "rule_mdc")
+    # Block.create_data_record(rule_mdc, changeset, "rule_mdc")
     changeset
   end
 

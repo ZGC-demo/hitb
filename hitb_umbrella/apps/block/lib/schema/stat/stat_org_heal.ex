@@ -26,15 +26,16 @@ defmodule Block.Stat.StatOrgHeal do
     field :int_time, :integer #时间排序
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
   def changeset(stat_org_heal, params \\ %{}) do
     changeset = stat_org_heal
-      |> cast(params, [:time, :org, :true_org, :num_sum, :death_rate, :day_avg, :fee_avg, :heal_fee_avg, :self_fee_avg, :fee_gl, :fee_hl, :fee_yj, :fee_yl, :fee_yp, :pay_rate, :selfpay_rate, :time_type, :org_type, :int_time, :previous_hash, :hash])
-      |> validate_required([:time, :org, :previous_hash, :hash])
+      |> cast(params, [:time, :org, :true_org, :num_sum, :death_rate, :day_avg, :fee_avg, :heal_fee_avg, :self_fee_avg, :fee_gl, :fee_hl, :fee_yj, :fee_yl, :fee_yp, :pay_rate, :selfpay_rate, :time_type, :org_type, :int_time, :previous_hash, :hash, :datetime])
+      |> validate_required([:time, :org, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(stat_org_heal, changeset, "stat_org_heal")
+    # Block.create_data_record(stat_org_heal, changeset, "stat_org_heal")
     changeset
   end
 end

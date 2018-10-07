@@ -102,15 +102,16 @@ defmodule Block.P2pClientHandler do
 
   # def handle_reply("p2p", _ref, %{"response" => %{"type" => @latest_block, "data" => data}}, transport, state) do
   def handle_reply("p2p", _ref, %{"response" => %{"type" => @latest_block, "data" => data}}, transport, state) do
+    latest_block = BlockService.get_latest_block()
     cond do
-      BlockService.get_latest_block() == nil ->
+      latest_block == nil ->
         GenSocketClient.push(transport, "p2p", @all_blocks, %{})
-      BlockService.get_latest_block().index > data["index"] ->
+      latest_block.index > data["index"] ->
         block = BlockService.get_blocks()
         GenSocketClient.push(transport, "p2p", @add_block, %{block: block})
-      BlockService.get_latest_block().index < data["index"] ->
+      latest_block.index < data["index"] ->
         GenSocketClient.push(transport, "p2p", @all_blocks, %{})
-      BlockService.get_latest_block().index == data["index"] ->
+      latest_block.index == data["index"] ->
         :timer.send_interval(10000, :ping)
     end
     {:ok, state}
@@ -126,8 +127,8 @@ defmodule Block.P2pClientHandler do
           Map.put(acc, String.to_atom(k), Map.get(x, k))
         end)
       end)
-    |>Enum.each(fn x -> BlockService.add_block(x) end)
-    # #下一个同步
+    |>Enum.each(fn x -> BlockService.sync_block(x) end)
+    #下一个同步
     GenSocketClient.push(transport, "p2p", @all_accounts, %{})
     {:ok, state}
   end
@@ -164,6 +165,7 @@ defmodule Block.P2pClientHandler do
           true -> []
         end
       end)|>List.flatten
+    # IO.inspect data
     case data do
       [] -> :timer.send_interval(10000, :ping)
       _ -> GenSocketClient.push(transport, "p2p", "sync_data", %{data: data})
@@ -181,7 +183,8 @@ defmodule Block.P2pClientHandler do
             SyncService.insert(key, x)
         end)
     end)
-    :timer.send_interval(10000, :ping)
+    Logger.info("sync finish.")
+    # :timer.send_interval(10000, :ping)
     {:ok, state}
   end
 

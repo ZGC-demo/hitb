@@ -10,6 +10,7 @@ defmodule Block.Library.DrgRate do
     field :type, :string
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
@@ -19,10 +20,10 @@ defmodule Block.Library.DrgRate do
 
   def changeset(%DrgRate{} = drg_rate, attrs) do
     changeset = drg_rate
-      |> cast(attrs, [:drg, :name, :rate, :type, :previous_hash, :hash])
-      |> validate_required([:drg, :name, :rate, :type, :previous_hash, :hash])
+      |> cast(attrs, [:drg, :name, :rate, :type, :previous_hash, :hash, :datetime])
+      |> validate_required([:drg, :name, :rate, :type, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(drg_rate, changeset, "drg_rate")
+    # Block.create_data_record(drg_rate, changeset, "drg_rate")
     changeset
   end
 

@@ -112,6 +112,7 @@ defmodule Block.Library.Wt4 do
     field :zygt, :integer #住院天数>60病历数
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
@@ -120,10 +121,10 @@ defmodule Block.Library.Wt4 do
   """
   def changeset(wt4, params \\ %{}) do
     changeset = wt4
-      |> cast(params, [:payment_methods, :case_id, :gender, :age, :total_expense, :bed_expense, :bed_tend_expense, :western_medicine_expense, :chinese_medicine_expense1, :chinese_medicine_expense2, :radiate_expense, :check_expense, :oxygen_expense, :transfusion_expense, :examine_expense, :operation_expense, :deliver_expense, :horus_expense, :other_expense, :date_inhospital, :acctual_days, :director_doctor, :selfpayment_expense, :check_normal_expense, :cure_clinical_expense, :cure_intrude_expense, :cure_special_expense, :cure_recover_expense, :cure_chinese_expense, :cure_normal_expense, :cure_mind_expense, :auxiliary_expense, :stuff_cure_expense, :stuff_intrude_expense, :stuff_surgery_expense, :stuff_check_expense, :register_expense, :antiseptic_medicine_expense, :product_albumin_expense, :product_globulin_expense, :product_blood_expense, :product_cell_expense, :check_nucleus_expense, :cure_nucleus_expense, :ultrasound_expense, :pathology_expense, :cure_tend_expense, :disease_code1, :goout_diagnose_name, :b_wt4_v1_id, :disease_code, :expense_gl, :expense_hl, :expense_yj, :expense_yl, :expense_yp, :expense_yp_hc, :pay_type,  :heal_expense, :self_expense, :diags_code, :opers_code, :half_year, :season_time, :month_time, :org, :department, :cherf_department, :drg, :adrg, :mdc, :zl, :jc, :wlzl, :jrzl, :tszl, :kfzl, :zyzl, :ybzl, :jszl, :js, :hsjc, :hszl, :cszl, :fszl, :hy, :bl, :jhfz, :sx, :sy, :hlzl, :hl, :yzcy, :yzzy, :mzzy, :jzzy, :zygt, :sf0100, :sf0102, :sf0104, :sf0108, :previous_hash, :hash])
-      |> validate_required([:b_wt4_v1_id, :previous_hash, :hash])
+      |> cast(params, [:payment_methods, :case_id, :gender, :age, :total_expense, :bed_expense, :bed_tend_expense, :western_medicine_expense, :chinese_medicine_expense1, :chinese_medicine_expense2, :radiate_expense, :check_expense, :oxygen_expense, :transfusion_expense, :examine_expense, :operation_expense, :deliver_expense, :horus_expense, :other_expense, :date_inhospital, :acctual_days, :director_doctor, :selfpayment_expense, :check_normal_expense, :cure_clinical_expense, :cure_intrude_expense, :cure_special_expense, :cure_recover_expense, :cure_chinese_expense, :cure_normal_expense, :cure_mind_expense, :auxiliary_expense, :stuff_cure_expense, :stuff_intrude_expense, :stuff_surgery_expense, :stuff_check_expense, :register_expense, :antiseptic_medicine_expense, :product_albumin_expense, :product_globulin_expense, :product_blood_expense, :product_cell_expense, :check_nucleus_expense, :cure_nucleus_expense, :ultrasound_expense, :pathology_expense, :cure_tend_expense, :disease_code1, :goout_diagnose_name, :b_wt4_v1_id, :disease_code, :expense_gl, :expense_hl, :expense_yj, :expense_yl, :expense_yp, :expense_yp_hc, :pay_type,  :heal_expense, :self_expense, :diags_code, :opers_code, :half_year, :season_time, :month_time, :org, :department, :cherf_department, :drg, :adrg, :mdc, :zl, :jc, :wlzl, :jrzl, :tszl, :kfzl, :zyzl, :ybzl, :jszl, :js, :hsjc, :hszl, :cszl, :fszl, :hy, :bl, :jhfz, :sx, :sy, :hlzl, :hl, :yzcy, :yzzy, :mzzy, :jzzy, :zygt, :sf0100, :sf0102, :sf0104, :sf0108, :previous_hash, :hash, :datetime])
+      |> validate_required([:b_wt4_v1_id, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(wt4, changeset, "wt4")
+    # Block.create_data_record(wt4, changeset, "wt4")
     changeset
   end
 end

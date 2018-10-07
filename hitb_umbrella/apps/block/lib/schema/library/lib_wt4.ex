@@ -11,16 +11,17 @@ defmodule Block.Library.LibWt4 do
     field :type, :string #类型
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
   @doc false
   def changeset(%LibWt4{} = lib_wt4, attrs) do
     changeset = lib_wt4
-      |> cast(attrs, [:code, :name, :year, :type, :previous_hash, :hash])
-      |> validate_required([:code, :name, :type, :previous_hash, :hash])
+      |> cast(attrs, [:code, :name, :year, :type, :previous_hash, :hash, :datetime])
+      |> validate_required([:code, :name, :type, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(lib_wt4, changeset, "lib_wt4")
+    # Block.create_data_record(lib_wt4, changeset, "lib_wt4")
     changeset
   end
 end

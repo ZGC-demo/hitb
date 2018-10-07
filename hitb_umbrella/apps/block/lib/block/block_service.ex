@@ -75,6 +75,10 @@ defmodule Block.BlockService do
     end
   end
 
+  def sync_block(block) do
+    BlockRepository.insert_block(block, "sync")
+  end
+
   def get_latest_block() do
     list = :ets.lookup(:latest_block, :latest)
     cond do

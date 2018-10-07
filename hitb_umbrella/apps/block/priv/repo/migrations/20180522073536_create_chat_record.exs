@@ -9,6 +9,7 @@ defmodule Block.Server.Repo.Migrations.CreateChatRecord do
       add :record_array, {:array, :string}, size: 1000000
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:chat_record, [:hash])

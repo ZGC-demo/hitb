@@ -4,7 +4,7 @@ defmodule Block.Time do
   def stime_local() do
     time = :calendar.local_time()
     {year, month, day, hour, minute, second} = gb_time(time)
-    to_string(year) <> "-" <> to_string(month) <> "-" <> to_string(day) <> " " <> to_string(hour) <> ":" <> to_string(minute) <> ":" <> to_string(second)
+    "#{year}-#{month}-#{day} #{hour}:#{minute}:#{second}"
   end
 
   #当前日期字符串string

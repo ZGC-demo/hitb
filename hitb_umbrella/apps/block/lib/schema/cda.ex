@@ -18,7 +18,7 @@ defmodule Block.Cda do
     changeset = cda
       |> cast(attrs, [:username, :name, :content, :is_change, :is_show])
       |> validate_required([:username, :name, :content, :is_change, :is_show])
-    Block.create_data_record(cda, changeset, "cda")
+    # Block.create_data_record(cda, changeset, "cda")
     changeset
   end
 end

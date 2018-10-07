@@ -3,9 +3,9 @@ defmodule Block.BlockRepository do
   alias Block.Repo
   alias Block.BlockList
 
-  def insert_block(block) do
+  def insert_block(block, type \\ "insert") do
     %BlockList{}
-    |> BlockList.changeset(block)
+    |> BlockList.changeset(block, type)
     |> Repo.insert
     :ets.insert(:latest_block, {:latest, block})
     :ok

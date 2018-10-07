@@ -9,6 +9,7 @@ defmodule Block.Library.Repo.Migrations.CreateLibWt4 do
       add :type, :string #类型
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:lib_wt4, [:hash])

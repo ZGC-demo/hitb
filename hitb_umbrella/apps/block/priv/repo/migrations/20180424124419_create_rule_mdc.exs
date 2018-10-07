@@ -16,6 +16,7 @@ defmodule Block.Library.Repo.Migrations.CreateRuleMdc do
       add :plat, :string
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:rule_mdc, [:hash])

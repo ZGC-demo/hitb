@@ -10,6 +10,7 @@ defmodule Block.Library.Repo.Migrations.RuleExamine do
       add :update_user, :string
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:rule_examine, [:hash])

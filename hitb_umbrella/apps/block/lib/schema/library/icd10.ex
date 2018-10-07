@@ -20,15 +20,16 @@ defmodule Block.Library.Icd10 do
     field :mcc, :boolean, default: false
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
   def changeset(%Icd10{} = icd10, attrs) do
     changeset = icd10
-      |> cast(attrs, [:code, :name, :icdcc, :icdc, :icdc_az, :adrg, :drg, :cc, :nocc_1, :nocc_a, :nocc_aa, :mcc, :codes, :previous_hash, :hash])
-      |> validate_required([:codes, :name, :adrg, :previous_hash, :hash])
+      |> cast(attrs, [:code, :name, :icdcc, :icdc, :icdc_az, :adrg, :drg, :cc, :nocc_1, :nocc_a, :nocc_aa, :mcc, :codes, :previous_hash, :hash, :datetime])
+      |> validate_required([:codes, :name, :adrg, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(icd10, changeset, "icd10")
+    # Block.create_data_record(icd10, changeset, "icd10")
     changeset
   end
 end

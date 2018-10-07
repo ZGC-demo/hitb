@@ -11,6 +11,7 @@ defmodule Block.Library.RuleSymptom do
     field :update_user, :string
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
@@ -20,10 +21,10 @@ defmodule Block.Library.RuleSymptom do
 
   def changeset(rule_symptom, params \\ %{}) do
     changeset = rule_symptom
-      |> cast(params, [:symptom, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
-      |> validate_required([:symptom, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
+      |> cast(params, [:symptom, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user, :previous_hash, :hash, :datetime])
+      |> validate_required([:symptom, :pharmacys, :create_user, :update_user, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(rule_symptom, changeset, "rule_symptom")
+    # Block.create_data_record(rule_symptom, changeset, "rule_symptom")
     changeset
   end
 

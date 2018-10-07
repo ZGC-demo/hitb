@@ -13,6 +13,7 @@ defmodule Block.Library.Repo.Migrations.EnglishMedicine do
         add :reimbursement_restrictions, :string #报销限制内容
         add :hash, :string
         add :previous_hash, :string
+        add :datetime, :string
         timestamps()
       end
       create unique_index(:english_medicine, [:hash])

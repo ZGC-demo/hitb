@@ -8,6 +8,7 @@ defmodule Block.Stat.Repo.Migrations.CreateClientSaveStat do
       add :data, :string, size: 100000 #数据
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:client_save_stat, [:hash])

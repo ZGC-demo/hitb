@@ -17,6 +17,7 @@ defmodule Block.Library.Repo.Migrations.ChineseMedicine do
       add :type, :string #分类
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:chinese_medicine, [:hash])

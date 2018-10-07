@@ -11,6 +11,7 @@ defmodule Block.Library.Repo.Migrations.RuleSymptom do
         add :update_user, :string
         add :previous_hash, :string
         add :hash, :string
+        add :datetime, :string
         timestamps()
       end
       create unique_index(:rule_symptom, [:hash])

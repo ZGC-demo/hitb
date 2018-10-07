@@ -9,6 +9,7 @@ defmodule Block.Library.Repo.Migrations.CreateDrgRate do
       add :type, :string
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:drg_rate, [:hash])

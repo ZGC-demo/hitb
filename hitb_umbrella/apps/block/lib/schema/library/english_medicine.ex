@@ -14,6 +14,7 @@ defmodule Hitb.Library.EnglishMedicine do
       field :reimbursement_restrictions, :string #报销限制内容
       field :hash, :string
       field :previous_hash, :string
+      field :datetime, :string
       timestamps()
     end
 
@@ -23,7 +24,7 @@ defmodule Hitb.Library.EnglishMedicine do
         |> cast(attrs, [:first_level, :second_level, :third_level, :zh_name, :en_name, :dosage_form, :reimbursement_restrictions, :hash, :previous_hash])
         |> validate_required([:first_level, :second_level, :third_level, :zh_name, :en_name, :dosage_form, :reimbursement_restrictions, :hash, :previous_hash])
         |> unique_constraint(:hash)
-      Block.create_data_record(english_medicine, changeset, "english_medicine")
+      # Block.create_data_record(english_medicine, changeset, "english_medicine")
       changeset
     end
   end

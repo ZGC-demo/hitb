@@ -25,6 +25,7 @@ defmodule Block.Library.RuleAdrg do
     field :plat, :string
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
@@ -34,10 +35,10 @@ defmodule Block.Library.RuleAdrg do
 
   def changeset(rule_adrg, params \\ %{}) do
     changeset = rule_adrg
-      |> cast(params, [:code, :name, :drgs_1, :icd10_a, :icd10_aa, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_a, :icd9_aa, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc, :mdc, :org, :year, :version, :plat, :previous_hash, :hash])
-      |> validate_required([:code, :previous_hash, :hash])
+      |> cast(params, [:code, :name, :drgs_1, :icd10_a, :icd10_aa, :icd10_acc, :icd10_b, :icd10_bb, :icd10_bcc, :icd9_a, :icd9_aa, :icd9_acc, :icd9_b, :icd9_bb, :icd9_bcc, :mdc, :org, :year, :version, :plat, :previous_hash, :hash, :datetime])
+      |> validate_required([:code, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(rule_adrg, changeset, "rule_adrg")
+    # Block.create_data_record(rule_adrg, changeset, "rule_adrg")
     changeset
   end
 end

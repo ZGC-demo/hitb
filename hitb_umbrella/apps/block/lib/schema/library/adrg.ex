@@ -22,15 +22,16 @@ defmodule Block.Library.Adrg do
     field :mdc, :string
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
   def changeset(%Adrg{} = adrg, attrs) do
     changeset = adrg
-      |> cast(attrs, [:code, :name, :drgs_1, :icd10a1, :icd10a2, :icd9a1, :icd9a2, :icd10d1, :icd10d2, :icd9d1, :icd9d2, :mdc, :opers_code, :sf0100, :sf0102, :previous_hash, :hash])
-      |> validate_required([:code, :name, :drgs_1, :mdc, :previous_hash, :hash])
+      |> cast(attrs, [:code, :name, :drgs_1, :icd10a1, :icd10a2, :icd9a1, :icd9a2, :icd10d1, :icd10d2, :icd9d1, :icd9d2, :mdc, :opers_code, :sf0100, :sf0102, :previous_hash, :hash, :datetime])
+      |> validate_required([:code, :name, :drgs_1, :mdc, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(adrg, changeset, "adrg")
+    # Block.create_data_record(adrg, changeset, "adrg")
     changeset
   end
 end

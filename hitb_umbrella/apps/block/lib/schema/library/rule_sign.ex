@@ -12,6 +12,7 @@ defmodule Block.Library.RuleSign do
     field :update_user, :string
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
@@ -21,10 +22,10 @@ defmodule Block.Library.RuleSign do
 
   def changeset(rule_sign, params \\ %{}) do
     changeset = rule_sign
-      |> cast(params, [:sign, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
-      |> validate_required([:sign, :pharmacys, :create_user, :update_user, :previous_hash, :hash])
+      |> cast(params, [:sign, :icd9_a, :icd10_a, :pharmacys, :create_user, :update_user, :previous_hash, :hash, :datetime])
+      |> validate_required([:sign, :pharmacys, :create_user, :update_user, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(rule_sign, changeset, "rule_sign")
+    # Block.create_data_record(rule_sign, changeset, "rule_sign")
     changeset
   end
 

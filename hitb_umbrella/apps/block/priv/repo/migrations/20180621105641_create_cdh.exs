@@ -7,6 +7,7 @@ defmodule Block.Library.Repo.Migrations.Cdh do
       add :value, :string, size: 10485760
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:cdh, [:hash])

@@ -7,6 +7,7 @@ defmodule Block.Library.Repo.Migrations.StatFile do
         add :second_menu, :string
         add :file_name, :string
         add :page_type, :string
+        add :datetime, :string
         timestamps()
       end
     end

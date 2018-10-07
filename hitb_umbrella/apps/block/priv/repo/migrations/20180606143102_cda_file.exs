@@ -7,6 +7,7 @@ defmodule Block.Library.Repo.Migrations.CdaFile do
         add :filename, :string #一级分类
         add :hash, :string
         add :previous_hash, :string
+        add :datetime, :string
         timestamps()
       end
       create unique_index(:cda_file, [:hash])

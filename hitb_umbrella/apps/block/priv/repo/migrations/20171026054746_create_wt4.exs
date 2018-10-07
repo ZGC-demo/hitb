@@ -112,6 +112,7 @@ defmodule Block.Library.Repo.Migrations.CreateWt4 do
       add :zygt, :integer #住院天数>60病历数
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:wt4, [:hash])

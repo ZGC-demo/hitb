@@ -15,6 +15,7 @@ defmodule Block.Library.Repo.Migrations.CreateIcd9 do
       add :year, :string
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:icd9, [:hash])

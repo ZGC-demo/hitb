@@ -10,16 +10,17 @@ defmodule Block.Stat.StatCda do
     field :previous_hash, :string
     field :hash, :string
     field :patient_id, {:array, :string}
+    field :datetime, :string
     timestamps()
   end
 
   @doc false
   def changeset(%StatCda{} = stat_cda, attrs) do
     changeset = stat_cda
-      |> cast(attrs, [:items, :num, :patient_id, :previous_hash, :hash])
-      |> validate_required([:items, :num, :patient_id, :previous_hash, :hash])
+      |> cast(attrs, [:items, :num, :patient_id, :previous_hash, :hash, :datetime])
+      |> validate_required([:items, :num, :patient_id, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(stat_cda, changeset, "stat_cda")
+    # Block.create_data_record(stat_cda, changeset, "stat_cda")
     changeset
   end
 end

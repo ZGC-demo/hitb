@@ -10,6 +10,7 @@ defmodule Block.Server.Repo.Migrations.CreateRecord do
       add :value, :string #新值
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:record, [:hash])

@@ -15,6 +15,7 @@ defmodule Block.Library.RuleCdaIcd9 do
     field :update_user, :string
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
@@ -24,10 +25,10 @@ defmodule Block.Library.RuleCdaIcd9 do
 
   def changeset(rule_cda_icd9, params \\ %{}) do
     changeset = rule_cda_icd9
-      |> cast(params, [:code, :name, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user, :previous_hash, :hash])
-      |> validate_required([:code, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user, :previous_hash, :hash])
+      |> cast(params, [:code, :name, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user, :previous_hash, :hash, :datetime])
+      |> validate_required([:code, :symptoms, :breathe, :body_heat, :sphygums, :blood_pressure, :examines, :create_user, :update_user, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(rule_cda_icd9, changeset, "rule_cda_icd9")
+    # Block.create_data_record(rule_cda_icd9, changeset, "rule_cda_icd9")
     changeset
   end
 

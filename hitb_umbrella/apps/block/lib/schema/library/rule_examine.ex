@@ -11,6 +11,7 @@ defmodule Block.Library.RuleExamine do
     field :update_user, :string
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
@@ -20,10 +21,10 @@ defmodule Block.Library.RuleExamine do
 
   def changeset(rule_examine, params \\ %{}) do
     changeset = rule_examine
-      |> cast(params, [:examine, :icd10_a, :icd10_b, :create_user, :update_user, :previous_hash, :hash])
-      |> validate_required([:examine, :icd10_a, :icd10_b, :create_user, :update_user, :previous_hash, :hash])
+      |> cast(params, [:examine, :icd10_a, :icd10_b, :create_user, :update_user, :previous_hash, :hash, :datetime])
+      |> validate_required([:examine, :icd10_a, :icd10_b, :create_user, :update_user, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(rule_examine, changeset, "rule_examine")
+    # Block.create_data_record(rule_examine, changeset, "rule_examine")
     changeset
   end
 

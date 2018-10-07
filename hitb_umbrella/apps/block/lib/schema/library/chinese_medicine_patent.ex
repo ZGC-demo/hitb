@@ -18,15 +18,16 @@ defmodule Block.Library.ChineseMedicinePatent do
     field :other_limit, :string#其他限制
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
 
   def changeset(%ChineseMedicinePatent{} = chinese_medicine_patent, attrs) do
     changeset = chinese_medicine_patent
-      |> cast(attrs, [:code, :medicine_type, :type, :medicine_code, :name, :name_1, :other_spec, :org_limit, :department_limit, :user_limit, :other_limit, :previous_hash, :hash])
+      |> cast(attrs, [:code, :medicine_type, :type, :medicine_code, :name, :name_1, :other_spec, :org_limit, :department_limit, :user_limit, :other_limit, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(chinese_medicine_patent, changeset, "chinese_medicine_patent")
+    # Block.create_data_record(chinese_medicine_patent, changeset, "chinese_medicine_patent")
     changeset
   end
 end

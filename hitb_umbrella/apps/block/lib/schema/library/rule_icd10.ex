@@ -23,6 +23,7 @@ defmodule Block.Library.RuleIcd10 do
     field :plat, :string
     field :previous_hash, :string
     field :hash, :string
+    field :datetime, :string
     timestamps()
   end
 
@@ -32,10 +33,10 @@ defmodule Block.Library.RuleIcd10 do
 
   def changeset(rule_icd10, params \\ %{}) do
     changeset = rule_icd10
-      |> cast(params, [:code, :name, :codes, :dissect, :icdcc, :icdc, :icdc_az, :adrg, :cc, :nocc_1, :nocc_a, :nocc_aa, :mcc, :org, :year, :version, :plat, :mdc, :previous_hash, :hash])
-      |> validate_required([:code, :previous_hash, :hash])
+      |> cast(params, [:code, :name, :codes, :dissect, :icdcc, :icdc, :icdc_az, :adrg, :cc, :nocc_1, :nocc_a, :nocc_aa, :mcc, :org, :year, :version, :plat, :mdc, :previous_hash, :hash, :datetime])
+      |> validate_required([:code, :previous_hash, :hash, :datetime])
       |> unique_constraint(:hash)
-    Block.create_data_record(rule_icd10, changeset, "rule_icd10")
+    # Block.create_data_record(rule_icd10, changeset, "rule_icd10")
     changeset
   end
 

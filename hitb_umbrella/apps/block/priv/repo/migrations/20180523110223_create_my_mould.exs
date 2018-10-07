@@ -10,6 +10,7 @@ defmodule Block.Edit.Repo.Migrations.CreateMyMould do
       add :is_show, :boolean, default: false
       add :previous_hash, :string
       add :hash, :string
+      add :datetime, :string
       timestamps()
     end
     create unique_index(:my_mould, [:hash])
