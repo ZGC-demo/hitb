@@ -165,7 +165,6 @@ defmodule Block.P2pClientHandler do
           true -> []
         end
       end)|>List.flatten
-    # IO.inspect data
     case data do
       [] -> :timer.send_interval(10000, :ping)
       _ -> GenSocketClient.push(transport, "p2p", "sync_data", %{data: data})
@@ -184,7 +183,7 @@ defmodule Block.P2pClientHandler do
         end)
     end)
     Logger.info("sync finish.")
-    # :timer.send_interval(10000, :ping)
+    :timer.send_interval(10000, :ping)
     {:ok, state}
   end
 
@@ -196,6 +195,49 @@ defmodule Block.P2pClientHandler do
     :timer.send_interval(10000, :ping)
     {:ok, state}
   end
+
+
+  ##向服务器反向同步
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => @add_accounts}}, transport, state) do
+    #取得全部用户名
+    Logger.info("sending all accounts")
+    data = AccountRepository.get_all_accounts()|>Enum.map(fn x -> send(x) end)
+    # #下一个同步
+    GenSocketClient.push(transport, "p2p", @add_accounts, %{data: data})
+    {:ok, state}
+  end
+
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => "add_transactions"}}, transport, state) do
+    Logger.info("sending all transactions")
+    data = TransactionRepository.get_all_transactions()|>Enum.map(fn x -> send(x) end)
+    # #下一个同步
+    GenSocketClient.push(transport, "p2p", @add_transactions, %{data: data})
+    {:ok, state}
+  end
+
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => "add_peers"}}, transport, state) do
+    Logger.info("sync_peer")
+    data = PeerService.getPeers()|>Enum.map(fn x -> x.host end)
+    GenSocketClient.push(transport, "p2p", @add_peers, %{data: data})
+    {:ok, state}
+  end
+
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => "add_other_sync"}}, transport, state) do
+    data = SyncService.get_data()
+    GenSocketClient.push(transport, "p2p", @add_other_sync, %{data: data})
+    {:ok, state}
+  end
+
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => "add_other_data", "data" => data}}, transport, state) do
+    data = Enum.reduce(data, %{}, fn x, acc ->
+      attrs = SyncService.get(x)|>Enum.map(fn x -> send(x) end)
+      Map.put(acc, x, attrs)
+    end)
+    GenSocketClient.push(transport, "p2p", @add_other_data, %{data: data})
+    {:ok, state}
+  end
+
+  ##向服务器反向同步
 
   def handle_reply(_topic, _ref, _payload, transport, state) do
     GenSocketClient.push(transport, "p2p", @all_accounts, %{})
@@ -221,7 +263,6 @@ defmodule Block.P2pClientHandler do
         Process.send_after(self(), {:join, topic}, :timer.seconds(1))
       {:ok, _ref} -> :ok
     end
-
     {:ok, state}
   end
   def handle_info(message, _transport, state) do
@@ -233,6 +274,10 @@ defmodule Block.P2pClientHandler do
     reply = :reply
     new_state = :new_state
     {:reply, reply, new_state}
+  end
+
+  defp send(map) do
+    Map.drop(map, [:id, :__meta__, :__struct__])
   end
 
 end

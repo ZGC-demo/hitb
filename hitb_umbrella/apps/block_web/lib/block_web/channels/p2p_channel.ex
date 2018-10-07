@@ -37,11 +37,6 @@ defmodule BlockWeb.P2pChannel do
     {:reply, {:ok, %{type: @latest_block, data: data}}, socket}
   end
 
-  def handle_in(@add_block, %{"block" => block}, socket) do
-    Enum.each(block, fn x -> BlockRepository.insert_block(x) end)
-    {:reply, {:ok, %{type: "add_transactions", block: block}}, socket}
-  end
-
   def handle_in(@sync_block, _payload, socket) do
     Logger.info("sync_block")
     data = BlockService.get_latest_block()|>send()
@@ -82,21 +77,70 @@ defmodule BlockWeb.P2pChannel do
       attrs = SyncService.get(x)|>Enum.map(fn x -> send(x) end)
       Map.put(acc, x, attrs)
     end)
-    IO.inspect data
     {:reply, {:ok, %{type: "sync_data", data: data}}, socket}
   end
-
-  # def handle_in("acto_sync", payload, socket) do
-  #   PeerRepository.get_all_peers
-  #   |> Enum.each(fn x -> Block.P2pSessionManager.connect(x.host, x.port) end)
-  #   {:reply, {:ok, %{type: "acto_sync", data: []}}, socket}
-  # end
 
   def handle_in(event, payload, socket) do
     Logger.warn("unhandled event #{event} #{inspect payload}")
     {:noreply, socket}
   end
 
+  ####反向同步方法
+  def handle_in(@add_block, %{"block" => block}, socket) do
+    Enum.each(block, fn x -> BlockService.sync_block(x) end)
+    {:reply, {:ok, %{type: "add_accounts"}}, socket}
+  end
+
+  def handle_in(@add_accounts, %{"data" => account}, socket) do
+    usernames = AccountRepository.get_all_usernames()
+    Enum.reject(account, fn x -> x["username"] in usernames end)
+    |>Enum.each(fn x -> AccountRepository.insert_account(x) end)
+    {:reply, {:ok, %{type: "add_transactions"}}, socket}
+  end
+
+  def handle_in("add_transactions", %{"data" => transactions}, socket) do
+    transactions_id = TransactionRepository.get_all_transactions_id()
+    Enum.reject(transactions, fn x -> x["transaction_id"] in transactions_id end)
+    |>Enum.each(fn x -> TransactionRepository.insert_transaction(x) end)
+    {:reply, {:ok, %{type: "add_peers"}}, socket}
+  end
+
+  def handle_in("add_peers", %{"data" => data}, socket) do
+    Enum.each(data, fn x -> Block.PeerService.newPeer(x, "4000") end)
+    {:reply, {:ok, %{type: "add_other_sync"}}, socket}
+  end
+
+  def handle_in("add_other_sync", %{"data" => data}, socket) do
+    local = SyncService.get_data()
+    data = Enum.map(local, fn x ->
+        {key, local_time} = x
+        server_time = Map.get(data, to_string(key))
+        cond do
+          local_time == server_time -> []
+          local_time == "" -> key
+          server_time > local_time -> key
+          true -> []
+        end
+      end)|>List.flatten
+    case data do
+      [] -> {:reply, {:ok, %{type: "over"}}, socket}
+      _ -> {:reply, {:ok, %{type: "add_other_data", data: data}}, socket}
+    end
+  end
+
+  def handle_in("add_other_data", %{"data" => data}, socket) do
+    Map.keys(data)
+    |>Enum.map(fn key ->
+        local = SyncService.get_hashs(key)
+        Map.get(data, key)
+        |>Enum.reject(fn x -> x["hash"] in local end)
+        |>Enum.each(fn x ->
+            SyncService.insert(key, x)
+        end)
+    end)
+    {:reply, {:ok, %{type: "over"}}, socket}
+  end
+  ####反向同步方法
 
   defp send(map) do
     Map.drop(map, [:id, :__meta__, :__struct__])
