@@ -13,7 +13,7 @@ defmodule BlockWeb.PeerController do
 
   def add_peer(conn, %{"peer_data" => peer_data}) do
     %{"host" => host, "port" => port} = peer_data
-    result = P2pSessionManager.connect(host, port)
+    result = P2pSessionManager.connect(host, port, [])
     if result != :ok do
       raise ErrorAlreadyConnected
     else

@@ -1,6 +1,6 @@
 defmodule Block do
-  alias Block.DataRecord
-  alias Block.Repo
+  # alias Block.DataRecord
+  # alias Block.Repo
   alias Block.Time
   @moduledoc """
   Documentation for Block.
@@ -14,7 +14,7 @@ defmodule Block do
   end
 
   #数据日志
-  def create_data_record(attrs, changeset, table) do
+  # def create_data_record(attrs, changeset, table) do
     # if(changeset.errors == [])do
     #   data = Poison.encode!(changeset.changes)
     #   data_record =
@@ -29,7 +29,7 @@ defmodule Block do
     #   |>DataRecord.changeset(data_record)
     #   |>Repo.insert
     # end
-  end
+  # end
 
   def sign do
 
@@ -62,12 +62,12 @@ defmodule Block do
     end
   end
 
-  defp hash(s) do
-    s = :crypto.hash(:sha256, s)
-    |> Base.encode64
+  # defp hash(s) do
+  #   s = :crypto.hash(:sha256, s)
+  #   |> Base.encode64
 
-    [~r/\+/, ~r/ /, ~r/\=/, ~r/\%/, ~r/\//, ~r/\#/, ~r/\$/, ~r/\~/, ~r/\'/, ~r/\@/, ~r/\*/, ~r/\-/]
-    |> Enum.reduce(s, fn x, acc -> Regex.replace(x, acc, "") end)
-  end
+  #   [~r/\+/, ~r/ /, ~r/\=/, ~r/\%/, ~r/\//, ~r/\#/, ~r/\$/, ~r/\~/, ~r/\'/, ~r/\@/, ~r/\*/, ~r/\-/]
+  #   |> Enum.reduce(s, fn x, acc -> Regex.replace(x, acc, "") end)
+  # end
 
 end

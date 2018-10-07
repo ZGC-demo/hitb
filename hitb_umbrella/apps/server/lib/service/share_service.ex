@@ -45,7 +45,8 @@ defmodule Server.ShareService do
         "edit" -> EditService.get_cda()
         "stat" -> StatService.get_stat()
         "library" ->
-          if(file_name in ["mdc", "adrg", "drg", "icd9", "icd10", "中药", "中成药", "诊断规则", "手术规则", "检查规则", "药品规则", "体征规则", "症状规则"])do
+          file_names = ["mdc", "adrg", "drg", "icd9", "icd10", "中药", "中成药", "诊断规则", "手术规则", "检查规则", "药品规则", "体征规则", "症状规则"]
+          if(file_name in file_names)do
             LibraryService.get_last(file_name, "")
           else
             file_name2 = String.split(file_name, ".")|>List.first

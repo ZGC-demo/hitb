@@ -32,9 +32,9 @@ defmodule Hitb.Convert do
           |>Enum.reduce(%{}, fn k, acc ->
               v = Map.get(x, k)
               cond do
-                is_nil(v) -> Map.put(acc, k, Rand.rand(k, nil))
+                is_nil(v) -> Map.put(acc, k, :rand.uniform())
                 is_float(v) ->  Map.put(acc, k, Float.round(v, 4))
-                is_integer(v) ->  Map.put(acc, k, Rand.rand(k, nil))
+                is_integer(v) ->  Map.put(acc, k, :rand.uniform())
                 true -> Map.put(acc, k, v)
               end
           end)

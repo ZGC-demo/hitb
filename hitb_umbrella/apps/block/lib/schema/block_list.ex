@@ -15,14 +15,14 @@ defmodule Block.BlockList do
   end
 
   @doc false
-  def changeset(%BlockList{} = block_list, attrs, type) do
+  def changeset(%BlockList{} = block_list, attrs, _type) do
     changeset = block_list
     |> cast(attrs, [:index, :previous_hash, :timestamp, :data, :hash, :generateAdress])
     |> validate_required([:index, :previous_hash, :timestamp, :data, :hash, :generateAdress])
     |> unique_constraint(:index)
-    if(type == "insert")do
-      Block.create_data_record(block_list, changeset, "block_list")
-    end
+    # if(type == "insert")do
+      # Block.create_data_record(block_list, changeset, "block_list")
+    # end
     changeset
   end
 end
