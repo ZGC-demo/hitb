@@ -69,12 +69,7 @@ defmodule Block.P2pClientHandler do
 
   def handle_joined(topic, _payload, transport, state) do
     Logger.info("joined the topic #{topic}.")
-    ip =
-      case :ets.lookup(:local_ip, :local_ip) do
-        [] -> []
-        local_ip -> local_ip|>List.last|>elem(1)
-      end
-    GenSocketClient.push(transport, "p2p", @latest_block, %{ip: ip})
+    GenSocketClient.push(transport, "p2p", @sync_peer, %{})
     {:ok, state}
   end
 
@@ -102,6 +97,17 @@ defmodule Block.P2pClientHandler do
   def handle_reply("p2p", _ref, %{"response" => %{"type" => @connection_error}}, _transport, state) do
     Logger.info("connection to server failed...")
     P2pSessionManager.terminate_session(self())
+    {:ok, state}
+  end
+
+  def handle_reply(_topic, _ref, %{"response" => %{"type" => @sync_peer, "data" => data}}, transport, state) do
+    Enum.each(data, fn x -> Block.PeerService.newPeer(x, "4000") end)
+    ip =
+      case :ets.lookup(:local_ip, :local_ip) do
+        [] -> []
+        local_ip -> local_ip|>List.last|>elem(1)
+      end
+    GenSocketClient.push(transport, "p2p", @latest_block, %{ip: ip})
     {:ok, state}
   end
 
@@ -190,16 +196,6 @@ defmodule Block.P2pClientHandler do
     :timer.send_interval(10000, :ping)
     {:ok, state}
   end
-
-  def handle_reply(_topic, _ref, %{"response" => %{"type" => @sync_peer, "data" => data}}, _transport, state) do
-    Enum.each(data, fn x -> Block.PeerService.newPeer(x, "4000") end)
-    PeerService.getPeers()
-    |>Enum.each(fn x -> Block.P2pSessionManager.connect(x.host, x.port, []) end)
-    Logger.warn("Sync over.")
-    :timer.send_interval(10000, :ping)
-    {:ok, state}
-  end
-
 
   ##向服务器反向同步
   def handle_reply(_topic, _ref, %{"response" => %{"type" => @add_accounts}}, transport, state) do

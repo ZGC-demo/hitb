@@ -33,15 +33,15 @@ defmodule BlockWeb.P2pChannel do
     {:noreply, socket}
   end
 
+  def handle_in(@sync_block, _payload, socket) do
+    Logger.info("sync_block")
+    data = BlockService.get_latest_block()|>send()
+    {:reply, {:ok, %{type: @sync_block, data: data}}, socket}
+  end
+
   def handle_in(@latest_block, %{"ip" => ip}, socket) do
     Enum.each(ip, fn x -> PeerService.newPeer(x["host"], x["port"]) end)
     Logger.info("sending latest block")
-    data = BlockService.get_latest_block()|>send()
-    {:reply, {:ok, %{type: @latest_block, data: data}}, socket}
-  end
-
-  def handle_in(@sync_block, _payload, socket) do
-    Logger.info("sync_block")
     data = BlockService.get_latest_block()|>send()
     {:reply, {:ok, %{type: @latest_block, data: data}}, socket}
   end
