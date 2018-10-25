@@ -197,6 +197,7 @@ defmodule HitbserverWeb.Router do
     get "/get_share", ShareController, :get_share
     get "/insert_share", ShareController, :insert_share
     post "/share", ShareController, :share
+    post "/login", PageController, :login
   end
 
   scope "/stat", HitbserverWeb do

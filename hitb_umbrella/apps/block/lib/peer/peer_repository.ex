@@ -8,7 +8,6 @@ defmodule Block.PeerRepository do
   end
 
   def insert_peer(peer) do
-    IO.inspect %Peer{}|> Peer.changeset(peer)
     %Peer{}
     |> Peer.changeset(peer)
     |> Repo.insert

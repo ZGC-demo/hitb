@@ -122,7 +122,7 @@ defmodule Block.P2pClientHandler do
       latest_block.index < data["index"] ->
         GenSocketClient.push(transport, "p2p", @all_blocks, %{})
       latest_block.index == data["index"] ->
-        :timer.send_interval(10000, :ping)
+        :timer.send_interval(600000, :ping)
     end
     {:ok, state}
   end
@@ -176,7 +176,7 @@ defmodule Block.P2pClientHandler do
         end
       end)|>List.flatten
     case data do
-      [] -> :timer.send_interval(10000, :ping)
+      [] -> :timer.send_interval(600000, :ping)
       _ -> GenSocketClient.push(transport, "p2p", @sync_data, %{data: data})
     end
     {:ok, state}
@@ -193,7 +193,7 @@ defmodule Block.P2pClientHandler do
         end)
     end)
     Logger.info("sync finish.")
-    :timer.send_interval(10000, :ping)
+    :timer.send_interval(600000, :ping)
     {:ok, state}
   end
 
